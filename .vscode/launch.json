@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run Plugin",
+            "request": "launch",
+            "mainClass": "com.sithclanplugin.SithClanPluginTest",
+            "vmArgs": "-ea"
+        }
+    ]
+}
