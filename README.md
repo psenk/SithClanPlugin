@@ -1,2 +1,5 @@
-# Example
-An example greeter plugin
+# Sith Clan Plugin
+
+TODO:
+- event schedule viewer
+- clan member viewer
