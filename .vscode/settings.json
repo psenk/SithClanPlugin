@@ -1,4 +1,8 @@
 {
+<<<<<<< HEAD
+=======
+    "java.jdt.ls.java.home": "F:/Java/JDK 21",
+>>>>>>> 36afc96dd74cfc5f382d53074b6f8f87d0f42542
     "java.configuration.runtimes": [
         {
             "name": "JavaSE-11",
