@@ -1,5 +1,14 @@
 {
+    "java.jdt.ls.java.home": "F:/Java/JDK 21",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-11",
+            "path": "F:/Java/JDK 11",
+            "default": true
+        }
+    ],
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "interactive",
-    "java.jdt.ls.lombokSupport.enabled": true
+    "java.jdt.ls.lombokSupport.enabled": true,
+    "java.debug.settings.onBuildFailureProceed": true
 }
