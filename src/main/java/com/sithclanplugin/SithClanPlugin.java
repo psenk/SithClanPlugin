@@ -1,4 +1,4 @@
-package com.example;
+package com.sithclanplugin;
 
 import com.google.inject.Provides;
 import javax.inject.Inject;
@@ -14,26 +14,26 @@ import net.runelite.client.plugins.PluginDescriptor;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Example"
+	name = "Sith Clan Plugin"
 )
-public class ExamplePlugin extends Plugin
+public class SithClanPlugin extends Plugin
 {
 	@Inject
 	private Client client;
 
 	@Inject
-	private ExampleConfig config;
+	private SithClanPluginConfig config;
 
 	@Override
 	protected void startUp() throws Exception
 	{
-		log.debug("Example started!");
+		log.debug("Sith Clan Plugin started!");
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
-		log.debug("Example stopped!");
+		log.debug("Sith Clan Plugin stopped!");
 	}
 
 	@Subscribe
@@ -41,13 +41,13 @@ public class ExamplePlugin extends Plugin
 	{
 		if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
 		{
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Example says " + config.greeting(), null);
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Sith Clan Plugin says " + config.greeting(), null);
 		}
 	}
 
 	@Provides
-	ExampleConfig provideConfig(ConfigManager configManager)
+	SithClanPluginConfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(ExampleConfig.class);
+		return configManager.getConfig(SithClanPluginConfig.class);
 	}
 }
