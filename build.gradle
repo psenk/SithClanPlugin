@@ -13,6 +13,12 @@ repositories {
 	mavenCentral()
 }
 
+test {
+	testLogging {
+		showStandardStreams = true
+	}
+}
+
 def runeLiteVersion = 'latest.release'
 def pluginMainClass = 'com.sithclanplugin.SithClanPluginTest'
 
