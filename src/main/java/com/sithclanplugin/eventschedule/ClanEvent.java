@@ -15,12 +15,12 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Event {
+public class ClanEvent {
 
     String eventTitle;
     String eventTime;
     String eventHost = "";
-    ArrayList<String> eventMiscInfo = new ArrayList<>();
+    ArrayList<String> eventMiscInfo;
     String eventLocation = "";
     boolean eventRepeated = false;
 }
