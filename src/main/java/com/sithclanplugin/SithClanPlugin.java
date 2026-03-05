@@ -2,9 +2,11 @@ package com.sithclanplugin;
 
 import java.awt.image.BufferedImage;
 
+import javax.inject.Inject;
+
 import com.google.inject.Provider;
 import com.google.inject.Provides;
-import javax.inject.Inject;
+
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
