@@ -11,21 +11,21 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.sithclanplugin.eventschedule.ClanEvent;
-import com.sithclanplugin.eventschedule.EventSchedule;
+import com.sithclanplugin.eventschedule.SithClanEvent;
+import com.sithclanplugin.eventschedule.SithClanEventSchedule;
 
 public class ClanScheduleTests {
 
-    private static EventSchedule eventSchedule;
+    private static SithClanEventSchedule eventSchedule;
     private static ArrayList<String> testSchedule;
-    private static ClanEvent testEvent;
+    private static SithClanEvent testEvent;
     private static final String testSchedulePath = "src\\test\\resources\\testschedule.txt";
 
     @BeforeClass
     public static void setup() {
-        eventSchedule = new EventSchedule();
+        eventSchedule = new SithClanEventSchedule();
         testSchedule = eventSchedule.readScheduleFromFile(testSchedulePath);
-        testEvent = new ClanEvent("Mahogany Homes", "12:00 PM", "Sasa254", new ArrayList<>(), ":earth_americas: W491",
+        testEvent = new SithClanEvent("Mahogany Homes", "12:00 PM", "Sasa254", new ArrayList<>(), ":earth_americas: W491",
                 true);
 
     }
