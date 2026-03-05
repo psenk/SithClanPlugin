@@ -16,11 +16,11 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class EventSchedule {
+public class SithClanEventSchedule {
 
-    private Map<String, ArrayList<ClanEvent>> schedule;
+    private Map<String, ArrayList<SithClanEvent>> schedule;
 
-    public EventSchedule() {
+    public SithClanEventSchedule() {
         schedule = new LinkedHashMap<>();
     }
 
@@ -38,12 +38,12 @@ public class EventSchedule {
             String line = scheduleList.get(i);
             if (line.startsWith("--")) {
                 eventDate = line.substring(2).trim();
-                ArrayList<ClanEvent> eventsForToday = new ArrayList<>();
+                ArrayList<SithClanEvent> eventsForToday = new ArrayList<>();
                 this.schedule.put(eventDate, eventsForToday);
                 continue;
             }
             if (line.startsWith("-")) {
-                ClanEvent newEvent = new ClanEvent();
+                SithClanEvent newEvent = new SithClanEvent();
                 ArrayList<String> eventMiscInfo = new ArrayList<>();
 
                 newEvent.setEventTitle(line.substring(1).trim());
@@ -106,10 +106,10 @@ public class EventSchedule {
         // TODO: remove later
         ArrayList<String> schedule = readScheduleFromFile("src\\test\\resources\\testschedule.txt");
         this.inputSchedule(schedule);
-        for (Map.Entry<String, ArrayList<ClanEvent>> entry : this.schedule.entrySet()) {
+        for (Map.Entry<String, ArrayList<SithClanEvent>> entry : this.schedule.entrySet()) {
             System.out.println("Date: " + entry.getKey());
             System.out.println("Events: ");
-            for (ClanEvent clanEvent : entry.getValue()) {
+            for (SithClanEvent clanEvent : entry.getValue()) {
                 System.out.println(" - Event Title: " + clanEvent.eventTitle);
                 System.out.println(" - Event Time: " + clanEvent.eventTime);
                 System.out.println(" - Event Host: " + clanEvent.eventHost);
