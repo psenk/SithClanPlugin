@@ -3,9 +3,18 @@ package com.sithclanplugin.eventschedule;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.inject.Inject;
+
+import com.google.inject.Singleton;
+import com.sithclanplugin.SithClanPluginConfig;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,12 +25,21 @@ import lombok.Setter;
 
 @Setter
 @Getter
+@Singleton
 public class SithClanEventSchedule {
 
     private Map<String, ArrayList<SithClanEvent>> schedule;
+    private HttpClient httpClient;
+    private SithClanPluginConfig config;
 
-    public SithClanEventSchedule() {
+    private static final String EVENT_SCHEDULE_REQUEST_URI = "http://127.0.0.1:8787/api/testschedule";
+    private static final String EVENT_SCHEDULE_POST_URI = "http://127.0.0.1:8787/api/eventschedule";
+
+    @Inject
+    public SithClanEventSchedule(SithClanPluginConfig config) {
+        this.config = config;
         schedule = new LinkedHashMap<>();
+        httpClient = HttpClient.newHttpClient();
     }
 
     /**
@@ -122,4 +140,33 @@ public class SithClanEventSchedule {
         }
     }
 
+    public HttpResponse<String> getEventSchedule() {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(EVENT_SCHEDULE_REQUEST_URI))
+                .GET()
+                .build();
+
+        try {
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public HttpResponse<String> postEventSchedule(String data) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(EVENT_SCHEDULE_POST_URI))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + config.apiKey())
+                .POST(HttpRequest.BodyPublishers.ofString(data))
+                .build();
+
+        try {
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

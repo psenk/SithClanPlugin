@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import com.google.inject.Provider;
 import com.google.inject.Provides;
+import com.sithclanplugin.ui.SithClanPluginPanel;
 
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -34,17 +35,20 @@ public class SithClanPlugin extends Plugin {
 
 	private NavigationButton uiNavigationButton;
 
+	private static final String PLUGIN_ICON_PATH = "\\resources\\icon.png";
+	private static final String PLUGIN_TOOLTIP = "Sith Clan Plugin";
+
 	@Override
 	protected void startUp() throws Exception {
-		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "icon.png");
 
+		// navigation bar plugin icon
+		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), PLUGIN_ICON_PATH);
 		uiNavigationButton = NavigationButton.builder()
-				.tooltip("Sith Clan Plugin")
+				.tooltip(PLUGIN_TOOLTIP)
 				.icon(icon)
 				.priority(6)
 				.panel(uiPanel.get())
 				.build();
-
 		clientToolbar.addNavigation(uiNavigationButton);
 	}
 
