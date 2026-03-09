@@ -1,5 +1,6 @@
 package com.sithclanplugin.eventschedule;
 
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.inject.Singleton;
 import com.sithclanplugin.SithClanPluginConfig;
 
@@ -25,7 +27,6 @@ import lombok.Setter;
 @Singleton
 public class SithClanEventSchedule {
 
-    private String rawSchedule;
     private HttpClient httpClient;
     private SithClanPluginConfig config;
     private ArrayList<SithClanDaySchedule> schedule;
@@ -49,24 +50,18 @@ public class SithClanEventSchedule {
     /**
      * Uses HTTP GET request to obtain event schedule
      * 
-     * @return event schedule as String
+     * @return String event schedule
      */
-    public String getEventSchedule() {
-        // rate limiting, 5 minutes
-        if (lastScheduleFetch != null
-                && LocalDateTime.now().isBefore(lastScheduleFetch.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES))) {
-            return this.getRawSchedule();
-        }
-        
+    private String getEventSchedule() {
+        // build HTTP GET request
         HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create(EVENT_SCHEDULE_GET_URI))
-        .GET()
-        .build();
+                .uri(URI.create(EVENT_SCHEDULE_GET_URI))
+                .GET()
+                .build();
         try {
+            // send request and return response
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            this.rawSchedule = response.body();
-            this.lastScheduleFetch = LocalDateTime.now();
-            return this.getRawSchedule();
+            return response.body();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -76,23 +71,51 @@ public class SithClanEventSchedule {
     /**
      * Uses HTTP POST request to post event schedule
      * 
-     * @param data event schedule as String
-     * @return HTTPResponse
+     * @param jsonData String event schedule
+     * @return String HTTP response body
      */
-    public HttpResponse<String> postEventSchedule(String data) {
+    private String postEventSchedule(String jsonData) {
+        // build HTTP POST request
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(EVENT_SCHEDULE_POST_URI))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + config.apiKey())
-                .POST(HttpRequest.BodyPublishers.ofString(data))
+                .POST(HttpRequest.BodyPublishers.ofString(jsonData))
                 .build();
-
         try {
-            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            // send request and return response
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.body();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Returns event schedule for display on panel
+     * Includes 5 min rate limiting
+     */
+    public void parseScheduleFromGet() {
+        // rate limiting, 5 minutes
+        // if fetched recently, return
+        // this.schedule still has data from last fetch
+        if (lastScheduleFetch != null
+                && LocalDateTime.now().isBefore(lastScheduleFetch.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES))) {
+            return;
+        }
+
+        // get fresh schedule
+        String jsonSchedule = getEventSchedule();
+        if (jsonSchedule == null)
+            return;
+        // convert schedule to JSON
+        Gson gson = new Gson();
+        // java generic type erasure workaround
+        Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
+        }.getType();
+        this.schedule = gson.fromJson(jsonSchedule, scheduleType);
+        this.lastScheduleFetch = LocalDateTime.now();
     }
 
     /**
@@ -102,8 +125,8 @@ public class SithClanEventSchedule {
      * @return String HTTPResponse
      */
     public String parseScheduleForPost(String text) {
-        // prevent data accumulation
-        schedule.clear();
+        ArrayList<SithClanDaySchedule> newSchedule = new ArrayList<>();
+
         // split input into list of strings
         String[] scheduleInput = text.split("\\r?\\n");
         // tracking states
@@ -119,7 +142,7 @@ public class SithClanEventSchedule {
             if (line.startsWith("--")) {
                 // next day in list
                 if (currentDay != null) {
-                    schedule.add(currentDay);
+                    newSchedule.add(currentDay);
                 }
                 // first day
                 currentDay = new SithClanDaySchedule();
@@ -164,23 +187,19 @@ public class SithClanEventSchedule {
         }
         // add last day
         if (currentDay != null) {
-            schedule.add(currentDay);
+            newSchedule.add(currentDay);
         }
 
         // storing schedule as JSON object
         Gson gson = new Gson();
-        String data = gson.toJson(schedule);
+        String data = gson.toJson(newSchedule);
 
         // posting schedule online
-        HttpResponse<String> response = postEventSchedule(data);
+        String response = postEventSchedule(data);
         if (response == null) {
             return "Post request failed.";
         }
-        return response.body();
-    }
-
-    public String parseScheduleFromGet(String text) {
-        getEventSchedule();
-        return "";
+        this.schedule = newSchedule;
+        return response;
     }
 }
