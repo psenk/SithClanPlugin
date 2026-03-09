@@ -21,6 +21,7 @@ import net.runelite.client.util.ImageUtil;
 
 @PluginDescriptor(name = "Sith Clan Plugin", description = "Enable the Sith Clan Plugin")
 public class SithClanPlugin extends Plugin {
+
 	@Inject
 	private Client client;
 
@@ -35,7 +36,7 @@ public class SithClanPlugin extends Plugin {
 
 	private NavigationButton uiNavigationButton;
 
-	private static final String PLUGIN_ICON_PATH = "\\resources\\icon.png";
+	private static final String PLUGIN_ICON_PATH = "./resources/icon.png";
 	private static final String PLUGIN_TOOLTIP = "Sith Clan Plugin";
 
 	@Override
