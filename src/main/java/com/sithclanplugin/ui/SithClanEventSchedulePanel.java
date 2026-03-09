@@ -44,8 +44,15 @@ public class SithClanEventSchedulePanel extends JPanel {
         // get event schedule action
         scheduleGetEventScheduleButton.addActionListener((new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                eventSchedule.getEventSchedule();
+                displaySchedule();
             }
         }));
+    }
+
+    private void displaySchedule() {
+        if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty()) {
+            eventSchedule.parseScheduleFromGet();
+        }
+        System.out.println(eventSchedule.getSchedule());
     }
 }
