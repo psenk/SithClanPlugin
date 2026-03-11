@@ -1,4 +1,4 @@
-package com.sithclanplugin.ui;
+package sithclanplugin.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -19,10 +19,10 @@ import javax.swing.JTextArea;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.sithclanplugin.eventschedule.SithClanEventSchedule;
 
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
+import sithclanplugin.eventschedule.SithClanEventSchedule;
 
 @Singleton
 public class SithClanSenatePanel extends JPanel {

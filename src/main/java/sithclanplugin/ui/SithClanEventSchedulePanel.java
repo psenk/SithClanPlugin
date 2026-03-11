@@ -1,4 +1,4 @@
-package com.sithclanplugin.ui;
+package sithclanplugin.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -12,7 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.google.inject.Inject;
-import com.sithclanplugin.eventschedule.SithClanEventSchedule;
+
+import sithclanplugin.eventschedule.SithClanEventSchedule;
 
 public class SithClanEventSchedulePanel extends JPanel {
 

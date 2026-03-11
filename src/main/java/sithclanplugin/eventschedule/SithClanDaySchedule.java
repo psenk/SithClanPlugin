@@ -1,4 +1,4 @@
-package com.sithclanplugin.eventschedule;
+package sithclanplugin.eventschedule;
 
 import java.util.ArrayList;
 

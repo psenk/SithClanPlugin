@@ -1,9 +1,8 @@
-package com.sithclanplugin;
-
-import com.sithclanplugin.SithClanPlugin;
+package sithclanplugin;
 
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
+import sithclanplugin.SithClanPlugin;
 
 public class SithClanPluginTest
 {

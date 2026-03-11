@@ -1,4 +1,4 @@
-package com.sithclanplugin.eventschedule;
+package sithclanplugin.eventschedule;
 
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -13,10 +13,10 @@ import javax.inject.Inject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Singleton;
-import com.sithclanplugin.SithClanPluginConfig;
 
 import lombok.Getter;
 import lombok.Setter;
+import sithclanplugin.SithClanPluginConfig;
 
 /**
  * Event Schedule Object
@@ -34,6 +34,7 @@ public class SithClanEventSchedule {
 
     private static final String EVENT_SCHEDULE_GET_URI = "http://127.0.0.1:8787/api/eventschedule";
     private static final String EVENT_SCHEDULE_POST_URI = "http://127.0.0.1:8787/api/eventschedule/post";
+    private static final String LOCAL_FOLDER_PATH = "%userprofile%/.runelite/sithclanplugin";
     private static final int SCHEDULE_FETCH_COOLDOWN_MINUTES = 5;
 
     // TODO: save schedule locally for faster loading
@@ -202,4 +203,6 @@ public class SithClanEventSchedule {
         this.schedule = newSchedule;
         return response;
     }
+
+    
 }

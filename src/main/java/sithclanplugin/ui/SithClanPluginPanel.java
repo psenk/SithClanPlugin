@@ -1,4 +1,4 @@
-package com.sithclanplugin.ui;
+package sithclanplugin.ui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;

@@ -20,7 +20,7 @@ test {
 }
 
 def runeLiteVersion = 'latest.release'
-def pluginMainClass = 'com.sithclanplugin.SithClanPluginTest'
+def pluginMainClass = 'sithclanplugin.SithClanPluginTest'
 
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
@@ -34,7 +34,7 @@ dependencies {
 	testImplementation group: 'net.runelite', name:'jshell', version: runeLiteVersion
 }
 
-group = 'com.sithclanplugin'
+group = 'sithclanplugin'
 version = '1.0-SNAPSHOT'
 
 tasks.withType(JavaCompile).configureEach {
