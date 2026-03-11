@@ -40,8 +40,8 @@ public class SithClanSenatePanel extends JPanel {
     private static final String UPDATE_SCHEDULE_BUTTON = "Update Schedule";
     private static final String UPDATE_BUTTON = "Update";
     private static final String TEXT_AREA_DEFAULT = "Post Event Schedule Here";
-    private static final String ARROW_RIGHT_PATH = "../resources/arrow_right.png";
-    private static final String ARROW_DOWN_PATH = "../resources/arrow_down.png";
+    private static final String ARROW_RIGHT_PATH = "arrow_right.png";
+    private static final String ARROW_DOWN_PATH = "arrow_down.png";
 
     @Inject
     SithClanSenatePanel(SithClanEventSchedule eventSchedule) {
