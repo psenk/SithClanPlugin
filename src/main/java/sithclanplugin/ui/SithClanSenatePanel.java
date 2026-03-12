@@ -35,7 +35,7 @@ public class SithClanSenatePanel extends JPanel {
     private SithClanEventSchedule eventSchedule;
 
     private static final String SENATE_OPTIONS_LABEL = "Senate Options";
-    private static final String UPDATE_SCHEDULE_BUTTON = "Update Schedule";
+    private static final String UPDATE_SCHEDULE_LABEL = "Update Schedule";
     private static final String UPDATE_BUTTON = "Update";
     private static final String TEXT_AREA_DEFAULT = "Post Event Schedule Here";
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
@@ -50,14 +50,14 @@ public class SithClanSenatePanel extends JPanel {
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // main panel label at top
+        // title panel label at top
         senatePanelLabel = new JLabel(SENATE_OPTIONS_LABEL);
         senatePanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         this.add(senatePanelLabel);
         this.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // label to collapse/expand schedule panel
-        senatePostScheduleLabel = new JLabel(UPDATE_SCHEDULE_BUTTON);
+        // label for schedule panel
+        senatePostScheduleLabel = new JLabel(UPDATE_SCHEDULE_LABEL);
         senatePostScheduleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         senatePostScheduleLabel.setOpaque(true);
         senatePostScheduleLabel.setIcon(rightArrowIcon);
@@ -78,14 +78,6 @@ public class SithClanSenatePanel extends JPanel {
         senatePostScheduleButton = new JButton(UPDATE_BUTTON);
         senatePostScheduleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // adding to main panel
-        senatePostSchedulePanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        senatePostSchedulePanel.add(senatePostScheduleScrollPane);
-        senatePostSchedulePanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        senatePostSchedulePanel.add(senatePostScheduleButton);
-        senatePostSchedulePanel.setVisible(false);
-        this.add(senatePostSchedulePanel);
-
         // expand/collapse event schedule options
         senatePostScheduleLabel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -99,6 +91,16 @@ public class SithClanSenatePanel extends JPanel {
                 repaint();
             }
         });
+
+        // adding to main panel
+        senatePostSchedulePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        senatePostSchedulePanel.add(senatePostScheduleScrollPane);
+
+        senatePostSchedulePanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        senatePostSchedulePanel.add(senatePostScheduleButton);
+
+        senatePostSchedulePanel.setVisible(false);
+        this.add(senatePostSchedulePanel);
 
         // post event schedule action
         senatePostScheduleButton.addActionListener(e -> {
