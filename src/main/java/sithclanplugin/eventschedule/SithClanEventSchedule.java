@@ -1,10 +1,13 @@
 package sithclanplugin.eventschedule;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -16,11 +19,14 @@ import com.google.inject.Singleton;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.runelite.client.RuneLite;
 import sithclanplugin.SithClanPluginConfig;
 
 /**
  * Event Schedule Object
  */
+
+// TODO: split file operations into separate class
 
 @Setter
 @Getter
@@ -31,18 +37,22 @@ public class SithClanEventSchedule {
     private SithClanPluginConfig config;
     private ArrayList<SithClanDaySchedule> schedule;
     private LocalDateTime lastScheduleFetch;
+    private final File localDirectory;
+    private final File storedScheduleFile;
 
     private static final String EVENT_SCHEDULE_GET_URI = "http://127.0.0.1:8787/api/eventschedule";
     private static final String EVENT_SCHEDULE_POST_URI = "http://127.0.0.1:8787/api/eventschedule/post";
-    private static final String LOCAL_FOLDER_PATH = "%userprofile%/.runelite/sithclanplugin";
+    private static final String LOCAL_DIRECTORY_NAME = "sithclanplugin";
+    private static final String STORED_SCHEDULE_NAME = "sithclaneventschedule.txt";
     private static final int SCHEDULE_FETCH_COOLDOWN_MINUTES = 5;
 
-    // TODO: save schedule locally for faster loading
     // TODO: schedule expiration?
 
     @Inject
     public SithClanEventSchedule(SithClanPluginConfig config) {
         this.config = config;
+        this.localDirectory = new File(RuneLite.RUNELITE_DIR, LOCAL_DIRECTORY_NAME);
+        this.storedScheduleFile = new File(localDirectory, STORED_SCHEDULE_NAME);
         schedule = new ArrayList<>();
         lastScheduleFetch = null;
         httpClient = HttpClient.newHttpClient();
@@ -94,17 +104,17 @@ public class SithClanEventSchedule {
     }
 
     /**
-     * Returns event schedule for display on panel
+     * Gets event schedule for display on panel
      * Includes 5 min rate limiting
+     * Saves schedule locally
      */
     public void parseScheduleFromGet() {
         // rate limiting, 5 minutes
         // if fetched recently, return
         // this.schedule still has data from last fetch
         if (lastScheduleFetch != null
-                && LocalDateTime.now().isBefore(lastScheduleFetch.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES))) {
+                && LocalDateTime.now().isBefore(lastScheduleFetch.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES)))
             return;
-        }
 
         // get fresh schedule
         String jsonSchedule = getEventSchedule();
@@ -116,16 +126,20 @@ public class SithClanEventSchedule {
         Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
         }.getType();
         this.schedule = gson.fromJson(jsonSchedule, scheduleType);
+        saveScheduleLocally(jsonSchedule);
         this.lastScheduleFetch = LocalDateTime.now();
     }
 
     /**
      * Takes String input and converts to JSON format for posting
+     * Saves schedule locally
      * 
      * @param text event schedule as String input from plugin
      * @return String HTTPResponse
      */
     public String parseScheduleForPost(String text) {
+        if (text.isBlank())
+            return "No text.";
         ArrayList<SithClanDaySchedule> newSchedule = new ArrayList<>();
 
         // split input into list of strings
@@ -142,9 +156,9 @@ public class SithClanEventSchedule {
             // event date and new day
             if (line.startsWith("--")) {
                 // next day in list
-                if (currentDay != null) {
+                if (currentDay != null)
                     newSchedule.add(currentDay);
-                }
+
                 // first day
                 currentDay = new SithClanDaySchedule();
                 currentDay.setDate(line.substring(2));
@@ -153,43 +167,45 @@ public class SithClanEventSchedule {
             // event title and new event
             else if (line.startsWith("-")) {
                 // add last event to day
-                if (currentEvent != null) {
+                if (currentEvent != null)
                     currentDay.getEvents().add(currentEvent);
-                }
+
                 // first event
                 currentEvent = new SithClanEvent();
                 currentEvent.setEventTitle(line.substring(1));
                 currentEvent.setEventMiscInfo(new ArrayList<>());
             }
             // event time
-            else if (currentEvent != null && currentEvent.getEventTime() == null) {
+            else if (currentEvent != null && currentEvent.getEventTime() == null)
                 currentEvent.setEventTime(line);
-            }
+
             // event host (optional)
-            else if (line.startsWith("Hosted by:")) {
+            else if (line.startsWith("Hosted by:"))
                 currentEvent.setEventHost(line.substring(11));
-            }
+
             // event location
-            else if (line.startsWith("🌎")) {
+            else if (line.startsWith("🌎"))
                 currentEvent.setEventLocation(line);
-            }
+
             // event repetition (optional)
-            else if (line.startsWith("**")) {
+            else if (line.startsWith("**"))
                 currentEvent.setEventRepeated(true);
-            }
+
             // misc event info
-            else {
+            else
                 currentEvent.getEventMiscInfo().add(line);
-            }
+
         }
         // add last event
-        if (currentEvent != null) {
+        if (currentEvent != null)
             currentDay.getEvents().add(currentEvent);
-        }
+
         // add last day
-        if (currentDay != null) {
+        if (currentDay != null)
             newSchedule.add(currentDay);
-        }
+
+        if (newSchedule.isEmpty())
+            return "Valid schedule input not found.";
 
         // storing schedule as JSON object
         Gson gson = new Gson();
@@ -197,12 +213,41 @@ public class SithClanEventSchedule {
 
         // posting schedule online
         String response = postEventSchedule(data);
-        if (response == null) {
+        if (response == null)
             return "Post request failed.";
-        }
+
         this.schedule = newSchedule;
+        saveScheduleLocally(data);
         return response;
     }
 
-    
+    /**
+     * Gets event schedule from local file for display on panel
+     */
+    public void parseScheduleFromFile() {
+        try {
+            String jsonSchedule = new String(Files.readAllBytes(storedScheduleFile.toPath()));
+            if (jsonSchedule.isBlank())
+                return;
+            Gson gson = new Gson();
+            Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
+            }.getType();
+            this.schedule = gson.fromJson(jsonSchedule, scheduleType);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Saves schedule to local file for cached loading
+     * 
+     * @param data String Schedule as JSON string
+     */
+    private void saveScheduleLocally(String data) {
+        try (FileWriter fileWriter = new FileWriter(storedScheduleFile)) {
+            fileWriter.write(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
