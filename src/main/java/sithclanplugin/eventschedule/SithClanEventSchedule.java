@@ -12,9 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.Popup;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -29,8 +27,6 @@ import sithclanplugin.SithClanPluginConfig;
 /**
  * Event Schedule Object
  */
-
-// TODO: split file operations into separate class
 
 @Setter
 @Getter
@@ -49,8 +45,6 @@ public class SithClanEventSchedule {
     private static final String LOCAL_DIRECTORY_NAME = "sithclanplugin";
     private static final String STORED_SCHEDULE_NAME = "sithclaneventschedule.txt";
     private static final int SCHEDULE_FETCH_COOLDOWN_MINUTES = 5;
-
-    // TODO: schedule expiration?
 
     @Inject
     public SithClanEventSchedule(SithClanPluginConfig config) {
