@@ -26,7 +26,7 @@ dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
 
 	compileOnly 'org.projectlombok:lombok:1.18.36'
-	compileOnly 'com.google.code.gson:gson:2.10.1'
+	compileOnly 'com.google.code.gson:gson:2.10.1.redhat-00005'
 	annotationProcessor 'org.projectlombok:lombok:1.18.36'
 
 	testImplementation 'junit:junit:4.12'
