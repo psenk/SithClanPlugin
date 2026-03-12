@@ -70,10 +70,7 @@ public class SithClanSenatePanel extends JPanel {
         senatePostSchedulePanel = new JPanel();
         senatePostSchedulePanel.setLayout(new BoxLayout(senatePostSchedulePanel, BoxLayout.Y_AXIS));
         senatePostScheduleTextArea = new JTextArea();
-
-        // TODO: change below lines
         senatePostScheduleTextArea.setText(TEXT_AREA_DEFAULT);
-
         senatePostScheduleTextArea.setRows(20);
         senatePostScheduleTextArea.setLineWrap(false);
         senatePostScheduleScrollPane = new JScrollPane(senatePostScheduleTextArea);
@@ -105,8 +102,8 @@ public class SithClanSenatePanel extends JPanel {
 
         // post event schedule action
         senatePostScheduleButton.addActionListener(e -> {
-            // TODO: validate data (what if they input something else?)
-            String schedule = eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
+            // TODO: validate data robustness
+            eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
             // if response good, popup good?
         });
     }
