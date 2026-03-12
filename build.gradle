@@ -47,7 +47,7 @@ tasks.register('run', JavaExec) {
 	mainClass = pluginMainClass
 
 	jvmArgs "-ea"
-	args "--developer-mode", "--debug", "--safe-mode", "--insecure-skip-tls-verification"
+	args "--developer-mode", "--safe-mode", "--insecure-skip-tls-verification"
 }
 
 tasks.register('shadowJar', Jar) {
