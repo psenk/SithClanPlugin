@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.Popup;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -20,6 +23,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.client.RuneLite;
+import net.runelite.client.ui.ContainableFrame;
 import sithclanplugin.SithClanPluginConfig;
 
 /**
@@ -113,8 +117,12 @@ public class SithClanEventSchedule {
         // if fetched recently, return
         // this.schedule still has data from last fetch
         if (lastScheduleFetch != null
-                && LocalDateTime.now().isBefore(lastScheduleFetch.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES)))
+                && LocalDateTime.now().isBefore(lastScheduleFetch.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES))) {
+            ContainableFrame popup = new ContainableFrame();
+            JOptionPane.showMessageDialog(popup,
+                    "The schedule has been retrieved too recently.  Try again in a few minutes.");
             return;
+        }
 
         // get fresh schedule
         String jsonSchedule = getEventSchedule();
@@ -137,6 +145,7 @@ public class SithClanEventSchedule {
      * @param text event schedule as String input from plugin
      * @return String HTTPResponse
      */
+    // TODO: long, refactor
     public String parseScheduleForPost(String text) {
         if (text.isBlank())
             return "No text.";
