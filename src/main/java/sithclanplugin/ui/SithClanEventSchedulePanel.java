@@ -93,6 +93,8 @@ public class SithClanEventSchedulePanel extends JPanel {
         });
     }
 
+    // TODO: doc for function
+    // TODO: refactor giant function
     public void displaySchedule() {
         if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty()) {
             new Thread(() -> {
