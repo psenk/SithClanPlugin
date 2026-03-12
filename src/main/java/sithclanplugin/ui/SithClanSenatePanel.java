@@ -2,8 +2,6 @@ package sithclanplugin.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -40,12 +38,12 @@ public class SithClanSenatePanel extends JPanel {
     private static final String UPDATE_SCHEDULE_BUTTON = "Update Schedule";
     private static final String UPDATE_BUTTON = "Update";
     private static final String TEXT_AREA_DEFAULT = "Post Event Schedule Here";
-    private static final String ARROW_RIGHT_PATH = "arrow_right.png";
-    private static final String ARROW_DOWN_PATH = "arrow_down.png";
+    private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
+    private static final String ARROW_DOWN_PATH = "/arrow_down.png";
 
     @Inject
     SithClanSenatePanel(SithClanEventSchedule eventSchedule) {
-        
+
         this.eventSchedule = eventSchedule;
         final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
         final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
@@ -64,7 +62,8 @@ public class SithClanSenatePanel extends JPanel {
         senatePostScheduleLabel.setOpaque(true);
         senatePostScheduleLabel.setIcon(rightArrowIcon);
         senatePostScheduleLabel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        senatePostScheduleLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, senatePostScheduleLabel.getPreferredSize().height));
+        senatePostScheduleLabel
+                .setMaximumSize(new Dimension(Integer.MAX_VALUE, senatePostScheduleLabel.getPreferredSize().height));
         this.add(senatePostScheduleLabel);
 
         // panel to post the event schedule
@@ -72,7 +71,7 @@ public class SithClanSenatePanel extends JPanel {
         senatePostSchedulePanel.setLayout(new BoxLayout(senatePostSchedulePanel, BoxLayout.Y_AXIS));
         senatePostScheduleTextArea = new JTextArea();
 
-        //TODO: change below lines
+        // TODO: change below lines
         senatePostScheduleTextArea.setText(TEXT_AREA_DEFAULT);
 
         senatePostScheduleTextArea.setRows(20);
@@ -81,7 +80,7 @@ public class SithClanSenatePanel extends JPanel {
         senatePostScheduleScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         senatePostScheduleButton = new JButton(UPDATE_BUTTON);
         senatePostScheduleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
+
         // adding to main panel
         senatePostSchedulePanel.add(Box.createRigidArea(new Dimension(0, 10)));
         senatePostSchedulePanel.add(senatePostScheduleScrollPane);
@@ -90,29 +89,25 @@ public class SithClanSenatePanel extends JPanel {
         senatePostSchedulePanel.setVisible(false);
         this.add(senatePostSchedulePanel);
 
-        //expand/collapse event schedule options
+        // expand/collapse event schedule options
         senatePostScheduleLabel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 boolean isVisible = !senatePostSchedulePanel.isVisible();
                 senatePostSchedulePanel.setVisible(isVisible);
-                if (isVisible) {
+                if (isVisible)
                     senatePostScheduleLabel.setIcon(downArrowIcon);
-                }
-                else {
+                else
                     senatePostScheduleLabel.setIcon(rightArrowIcon);
-                }
                 revalidate();
                 repaint();
             }
         });
 
         // post event schedule action
-        senatePostScheduleButton.addActionListener((new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                //TODO: validate data (what if they input something else?)
-                String schedule = eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
-                // if response good, popup good?
-            }
-        }));
+        senatePostScheduleButton.addActionListener(e -> {
+            // TODO: validate data (what if they input something else?)
+            String schedule = eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
+            // if response good, popup good?
+        });
     }
 }
