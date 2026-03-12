@@ -1,11 +1,14 @@
 package sithclanplugin.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +37,7 @@ import sithclanplugin.eventschedule.SithClanEventSchedule;
 public class SithClanEventSchedulePanel extends JPanel {
 
     private final JLabel schedulePanelLabel;
+    private final JLabel scheduleExpiredLabel;
     private final JButton scheduleGetEventScheduleButton;
     private final JPanel scheduleContainer;
     private final JScrollPane scheduleContainerScrollPane;
@@ -46,6 +50,7 @@ public class SithClanEventSchedulePanel extends JPanel {
     private static final String SITH_DISCORD_SERVER_ID = "741153043776667658";
     private static final String DISCORD_CHANNEL_URL = "https://discord.com/channels/" + SITH_DISCORD_SERVER_ID + "/";
     private static final String EVENT_SCHEDULE = "Event Schedule";
+    private static final String SCHEDULE_EXPIRED = "Schedule Expired! Please Refresh.";
     private static final String GET_SCHEDULE_BUTTON = "Refresh Schedule";
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
@@ -73,10 +78,16 @@ public class SithClanEventSchedulePanel extends JPanel {
         scheduleGetEventScheduleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         scheduleContainerScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        scheduleExpiredLabel = new JLabel(SCHEDULE_EXPIRED);
+        scheduleExpiredLabel.setForeground(Color.RED);
+        scheduleExpiredLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        scheduleExpiredLabel.setVisible(false);
+
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.add(schedulePanelLabel);
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        topPanel.add(scheduleExpiredLabel);
 
         this.add(topPanel, BorderLayout.NORTH);
         this.add(scheduleContainerScrollPane, BorderLayout.CENTER);
@@ -102,6 +113,7 @@ public class SithClanEventSchedulePanel extends JPanel {
      * Displays event schedule to panel
      */
     public void displaySchedule() {
+        String currentDay = "";
         if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty()) {
             new Thread(() -> {
                 eventSchedule.parseScheduleFromGet();
@@ -113,9 +125,9 @@ public class SithClanEventSchedulePanel extends JPanel {
         scheduleContainer.removeAll();
 
         for (SithClanDaySchedule day : eventSchedule.getSchedule()) {
-
+            currentDay = day.getDate();
             JPanel dailyEvents = createDailyEventsPanel();
-            JLabel dateLabel = createDateLabel(day.getDate(), dailyEvents);
+            JLabel dateLabel = createDateLabel(currentDay, dailyEvents);
 
             scheduleContainer.add(dateLabel);
             scheduleContainer.add(dailyEvents);
@@ -125,10 +137,14 @@ public class SithClanEventSchedulePanel extends JPanel {
 
                 dailyEvents.add(singleEvent);
                 dailyEvents.add(Box.createRigidArea(new Dimension(0, 10)));
-
             }
         }
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
+        LocalDate finalDate = LocalDate.parse(currentDay, formatter);
+        if (finalDate.isBefore(LocalDate.now()))
+            scheduleExpiredLabel.setVisible(true);
+        else
+            scheduleExpiredLabel.setVisible(false);
         scheduleContainer.revalidate();
         scheduleContainer.repaint();
     }
