@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.inject.Inject;
 import javax.swing.Box;
@@ -16,9 +14,11 @@ import javax.swing.JScrollPane;
 
 import com.google.inject.Singleton;
 
+import lombok.Getter;
 import net.runelite.client.ui.PluginPanel;
 
 @Singleton
+@Getter
 public class SithClanPluginPanel extends PluginPanel {
 
     private final SithClanEventSchedulePanel schedulePanel;
@@ -78,16 +78,12 @@ public class SithClanPluginPanel extends PluginPanel {
         this.add(cardPanel, BorderLayout.CENTER);
 
         // action listeners
-        scheduleButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                cardLayout.show(cardPanel, SCHEDULE_TITLE);
-            }
+        scheduleButton.addActionListener(e -> {
+            cardLayout.show(cardPanel, SCHEDULE_TITLE);
         });
 
-        senateButton.addActionListener((new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
+        senateButton.addActionListener(e -> {
                 cardLayout.show(cardPanel, SENATE_TITLE);
-            }
-        }));
+        });
     }
 }
