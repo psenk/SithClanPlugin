@@ -143,82 +143,16 @@ public class SithClanEventSchedule {
      * Saves schedule locally
      * 
      * @param text event schedule as String input from plugin
-     * @return String HTTPResponse
+     * @return String HTTPResponse body
      */
-    // TODO: long, refactor
     public String parseScheduleForPost(String text) {
         if (text.isBlank())
             return "No text.";
-        ArrayList<SithClanDaySchedule> newSchedule = new ArrayList<>();
 
         // split input into list of strings
         String[] scheduleInput = text.split("\\r?\\n");
-        // tracking states
-        SithClanDaySchedule currentDay = null;
-        SithClanEvent currentEvent = null;
 
-        // iterate through parsed event list
-        for (String line : scheduleInput) {
-            line = line.trim();
-            if (line.isBlank())
-                continue;
-            // event date and new day
-            if (line.startsWith("--")) {
-                // next day in list
-                if (currentDay != null)
-                    newSchedule.add(currentDay);
-
-                // first day
-                currentDay = new SithClanDaySchedule();
-                currentDay.setDate(line.substring(2));
-                currentDay.setEvents(new ArrayList<>());
-            }
-            // event title and new event
-            else if (line.startsWith("-")) {
-                if (currentDay == null)
-                    return "Day is null";
-                // add last event to day
-                if (currentEvent != null)
-                    currentDay.getEvents().add(currentEvent);
-
-                // first event
-                currentEvent = new SithClanEvent();
-                currentEvent.setEventTitle(line.substring(1));
-                currentEvent.setEventMiscInfo(new ArrayList<>());
-            }
-            // event time
-            else if (currentEvent != null && currentEvent.getEventTime() == null)
-                currentEvent.setEventTime(line);
-
-            // event host (optional)
-            else if (currentEvent != null && line.startsWith("Hosted by:"))
-                currentEvent.setEventHost(line.substring(11));
-
-            // event location
-            else if (currentEvent != null && line.startsWith("🌎"))
-                currentEvent.setEventLocation(line);
-
-            // event repetition (optional)
-            else if (currentEvent != null && line.startsWith("**"))
-                currentEvent.setEventRepeated(true);
-
-            // misc event info
-            else {
-                if (currentEvent == null)
-                    continue;
-                currentEvent.getEventMiscInfo().add(line);
-            }
-        }
-        // add last event
-        if (currentEvent != null) {
-            if (currentDay == null)
-                return "Event found without date.";
-            currentDay.getEvents().add(currentEvent);
-        }
-
-        // add last day
-        if (currentDay != null)
-            newSchedule.add(currentDay);
+        ArrayList<SithClanDaySchedule> newSchedule = convertSchedule(scheduleInput);
 
         if (newSchedule.isEmpty())
             return "Valid schedule input not found.";
@@ -267,5 +201,85 @@ public class SithClanEventSchedule {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Helper function, converts event schedule String list into custom object
+     * ArrayList output
+     * 
+     * @param scheduleInput String[] event schedule in list
+     * @return ArrayList<SithClanDaySchedule> converted event schedule output
+     */
+    private ArrayList<SithClanDaySchedule> convertSchedule(String[] scheduleInput) {
+        // tracking states
+        SithClanDaySchedule currentDay = null;
+        SithClanEvent currentEvent = null;
+        ArrayList<SithClanDaySchedule> newSchedule = new ArrayList<>();
+
+        // iterate through parsed event list
+        for (String line : scheduleInput) {
+            line = line.trim();
+            if (line.isBlank())
+                continue;
+            // event date and new day
+            if (line.startsWith("--")) {
+                // next day in list
+                if (currentDay != null)
+                    newSchedule.add(currentDay);
+
+                // first day
+                currentDay = new SithClanDaySchedule();
+                currentDay.setDate(line.substring(2));
+                currentDay.setEvents(new ArrayList<>());
+            }
+            // event title and new event
+            else if (line.startsWith("-")) {
+                if (currentDay == null)
+                    return null;
+                // add last event to day
+                if (currentEvent != null)
+                    currentDay.getEvents().add(currentEvent);
+
+                // first event
+                currentEvent = new SithClanEvent();
+                currentEvent.setEventTitle(line.substring(1));
+                currentEvent.setEventMiscInfo(new ArrayList<>());
+            }
+            // event time
+            else if (currentEvent != null && currentEvent.getEventTime() == null)
+                currentEvent.setEventTime(line);
+
+            // event host (optional)
+            else if (currentEvent != null && line.startsWith("Hosted by:"))
+                currentEvent.setEventHost(line.substring(11));
+
+            // event location
+            else if (currentEvent != null && line.startsWith("🌎"))
+                currentEvent.setEventLocation(line);
+
+            // event repetition (optional)
+            else if (currentEvent != null && line.startsWith("**"))
+                currentEvent.setEventRepeated(true);
+
+            // misc event info
+            else {
+                if (currentEvent == null)
+                    continue;
+                currentEvent.getEventMiscInfo().add(line);
+            }
+        }
+
+        // add last event
+        if (currentEvent != null) {
+            if (currentDay == null)
+                return null;
+            currentDay.getEvents().add(currentEvent);
+        }
+
+        // add last day
+        if (currentDay != null)
+            newSchedule.add(currentDay);
+
+        return newSchedule;
     }
 }
