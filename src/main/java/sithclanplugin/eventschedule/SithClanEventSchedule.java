@@ -166,6 +166,8 @@ public class SithClanEventSchedule {
             }
             // event title and new event
             else if (line.startsWith("-")) {
+                if (currentDay == null)
+                    return "Day is null";
                 // add last event to day
                 if (currentEvent != null)
                     currentDay.getEvents().add(currentEvent);
@@ -180,25 +182,30 @@ public class SithClanEventSchedule {
                 currentEvent.setEventTime(line);
 
             // event host (optional)
-            else if (line.startsWith("Hosted by:"))
+            else if (currentEvent != null && line.startsWith("Hosted by:"))
                 currentEvent.setEventHost(line.substring(11));
 
             // event location
-            else if (line.startsWith("🌎"))
+            else if (currentEvent != null && line.startsWith("🌎"))
                 currentEvent.setEventLocation(line);
 
             // event repetition (optional)
-            else if (line.startsWith("**"))
+            else if (currentEvent != null && line.startsWith("**"))
                 currentEvent.setEventRepeated(true);
 
             // misc event info
-            else
+            else {
+                if (currentEvent == null)
+                    continue;
                 currentEvent.getEventMiscInfo().add(line);
-
+            }
         }
         // add last event
-        if (currentEvent != null)
+        if (currentEvent != null) {
+            if (currentDay == null)
+                return "Event found without date.";
             currentDay.getEvents().add(currentEvent);
+        }
 
         // add last day
         if (currentDay != null)
