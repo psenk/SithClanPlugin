@@ -231,7 +231,9 @@ public class SithClanEventSchedule {
         String response = postEventSchedule(data);
         if (response == null)
             return "Post request failed.";
-
+        ContainableFrame popup = new ContainableFrame();
+        JOptionPane.showMessageDialog(popup,
+                "Schedule posted successfully.");
         this.schedule = newSchedule;
         saveScheduleLocally(data);
         return response;

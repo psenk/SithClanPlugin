@@ -106,7 +106,6 @@ public class SithClanSenatePanel extends JPanel {
         senatePostScheduleButton.addActionListener(e -> {
             // TODO: validate data robustness
             eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
-            // if response good, popup good?
         });
     }
 }
