@@ -139,12 +139,8 @@ public class SithClanEventSchedulePanel extends JPanel {
                 dailyEvents.add(Box.createRigidArea(new Dimension(0, 10)));
             }
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
-        LocalDate finalDate = LocalDate.parse(currentDay, formatter);
-        if (finalDate.isBefore(LocalDate.now()))
-            scheduleExpiredLabel.setVisible(true);
-        else
-            scheduleExpiredLabel.setVisible(false);
+        checkScheduleExpired(currentDay);
+
         scheduleContainer.revalidate();
         scheduleContainer.repaint();
     }
@@ -219,7 +215,7 @@ public class SithClanEventSchedulePanel extends JPanel {
         singleEvent.add(eventTime);
 
         if (event.getEventHost() != null && !event.getEventHost().isBlank()) {
-            JLabel eventHost = new JLabel(event.getEventHost());
+            JLabel eventHost = new JLabel("Hosted by: " + event.getEventHost());
             eventHost.setAlignmentX(Component.LEFT_ALIGNMENT);
             singleEvent.add(eventHost);
         }
@@ -283,5 +279,19 @@ public class SithClanEventSchedulePanel extends JPanel {
      */
     private String removeEmojis(String text) {
         return text.replaceAll(":[a-zA-Z0-9_]+:", "").trim();
+    }
+
+    /**
+     * Checks if event schedule is expired
+     * 
+     * @param inputDay String last day of the event schedule
+     */
+    private void checkScheduleExpired(String inputDay) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
+        LocalDate finalDate = LocalDate.parse(inputDay, formatter);
+        if (finalDate.isBefore(LocalDate.now()))
+            scheduleExpiredLabel.setVisible(true);
+        else
+            scheduleExpiredLabel.setVisible(false);
     }
 }
