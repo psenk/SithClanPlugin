@@ -11,16 +11,19 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import com.google.inject.Singleton;
 
 import lombok.Getter;
 import net.runelite.client.ui.PluginPanel;
+import sithclanplugin.eventschedule.SithClanEventSchedule;
 
 @Singleton
 @Getter
 public class SithClanPluginPanel extends PluginPanel {
 
+    private SithClanEventSchedule eventSchedule;
     private final SithClanEventSchedulePanel schedulePanel;
     private final SithClanSenatePanel senatePanel;
 
@@ -37,7 +40,7 @@ public class SithClanPluginPanel extends PluginPanel {
     private static final String SENATE_TITLE = "senate";
 
     @Inject
-    SithClanPluginPanel(SithClanEventSchedulePanel schedulePanel,
+    SithClanPluginPanel(SithClanEventSchedule eventSchedule, SithClanEventSchedulePanel schedulePanel,
             SithClanSenatePanel senatePanel) {
         this.setLayout(new BorderLayout());
         getScrollPane().setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -82,6 +85,13 @@ public class SithClanPluginPanel extends PluginPanel {
 
         senateButton.addActionListener(e -> {
             cardLayout.show(cardPanel, SENATE_TITLE);
+        });
+
+        schedulePanel.setOnRefreshCallback(() -> {
+            new Thread(() -> {
+                boolean isSenateMember = eventSchedule.validateApiKey();
+                SwingUtilities.invokeLater(() -> senateButton.setVisible(isSenateMember));
+            }).start();
         });
     }
 }
