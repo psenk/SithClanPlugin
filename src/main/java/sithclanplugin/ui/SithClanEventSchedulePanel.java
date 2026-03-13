@@ -56,6 +56,8 @@ public class SithClanEventSchedulePanel extends JPanel {
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
+    private static final String DATE_FORMAT = "M/d/yyyy";
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
     @Inject
     SithClanEventSchedulePanel(SithClanEventSchedule eventSchedule) {
@@ -293,14 +295,18 @@ public class SithClanEventSchedulePanel extends JPanel {
      * @param inputDay String last day of the event schedule
      */
     private void checkScheduleExpired(String inputDay) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
-        LocalDate finalDate = LocalDate.parse(inputDay, formatter);
+        LocalDate finalDate = LocalDate.parse(inputDay, FORMATTER);
         if (finalDate.isBefore(LocalDate.now()))
             scheduleExpiredLabel.setVisible(true);
         else
             scheduleExpiredLabel.setVisible(false);
     }
 
+    /**
+     * Callback function for refresh schedule button
+     * 
+     * @param callback Runnable callback function
+     */
     public void setOnRefreshCallback(Runnable callback) {
         this.onRefreshCallback = callback;
     }
