@@ -10,7 +10,7 @@ import net.runelite.client.config.ConfigItem;
 public interface SithClanPluginConfig extends Config {
 	@ConfigItem(keyName = "senateapikey", name = "Senate API Key", description = "API Key for posting clan info to server")
 	default String apiKey() {
-		return "";
+		return "".trim();
 	}
 
 	@ConfigItem(keyName = "eventAlerts", name = "Event Alerts", description = "Enables or disables notifications for upcoming clan events")
