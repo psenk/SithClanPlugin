@@ -1,7 +1,6 @@
 package sithclanplugin.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -19,6 +18,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -82,7 +82,7 @@ public class SithClanEventSchedulePanel extends JPanel {
         scheduleContainerScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         scheduleExpiredLabel = new JLabel(SCHEDULE_EXPIRED);
-        scheduleExpiredLabel.setForeground(Color.RED);
+        scheduleExpiredLabel.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
         scheduleExpiredLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         scheduleExpiredLabel.setVisible(false);
 
@@ -106,8 +106,20 @@ public class SithClanEventSchedulePanel extends JPanel {
         // get event schedule action
         scheduleGetEventScheduleButton.addActionListener(e -> {
             new Thread(() -> {
-                eventSchedule.parseScheduleFromGet();
+                int status = eventSchedule.parseScheduleFromGet();
                 SwingUtilities.invokeLater(() -> {
+                    switch (status) {
+                        case 429:
+                            JOptionPane.showMessageDialog(null,
+                                    "The schedule has been retrieved too recently.  Try again in a few minutes.");
+                            break;
+                        case 404:
+                            JOptionPane.showMessageDialog(null,
+                                    "Unable to obtain schedule.");
+                            break;
+                        default:
+                            break;
+                    }
                     displaySchedule();
                     if (onRefreshCallback != null) {
                         onRefreshCallback.run();
@@ -124,8 +136,22 @@ public class SithClanEventSchedulePanel extends JPanel {
         String currentDay = "";
         if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty()) {
             new Thread(() -> {
-                eventSchedule.parseScheduleFromGet();
-                SwingUtilities.invokeLater(() -> displaySchedule());
+                int status = eventSchedule.parseScheduleFromGet();
+                SwingUtilities.invokeLater(() -> {
+                    switch (status) {
+                        case 429:
+                            JOptionPane.showMessageDialog(null,
+                                    "The schedule has been retrieved too recently.  Try again in a few minutes.");
+                            break;
+                        case 404:
+                            JOptionPane.showMessageDialog(null,
+                                    "Unable to obtain schedule.");
+                            break;
+                        default:
+                            break;
+                    }
+                    displaySchedule();
+                });
             }).start();
             return;
         }
@@ -295,6 +321,8 @@ public class SithClanEventSchedulePanel extends JPanel {
      * @param inputDay String last day of the event schedule
      */
     private void checkScheduleExpired(String inputDay) {
+        if (inputDay.isBlank())
+            return;
         LocalDate finalDate = LocalDate.parse(inputDay, FORMATTER);
         if (finalDate.isBefore(LocalDate.now()))
             scheduleExpiredLabel.setVisible(true);
