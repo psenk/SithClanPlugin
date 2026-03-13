@@ -61,6 +61,14 @@ public class SithClanPlugin extends Plugin {
 				.build();
 		clientToolbar.addNavigation(uiNavigationButton);
 
+		// validate API key of Senate members
+		new Thread(() -> {
+			boolean isSenateMember = eventSchedule.validateApiKey();
+			SwingUtilities.invokeLater(() -> {
+				uiPanel.get().getSenateButton().setVisible(isSenateMember);
+			});
+		}).start();
+
 		// create plugin folder if does not exist
 		File localDirectory = new File(RuneLite.RUNELITE_DIR, LOCAL_DIRECTORY_NAME);
 		if (!localDirectory.exists())
@@ -74,22 +82,24 @@ public class SithClanPlugin extends Plugin {
 			storedSchedule.createNewFile();
 
 		// load schedule if saved, else get new schedule
+		// validate API key of Senate members
 		if (storedSchedule.length() == 0)
 			new Thread(() -> {
 				eventSchedule.parseScheduleFromGet();
+				boolean isSenateMember = eventSchedule.validateApiKey();
 				SwingUtilities.invokeLater(() -> {
 					uiPanel.get().getSchedulePanel().displaySchedule();
+					uiPanel.get().getSenateButton().setVisible(isSenateMember);
+
 				});
 			}).start();
 		else
-			// check if expired
 			new Thread(() -> {
 				eventSchedule.parseScheduleFromFile();
 				SwingUtilities.invokeLater(() -> {
 					uiPanel.get().getSchedulePanel().displaySchedule();
 				});
 			}).start();
-
 	}
 
 	@Override
