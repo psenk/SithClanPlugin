@@ -40,8 +40,9 @@ public class SithClanEventSchedule {
     private final File localDirectory;
     private final File storedScheduleFile;
 
-    private static final String EVENT_SCHEDULE_GET_URI = "http://127.0.0.1:8787/api/eventschedule";
-    private static final String EVENT_SCHEDULE_POST_URI = "http://127.0.0.1:8787/api/eventschedule/post";
+    private static final String EVENT_SCHEDULE_GET_URI = "https://sithclanplugin.psenk168.workers.dev/api/eventschedule";
+    private static final String EVENT_SCHEDULE_POST_URI = "https://sithclanplugin.psenk168.workers.dev/api/eventschedule/post";
+    private static final String VALIDATE_URI = "https://sithclanplugin.psenk168.workers.dev/api/validate";
     private static final String LOCAL_DIRECTORY_NAME = "sithclanplugin";
     private static final String STORED_SCHEDULE_NAME = "sithclaneventschedule.txt";
     private static final int SCHEDULE_FETCH_COOLDOWN_MINUTES = 5;
@@ -275,5 +276,26 @@ public class SithClanEventSchedule {
             newSchedule.add(currentDay);
 
         return newSchedule;
+    }
+
+    /**
+     * Validates API key in config
+     * 
+     * @return boolean is key valid or not
+     */
+    public boolean validateApiKey() {
+        HttpRequest validationRequest = HttpRequest.newBuilder()
+                .uri(URI.create(VALIDATE_URI))
+                .header("Authorization", "Bearer " + config.apiKey())
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> validationResponse = httpClient.send(validationRequest,
+                    HttpResponse.BodyHandlers.ofString());
+            return validationResponse.statusCode() == 200;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
