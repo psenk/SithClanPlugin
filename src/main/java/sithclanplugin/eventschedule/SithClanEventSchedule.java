@@ -109,6 +109,8 @@ public class SithClanEventSchedule {
      * Includes 5 min rate limiting
      * Saves schedule locally
      * Schedules notifications
+     * 
+     * @return int SithClanPluginConstants status code value
      */
     public int parseScheduleFromGet() {
         // rate limiting, 5 minutes
@@ -141,7 +143,7 @@ public class SithClanEventSchedule {
      * Schedules notifications
      * 
      * @param text event schedule as String input from plugin
-     * @return String HTTPResponse body
+     * @return int SithClanPluginConstants status code value
      */
     public int parseScheduleForPost(String text) {
         if (text.isBlank())
@@ -170,6 +172,8 @@ public class SithClanEventSchedule {
 
     /**
      * Gets event schedule from local file for display on panel
+     * 
+     * @return int SithClanPluginConstants status code value
      */
     public int parseScheduleFromFile() {
         try {
