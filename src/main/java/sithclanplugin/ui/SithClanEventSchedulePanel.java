@@ -41,6 +41,7 @@ public class SithClanEventSchedulePanel extends JPanel {
     private final JButton scheduleGetEventScheduleButton;
     private final JPanel scheduleContainer;
     private final JScrollPane scheduleContainerScrollPane;
+    private Runnable onRefreshCallback;
 
     private SithClanEventSchedule eventSchedule;
 
@@ -104,7 +105,12 @@ public class SithClanEventSchedulePanel extends JPanel {
         scheduleGetEventScheduleButton.addActionListener(e -> {
             new Thread(() -> {
                 eventSchedule.parseScheduleFromGet();
-                SwingUtilities.invokeLater(() -> displaySchedule());
+                SwingUtilities.invokeLater(() -> {
+                    displaySchedule();
+                    if (onRefreshCallback != null) {
+                        onRefreshCallback.run();
+                    }
+                });
             }).start();
         });
     }
@@ -293,5 +299,9 @@ public class SithClanEventSchedulePanel extends JPanel {
             scheduleExpiredLabel.setVisible(true);
         else
             scheduleExpiredLabel.setVisible(false);
+    }
+
+    public void setOnRefreshCallback(Runnable callback) {
+        this.onRefreshCallback = callback;
     }
 }
