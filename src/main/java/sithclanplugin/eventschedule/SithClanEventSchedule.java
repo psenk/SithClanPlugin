@@ -33,8 +33,10 @@ import sithclanplugin.SithClanPluginConfig;
 @Singleton
 public class SithClanEventSchedule {
 
+    private final SithClanPluginConfig config;
+    private final SithClanNotificationManager notificationManager;
+
     private HttpClient httpClient;
-    private SithClanPluginConfig config;
     private ArrayList<SithClanDaySchedule> schedule;
     private LocalDateTime lastScheduleFetch;
     private final File localDirectory;
@@ -48,8 +50,10 @@ public class SithClanEventSchedule {
     private static final int SCHEDULE_FETCH_COOLDOWN_MINUTES = 5;
 
     @Inject
-    public SithClanEventSchedule(SithClanPluginConfig config) {
+    public SithClanEventSchedule(SithClanPluginConfig config, SithClanNotificationManager notificationManager) {
         this.config = config;
+        this.notificationManager = notificationManager;
+
         this.localDirectory = new File(RuneLite.RUNELITE_DIR, LOCAL_DIRECTORY_NAME);
         this.storedScheduleFile = new File(localDirectory, STORED_SCHEDULE_NAME);
         schedule = new ArrayList<>();
@@ -106,6 +110,7 @@ public class SithClanEventSchedule {
      * Gets event schedule for display on panel
      * Includes 5 min rate limiting
      * Saves schedule locally
+     * Schedules notifications
      */
     public void parseScheduleFromGet() {
         // rate limiting, 5 minutes
@@ -131,11 +136,13 @@ public class SithClanEventSchedule {
         this.schedule = gson.fromJson(jsonSchedule, scheduleType);
         saveScheduleLocally(jsonSchedule);
         this.lastScheduleFetch = LocalDateTime.now();
+        notificationManager.scheduleNotifications(schedule);
     }
 
     /**
      * Takes String input and converts to JSON format for posting
      * Saves schedule locally
+     * Schedules notifications
      * 
      * @param text event schedule as String input from plugin
      * @return String HTTPResponse body
@@ -163,8 +170,10 @@ public class SithClanEventSchedule {
         ContainableFrame popup = new ContainableFrame();
         JOptionPane.showMessageDialog(popup,
                 "Schedule posted successfully.");
+
         this.schedule = newSchedule;
         saveScheduleLocally(data);
+        notificationManager.scheduleNotifications(schedule);
         return response;
     }
 
