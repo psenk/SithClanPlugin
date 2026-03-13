@@ -27,10 +27,8 @@ public class SithClanPluginPanel extends PluginPanel {
     private final JPanel cardPanel;
     private final JPanel navPanel;
     private final JPanel buttonPanel;
-
     private final JButton scheduleButton;
     private final JButton senateButton;
-
     private CardLayout cardLayout;
 
     private static final String EVENT_SCHEDULE = "Event Schedule";
@@ -39,8 +37,8 @@ public class SithClanPluginPanel extends PluginPanel {
     private static final String SENATE_TITLE = "senate";
 
     @Inject
-    SithClanPluginPanel(SithClanEventSchedulePanel schedulePanel, SithClanSenatePanel senatePanel) {
-        super();
+    SithClanPluginPanel(SithClanEventSchedulePanel schedulePanel,
+            SithClanSenatePanel senatePanel) {
         this.setLayout(new BorderLayout());
         getScrollPane().setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
@@ -83,7 +81,7 @@ public class SithClanPluginPanel extends PluginPanel {
         });
 
         senateButton.addActionListener(e -> {
-                cardLayout.show(cardPanel, SENATE_TITLE);
+            cardLayout.show(cardPanel, SENATE_TITLE);
         });
     }
 }
