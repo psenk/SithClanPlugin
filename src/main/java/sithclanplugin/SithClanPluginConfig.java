@@ -3,6 +3,7 @@ package sithclanplugin;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.Range;
 
 // TODO: reshuffle config items on panel (currently alphabetically per name value)
 
@@ -18,7 +19,8 @@ public interface SithClanPluginConfig extends Config {
 		return false;
 	}
 
-	@ConfigItem(keyName = "eventAlertTimeBuffer", name = "Alert Time Buffer", description = "Sets amount of time before start of event notification occurs")
+	@Range(min = 1, max = 60)
+	@ConfigItem(keyName = "eventAlertTimeBuffer", name = "Alert Time Buffer", description = "Sets amount of time in minutes before event notification occurs")
 	default int notificationTimeBuffer() {
 		return 15;
 	}
