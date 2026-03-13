@@ -21,6 +21,7 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
+import sithclanplugin.eventschedule.SithClanNotificationManager;
 import sithclanplugin.ui.SithClanPluginPanel;
 
 @PluginDescriptor(name = "Sith Clan Plugin", description = "Enable the Sith Clan Plugin")
@@ -40,6 +41,9 @@ public class SithClanPlugin extends Plugin {
 
 	@Inject
 	private SithClanEventSchedule eventSchedule;
+
+	@Inject
+	private SithClanNotificationManager notificationManager;
 
 	private NavigationButton uiNavigationButton;
 
@@ -105,6 +109,7 @@ public class SithClanPlugin extends Plugin {
 	@Override
 	protected void shutDown() throws Exception {
 		clientToolbar.removeNavigation(uiNavigationButton);
+		notificationManager.shutDown();
 	}
 
 	@Subscribe
