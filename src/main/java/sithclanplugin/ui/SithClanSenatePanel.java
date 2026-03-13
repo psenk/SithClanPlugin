@@ -11,15 +11,18 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
+import sithclanplugin.SithClanPluginConstants;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
 
 @Singleton
@@ -104,7 +107,27 @@ public class SithClanSenatePanel extends JPanel {
 
         // post event schedule action
         senatePostScheduleButton.addActionListener(e -> {
-            eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
+            new Thread(() -> {
+                int status = eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
+                SwingUtilities.invokeLater(() -> {
+                    switch (status) {
+                        case SithClanPluginConstants.STATUS_OK:
+                            JOptionPane.showMessageDialog(null,
+                                    "Schedule posted successfully.");
+                            break;
+                        case SithClanPluginConstants.STATUS_BAD_INPUT:
+                            JOptionPane.showMessageDialog(null,
+                                    "There is a problem with the schedule input.");
+                            break;
+                        case SithClanPluginConstants.STATUS_NOT_FOUND:
+                            JOptionPane.showMessageDialog(null,
+                                    "Unable to post schedule.");
+                            break;
+                        default:
+                            break;
+                    }
+                });
+            }).start();
         });
     }
 }
