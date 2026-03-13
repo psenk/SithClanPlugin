@@ -12,33 +12,31 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
-import javax.swing.JOptionPane;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Singleton;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.runelite.client.RuneLite;
-import net.runelite.client.ui.ContainableFrame;
 import sithclanplugin.SithClanPluginConfig;
+import sithclanplugin.SithClanPluginConstants;
 
 /**
  * Event Schedule Object
  */
 
-@Setter
 @Getter
 @Singleton
 public class SithClanEventSchedule {
 
     private final SithClanPluginConfig config;
     private final SithClanNotificationManager notificationManager;
+    private boolean isSenateMember = false;
 
-    private HttpClient httpClient;
     private ArrayList<SithClanDaySchedule> schedule;
     private LocalDateTime lastScheduleFetch;
+    private final HttpClient httpClient;
     private final File localDirectory;
     private final File storedScheduleFile;
 
@@ -112,22 +110,19 @@ public class SithClanEventSchedule {
      * Saves schedule locally
      * Schedules notifications
      */
-    public void parseScheduleFromGet() {
+    public int parseScheduleFromGet() {
         // rate limiting, 5 minutes
-        // if fetched recently, return
-        // this.schedule still has data from last fetch
-        if (lastScheduleFetch != null
-                && LocalDateTime.now().isBefore(lastScheduleFetch.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES))) {
-            ContainableFrame popup = new ContainableFrame();
-            JOptionPane.showMessageDialog(popup,
-                    "The schedule has been retrieved too recently.  Try again in a few minutes.");
-            return;
-        }
+        boolean rateLimited = lastScheduleFetch != null
+                && LocalDateTime.now().isBefore(lastScheduleFetch.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES));
+
+        // senate members bypass rate limiting
+        if (rateLimited && !isSenateMember)
+            return SithClanPluginConstants.STATUS_RATE_LIMITED;
 
         // get fresh schedule
         String jsonSchedule = getEventSchedule();
         if (jsonSchedule == null)
-            return;
+            return SithClanPluginConstants.STATUS_NOT_FOUND;
         // convert schedule to JSON
         Gson gson = new Gson();
         // java generic type erasure workaround
@@ -137,6 +132,7 @@ public class SithClanEventSchedule {
         saveScheduleLocally(jsonSchedule);
         this.lastScheduleFetch = LocalDateTime.now();
         notificationManager.scheduleNotifications(schedule);
+        return SithClanPluginConstants.STATUS_OK;
     }
 
     /**
@@ -147,17 +143,16 @@ public class SithClanEventSchedule {
      * @param text event schedule as String input from plugin
      * @return String HTTPResponse body
      */
-    public String parseScheduleForPost(String text) {
+    public int parseScheduleForPost(String text) {
         if (text.isBlank())
-            return "No text.";
+            return SithClanPluginConstants.STATUS_BAD_INPUT;
 
         // split input into list of strings
         String[] scheduleInput = text.split("\\r?\\n");
 
         ArrayList<SithClanDaySchedule> newSchedule = convertSchedule(scheduleInput);
-
-        if (newSchedule.isEmpty())
-            return "Valid schedule input not found.";
+        if (newSchedule == null || newSchedule.isEmpty())
+            return SithClanPluginConstants.STATUS_BAD_INPUT;
 
         // storing schedule as JSON object
         Gson gson = new Gson();
@@ -166,31 +161,30 @@ public class SithClanEventSchedule {
         // posting schedule online
         String response = postEventSchedule(data);
         if (response == null)
-            return "Post request failed.";
-        ContainableFrame popup = new ContainableFrame();
-        JOptionPane.showMessageDialog(popup,
-                "Schedule posted successfully.");
-
+            return SithClanPluginConstants.STATUS_NOT_FOUND;
         this.schedule = newSchedule;
         saveScheduleLocally(data);
         notificationManager.scheduleNotifications(schedule);
-        return response;
+        return SithClanPluginConstants.STATUS_OK;
     }
 
     /**
      * Gets event schedule from local file for display on panel
      */
-    public void parseScheduleFromFile() {
+    public int parseScheduleFromFile() {
         try {
             String jsonSchedule = new String(Files.readAllBytes(storedScheduleFile.toPath()));
             if (jsonSchedule.isBlank())
-                return;
+                return SithClanPluginConstants.STATUS_BAD_INPUT;
             Gson gson = new Gson();
             Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
             }.getType();
             this.schedule = gson.fromJson(jsonSchedule, scheduleType);
+            notificationManager.scheduleNotifications(schedule);
+            return SithClanPluginConstants.STATUS_OK;
         } catch (Exception e) {
             e.printStackTrace();
+            return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
     }
 
@@ -289,6 +283,7 @@ public class SithClanEventSchedule {
 
     /**
      * Validates API key in config
+     * Saves senate member state
      * 
      * @return boolean is key valid or not
      */
@@ -302,7 +297,8 @@ public class SithClanEventSchedule {
         try {
             HttpResponse<String> validationResponse = httpClient.send(validationRequest,
                     HttpResponse.BodyHandlers.ofString());
-            return validationResponse.statusCode() == 200;
+            this.isSenateMember = validationResponse.statusCode() == 200;
+            return this.isSenateMember;
         } catch (Exception e) {
             return false;
         }
