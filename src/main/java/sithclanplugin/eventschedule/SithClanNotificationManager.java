@@ -21,22 +21,32 @@ public class SithClanNotificationManager {
 
     private final Notifier notifier;
     private final SithClanPluginConfig config;
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService scheduler;
 
     private final List<ScheduledFuture<?>> scheduledNotifications = new ArrayList<>();
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("M/d/yyyy h:mm a");
 
     @Inject
-    SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier) {
+    public SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier) {
         this.config = config;
         this.notifier = notifier;
+        this.scheduler = Executors.newScheduledThreadPool(1);
+    }
+
+    // for testing
+    // TODO: remove after testing
+    public SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier,
+            ScheduledExecutorService scheduler) {
+        this.config = config;
+        this.notifier = notifier;
+        this.scheduler = scheduler;
     }
 
     /**
-     * TODO: JAVADOC
+     * Schedules event notifications
      * 
-     * @param schedule
+     * @param schedule ArrayList<SithClanDaySchedule> clan event schedule
      */
     public void scheduleNotifications(ArrayList<SithClanDaySchedule> schedule) {
         if (!config.eventNotifications())
@@ -57,7 +67,7 @@ public class SithClanNotificationManager {
                             - config.notificationTimeBuffer();
 
                     // schedule event
-                    if (delay > 0) {
+                    if (delay >= 0) {
                         ScheduledFuture<?> future = scheduler.schedule(() -> {
                             notifier.notify("Clan event starting soon: " + event.getEventTitle());
                         }, delay, TimeUnit.MINUTES);
@@ -71,7 +81,7 @@ public class SithClanNotificationManager {
     }
 
     /**
-     * TODO: JAVADOC
+     * Cancels all active notifications and clears scheduled notifications
      */
     private void cancelAllNotifications() {
         for (ScheduledFuture<?> future : scheduledNotifications) {
@@ -81,7 +91,7 @@ public class SithClanNotificationManager {
     }
 
     /**
-     * TODO: JAVADOC
+     * Shuts the scheduler down
      */
     public void shutDown() {
         cancelAllNotifications();
