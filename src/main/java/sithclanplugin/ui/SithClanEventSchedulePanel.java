@@ -29,6 +29,7 @@ import com.google.inject.Singleton;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
+import sithclanplugin.SithClanPlugin;
 import sithclanplugin.SithClanPluginConstants;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
@@ -36,6 +37,9 @@ import sithclanplugin.eventschedule.SithClanEventSchedule;
 
 @Singleton
 public class SithClanEventSchedulePanel extends JPanel {
+
+    @Inject
+    private SithClanPlugin plugin;
 
     private final JLabel schedulePanelLabel;
     private final JLabel scheduleExpiredLabel;
@@ -260,8 +264,8 @@ public class SithClanEventSchedulePanel extends JPanel {
                 singleEvent.add(eventInfo);
             }
         }
-
-        JLabel eventLocation = new JLabel(event.getEventLocation());
+        JLabel eventLocation = createWorldLink(event.getEventLocation());
+        // TODO: world hop link
         eventLocation.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventLocation);
 
@@ -312,6 +316,32 @@ public class SithClanEventSchedulePanel extends JPanel {
      */
     private String removeEmojis(String text) {
         return text.replaceAll(":[a-zA-Z0-9_]+:", "").trim();
+    }
+
+    /**
+     * Turns world location into clickable link to hop worlds
+     * 
+     * @param location event location
+     * @return JLabel hyperlink to hop worlds
+     */
+    private JLabel createWorldLink(String location) {
+        Matcher matcher = Pattern.compile("W(\\d{3}$)").matcher(location);
+        if (!matcher.find())
+            return new JLabel(location);
+        String worldId = matcher.group(1);
+        JLabel worldLink = new JLabel(
+                "<html>" + location.replaceAll("W\\d{3}$", "<a href=''>W" + worldId + "</a>") + "</html>");
+        worldLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        worldLink.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    plugin.hopTo(Integer.parseInt(worldId));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        return worldLink;
     }
 
     /**
