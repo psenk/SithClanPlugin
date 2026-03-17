@@ -49,8 +49,6 @@ public class SithClanPlugin extends Plugin {
 
 	private static final String PLUGIN_ICON_PATH = "/icon.png";
 	private static final String PLUGIN_TOOLTIP = "Sith Clan Plugin";
-	private static final String LOCAL_DIRECTORY_NAME = "sithclanplugin";
-	private static final String STORED_SCHEDULE_NAME = "sithclaneventschedule.txt";
 
 	@Override
 	protected void startUp() throws Exception {
@@ -66,13 +64,13 @@ public class SithClanPlugin extends Plugin {
 		clientToolbar.addNavigation(uiNavigationButton);
 
 		// create plugin folder if does not exist
-		File localDirectory = new File(RuneLite.RUNELITE_DIR, LOCAL_DIRECTORY_NAME);
+		File localDirectory = new File(RuneLite.RUNELITE_DIR, SithClanPluginConstants.LOCAL_DIRECTORY_NAME);
 		if (!localDirectory.exists())
 			// plugin directory
 			localDirectory.mkdirs();
 
 		// create saved schedule file if does not exist
-		File storedSchedule = new File(localDirectory, STORED_SCHEDULE_NAME);
+		File storedSchedule = new File(localDirectory, SithClanPluginConstants.STORED_SCHEDULE_NAME);
 		if (!storedSchedule.exists())
 			// schedule file
 			storedSchedule.createNewFile();

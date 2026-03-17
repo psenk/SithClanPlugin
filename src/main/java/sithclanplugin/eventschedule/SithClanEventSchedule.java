@@ -40,11 +40,6 @@ public class SithClanEventSchedule {
     private final File localDirectory;
     private final File storedScheduleFile;
 
-    private static final String EVENT_SCHEDULE_GET_URI = "https://sithclanplugin.psenk168.workers.dev/api/eventschedule";
-    private static final String EVENT_SCHEDULE_POST_URI = "https://sithclanplugin.psenk168.workers.dev/api/eventschedule/post";
-    private static final String VALIDATE_URI = "https://sithclanplugin.psenk168.workers.dev/api/validate";
-    private static final String LOCAL_DIRECTORY_NAME = "sithclanplugin";
-    private static final String STORED_SCHEDULE_NAME = "sithclaneventschedule.txt";
     private static final int SCHEDULE_FETCH_COOLDOWN_MINUTES = 5;
 
     @Inject
@@ -52,8 +47,8 @@ public class SithClanEventSchedule {
         this.config = config;
         this.notificationManager = notificationManager;
 
-        this.localDirectory = new File(RuneLite.RUNELITE_DIR, LOCAL_DIRECTORY_NAME);
-        this.storedScheduleFile = new File(localDirectory, STORED_SCHEDULE_NAME);
+        this.localDirectory = new File(RuneLite.RUNELITE_DIR, SithClanPluginConstants.LOCAL_DIRECTORY_NAME);
+        this.storedScheduleFile = new File(localDirectory, SithClanPluginConstants.STORED_SCHEDULE_NAME);
         schedule = new ArrayList<>();
         lastScheduleFetch = null;
         httpClient = HttpClient.newHttpClient();
@@ -67,7 +62,7 @@ public class SithClanEventSchedule {
     private String getEventSchedule() {
         // build HTTP GET request
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(EVENT_SCHEDULE_GET_URI))
+                .uri(URI.create(SithClanPluginConstants.EVENT_SCHEDULE_GET_URI))
                 .GET()
                 .build();
         try {
@@ -89,7 +84,7 @@ public class SithClanEventSchedule {
     private String postEventSchedule(String jsonData) {
         // build HTTP POST request
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(EVENT_SCHEDULE_POST_URI))
+                .uri(URI.create(SithClanPluginConstants.EVENT_SCHEDULE_POST_URI))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + config.apiKey())
                 .POST(HttpRequest.BodyPublishers.ofString(jsonData))
@@ -293,7 +288,7 @@ public class SithClanEventSchedule {
      */
     public boolean validateApiKey() {
         HttpRequest validationRequest = HttpRequest.newBuilder()
-                .uri(URI.create(VALIDATE_URI))
+                .uri(URI.create(SithClanPluginConstants.VALIDATE_URI))
                 .header("Authorization", "Bearer " + config.apiKey())
                 .GET()
                 .build();

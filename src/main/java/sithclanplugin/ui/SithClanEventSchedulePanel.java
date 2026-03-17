@@ -29,6 +29,7 @@ import com.google.inject.Singleton;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
+import sithclanplugin.SithClanPluginConstants;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
@@ -48,8 +49,6 @@ public class SithClanEventSchedulePanel extends JPanel {
     private final Icon rightArrowIcon;
     private final Icon downArrowIcon;
 
-    private static final String SITH_DISCORD_SERVER_ID = "741153043776667658";
-    private static final String DISCORD_CHANNEL_URL = "https://discord.com/channels/" + SITH_DISCORD_SERVER_ID + "/";
     private static final String EVENT_SCHEDULE = "Event Schedule";
     private static final String SCHEDULE_EXPIRED = "Schedule Expired! Please Refresh.";
     private static final String GET_SCHEDULE_BUTTON = "Refresh Schedule";
@@ -286,7 +285,7 @@ public class SithClanEventSchedulePanel extends JPanel {
 
         if (matcher.find()) {
             String channelId = matcher.group(1);
-            String channelUrl = DISCORD_CHANNEL_URL + channelId;
+            String channelUrl = SithClanPluginConstants.DISCORD_CHANNEL_URL + channelId;
             // replace <#id> with "View Channel"
             JLabel channelLink = new JLabel(
                     "<html>" + text.replaceAll("<#\\d+>", "<a href=''>Discord Channel</a>") + "</html>");
