@@ -65,6 +65,9 @@ public class SithClanPlugin extends Plugin {
 	@Inject
 	private SithClanNotificationManager notificationManager;
 
+	@Inject
+	private SithClanPluginFileManager fileManager;
+
 	private NavigationButton uiNavigationButton;
 	private net.runelite.api.World eventLocationWorld;
 	private int displaySwitcherAttempts = 0;
@@ -90,20 +93,23 @@ public class SithClanPlugin extends Plugin {
 		// create plugin folder if does not exist
 		File localDirectory = new File(RuneLite.RUNELITE_DIR, SithClanPluginConstants.LOCAL_DIRECTORY_NAME);
 		if (!localDirectory.exists())
-			// plugin directory
 			localDirectory.mkdirs();
 
 		// create saved schedule file if does not exist
 		File storedSchedule = new File(localDirectory, SithClanPluginConstants.STORED_SCHEDULE_NAME);
 		if (!storedSchedule.exists())
-			// schedule file
 			storedSchedule.createNewFile();
+
+		// create file that saves preferred event notifications
+		File notifiedEvents = new File(localDirectory, SithClanPluginConstants.STORED_EVENTS_NOTIFIED);
+		if (!notifiedEvents.exists())
+			notifiedEvents.createNewFile();
 
 		// load schedule if saved, else get new schedule
 		// validate API key of Senate members
 		boolean hasStoredSchedule = storedSchedule.length() > 0;
 		new Thread(() -> {
-			int status = hasStoredSchedule ? eventSchedule.parseScheduleFromFile()
+			int status = hasStoredSchedule ? fileManager.parseScheduleFromFile()
 					: eventSchedule.parseScheduleFromGet();
 			boolean isSenateMember = eventSchedule.validateApiKey();
 			SwingUtilities.invokeLater(() -> {
