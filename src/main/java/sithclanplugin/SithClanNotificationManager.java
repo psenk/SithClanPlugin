@@ -1,7 +1,9 @@
-package sithclanplugin.eventschedule;
+package sithclanplugin;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import net.runelite.client.Notifier;
-import sithclanplugin.SithClanPluginConfig;
+import sithclanplugin.eventschedule.SithClanDaySchedule;
+import sithclanplugin.eventschedule.SithClanEvent;
 
 @Singleton
 public class SithClanNotificationManager {
@@ -25,8 +28,6 @@ public class SithClanNotificationManager {
 
     private final List<ScheduledFuture<?>> scheduledNotifications = new ArrayList<>();
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("M/d/yyyy h:mm a");
-
     @Inject
     public SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier) {
         this.config = config;
@@ -35,8 +36,8 @@ public class SithClanNotificationManager {
     }
 
     // for testing
-    // TODO: remove after testing
-    public SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier,
+    @Inject
+    SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier,
             ScheduledExecutorService scheduler) {
         this.config = config;
         this.notifier = notifier;
@@ -58,12 +59,16 @@ public class SithClanNotificationManager {
             String currentDay = day.getDate();
             for (SithClanEvent event : day.getEvents()) {
                 String currentTime = event.getEventTime();
-                String combinedDateTime = currentDay + " " + currentTime;
 
                 try {
+                    ZonedDateTime estTime = ZonedDateTime.of(
+                            LocalDate.parse(currentDay, SithClanPluginConstants.DATE_FORMATTER),
+                            LocalTime.parse(currentTime, SithClanPluginConstants.TIME_FORMATTER),
+                            ZoneId.of("America/New_York"));
+                    ZonedDateTime localDateTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
+
                     // has event past yet?
-                    LocalDateTime eventDateTime = LocalDateTime.parse(combinedDateTime, FORMATTER);
-                    long delay = ChronoUnit.MINUTES.between(LocalDateTime.now(), eventDateTime)
+                    long delay = ChronoUnit.MINUTES.between(ZonedDateTime.now(), localDateTime)
                             - config.notificationTimeBuffer();
 
                     // schedule event

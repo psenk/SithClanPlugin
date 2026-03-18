@@ -19,6 +19,7 @@ import com.google.inject.Singleton;
 
 import lombok.Getter;
 import net.runelite.client.RuneLite;
+import sithclanplugin.SithClanNotificationManager;
 import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.SithClanPluginConstants;
 

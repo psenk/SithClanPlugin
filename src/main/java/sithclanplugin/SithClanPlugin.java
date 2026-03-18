@@ -33,7 +33,6 @@ import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
-import sithclanplugin.eventschedule.SithClanNotificationManager;
 import sithclanplugin.ui.SithClanPluginPanel;
 
 @PluginDescriptor(name = "Sith Clan Plugin", description = "Enable the Sith Clan Plugin")
@@ -141,9 +140,6 @@ public class SithClanPlugin extends Plugin {
 
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged gameStateChanged) {
-		if (gameStateChanged.getGameState() == GameState.LOGGED_IN) {
-			// TODO: remove or update
-		}
 	}
 
 	// allows config to be accessible from RL settings panel
