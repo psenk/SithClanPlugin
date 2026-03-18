@@ -63,7 +63,6 @@ public class SithClanEventSchedulePanel extends JPanel {
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
 
-    @Inject
     SithClanEventSchedulePanel() {
         rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
         downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));

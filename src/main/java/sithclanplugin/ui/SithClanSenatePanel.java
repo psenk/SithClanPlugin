@@ -45,7 +45,6 @@ public class SithClanSenatePanel extends JPanel {
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
 
-    @Inject
     SithClanSenatePanel() {
         final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
         final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
