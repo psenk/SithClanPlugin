@@ -36,7 +36,6 @@ public class SithClanNotificationManager {
     }
 
     // for testing
-    @Inject
     SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier,
             ScheduledExecutorService scheduler) {
         this.config = config;
