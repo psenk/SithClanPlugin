@@ -1,13 +1,10 @@
 package sithclanplugin.eventschedule;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -18,10 +15,10 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Singleton;
 
 import lombok.Getter;
-import net.runelite.client.RuneLite;
 import sithclanplugin.SithClanNotificationManager;
 import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.SithClanPluginConstants;
+import sithclanplugin.SithClanPluginFileManager;
 
 /**
  * Event Schedule Object
@@ -31,25 +28,23 @@ import sithclanplugin.SithClanPluginConstants;
 @Singleton
 public class SithClanEventSchedule {
 
-    private final SithClanPluginConfig config;
-    private final SithClanNotificationManager notificationManager;
-    private boolean isSenateMember = false;
+    @Inject
+    private SithClanPluginConfig config;
 
+    @Inject
+    private SithClanNotificationManager notificationManager;
+
+    @Inject
+    private SithClanPluginFileManager fileManager;
+
+    private boolean isSenateMember = false;
     private ArrayList<SithClanDaySchedule> schedule;
     private LocalDateTime lastScheduleFetch;
     private final HttpClient httpClient;
-    private final File localDirectory;
-    private final File storedScheduleFile;
 
     private static final int SCHEDULE_FETCH_COOLDOWN_MINUTES = 5;
 
-    @Inject
-    public SithClanEventSchedule(SithClanPluginConfig config, SithClanNotificationManager notificationManager) {
-        this.config = config;
-        this.notificationManager = notificationManager;
-
-        this.localDirectory = new File(RuneLite.RUNELITE_DIR, SithClanPluginConstants.LOCAL_DIRECTORY_NAME);
-        this.storedScheduleFile = new File(localDirectory, SithClanPluginConstants.STORED_SCHEDULE_NAME);
+    public SithClanEventSchedule() {
         schedule = new ArrayList<>();
         lastScheduleFetch = null;
         httpClient = HttpClient.newHttpClient();
@@ -127,7 +122,7 @@ public class SithClanEventSchedule {
         Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
         }.getType();
         this.schedule = gson.fromJson(jsonSchedule, scheduleType);
-        saveScheduleLocally(jsonSchedule);
+        fileManager.saveScheduleLocally(jsonSchedule);
         this.lastScheduleFetch = LocalDateTime.now();
         notificationManager.scheduleNotifications(schedule);
         return SithClanPluginConstants.STATUS_OK;
@@ -161,44 +156,9 @@ public class SithClanEventSchedule {
         if (response == null)
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         this.schedule = newSchedule;
-        saveScheduleLocally(data);
+        fileManager.saveScheduleLocally(data);
         notificationManager.scheduleNotifications(schedule);
         return SithClanPluginConstants.STATUS_OK;
-    }
-
-    /**
-     * Gets event schedule from local file for display on panel
-     * 
-     * @return int SithClanPluginConstants status code value
-     */
-    public int parseScheduleFromFile() {
-        try {
-            String jsonSchedule = new String(Files.readAllBytes(storedScheduleFile.toPath()));
-            if (jsonSchedule.isBlank())
-                return SithClanPluginConstants.STATUS_BAD_INPUT;
-            Gson gson = new Gson();
-            Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
-            }.getType();
-            this.schedule = gson.fromJson(jsonSchedule, scheduleType);
-            notificationManager.scheduleNotifications(schedule);
-            return SithClanPluginConstants.STATUS_OK;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return SithClanPluginConstants.STATUS_NOT_FOUND;
-        }
-    }
-
-    /**
-     * Saves schedule to local file for cached loading
-     * 
-     * @param data String Schedule as JSON string
-     */
-    private void saveScheduleLocally(String data) {
-        try (FileWriter fileWriter = new FileWriter(storedScheduleFile)) {
-            fileWriter.write(data);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**

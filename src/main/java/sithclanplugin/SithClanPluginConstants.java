@@ -15,6 +15,7 @@ public class SithClanPluginConstants {
     // file structure
     public static final String LOCAL_DIRECTORY_NAME = "sithclanplugin";
     public static final String STORED_SCHEDULE_NAME = "sithclaneventschedule.txt";
+    public static final String STORED_EVENTS_NOTIFIED = "sithclannotifiedevents.txt";
 
     // uris
     public static final String EVENT_SCHEDULE_GET_URI = "https://sithclanplugin.psenk168.workers.dev/api/eventschedule";
