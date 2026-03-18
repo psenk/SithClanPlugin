@@ -7,7 +7,9 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,8 +61,6 @@ public class SithClanEventSchedulePanel extends JPanel {
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
-    private static final String DATE_FORMAT = "M/d/yyyy";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
     @Inject
     SithClanEventSchedulePanel(SithClanEventSchedule eventSchedule) {
@@ -170,7 +170,7 @@ public class SithClanEventSchedulePanel extends JPanel {
             scheduleContainer.add(dailyEvents);
 
             for (SithClanEvent event : day.getEvents()) {
-                JPanel singleEvent = createEvent(event);
+                JPanel singleEvent = createEvent(event, day.getDate());
 
                 dailyEvents.add(singleEvent);
                 dailyEvents.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -236,7 +236,7 @@ public class SithClanEventSchedulePanel extends JPanel {
      * @param event SithClanEvent object with all event data
      * @return JPanel containing single event
      */
-    private JPanel createEvent(SithClanEvent event) {
+    private JPanel createEvent(SithClanEvent event, String day) {
         JPanel singleEvent = new JPanel();
         singleEvent.setLayout(new BoxLayout(singleEvent, BoxLayout.Y_AXIS));
         singleEvent.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -247,7 +247,12 @@ public class SithClanEventSchedulePanel extends JPanel {
         eventTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventTitle);
 
-        JLabel eventTime = new JLabel(event.getEventTime());
+        ZonedDateTime estTime = ZonedDateTime.of(
+                LocalDate.parse(day, SithClanPluginConstants.DATE_FORMATTER),
+                LocalTime.parse(event.getEventTime(), SithClanPluginConstants.TIME_FORMATTER),
+                ZoneId.of("America/New_York"));
+        ZonedDateTime localTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
+        JLabel eventTime = new JLabel(localTime.format(SithClanPluginConstants.TIME_FORMATTER));
         eventTime.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventTime);
 
@@ -265,7 +270,6 @@ public class SithClanEventSchedulePanel extends JPanel {
             }
         }
         JLabel eventLocation = createWorldLink(event.getEventLocation());
-        // TODO: world hop link
         eventLocation.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventLocation);
 
@@ -352,7 +356,7 @@ public class SithClanEventSchedulePanel extends JPanel {
     private void checkScheduleExpired(String inputDay) {
         if (inputDay.isBlank())
             return;
-        LocalDate finalDate = LocalDate.parse(inputDay, FORMATTER);
+        LocalDate finalDate = LocalDate.parse(inputDay, SithClanPluginConstants.DATE_FORMATTER);
         if (finalDate.isBefore(LocalDate.now()))
             scheduleExpiredLabel.setVisible(true);
         else

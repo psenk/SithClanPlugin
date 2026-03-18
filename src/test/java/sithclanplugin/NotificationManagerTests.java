@@ -9,9 +9,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -25,7 +25,6 @@ import org.mockito.MockitoAnnotations;
 import net.runelite.client.Notifier;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
-import sithclanplugin.eventschedule.SithClanNotificationManager;
 
 public class NotificationManagerTests {
 
@@ -79,7 +78,7 @@ public class NotificationManagerTests {
     @Test
     public void testFutureEventScheduled() {
         // create future event
-        LocalDateTime futureEvent = LocalDateTime.now().plusMinutes(30);
+        ZonedDateTime futureEvent = ZonedDateTime.now(ZoneId.of("America/New_York")).plusMinutes(30);
         String date = futureEvent.format(DateTimeFormatter.ofPattern("M/d/yyyy"));
         String time = futureEvent.format(DateTimeFormatter.ofPattern("h:mm a"));
 
@@ -92,13 +91,9 @@ public class NotificationManagerTests {
 
     @Test
     public void testEventAtBufferThreshold() {
-        LocalDateTime thresholdEvent = LocalDateTime.now().plusMinutes(16);
+        ZonedDateTime thresholdEvent = ZonedDateTime.now(ZoneId.of("America/New_York")).plusMinutes(16);
         String date = thresholdEvent.format(DateTimeFormatter.ofPattern("M/d/yyyy"));
         String time = thresholdEvent.format(DateTimeFormatter.ofPattern("h:mm a"));
-
-        System.out.println("Event time: " + thresholdEvent);
-        System.out.println("Now: " + LocalDateTime.now());
-        System.out.println("Minutes between: " + ChronoUnit.MINUTES.between(LocalDateTime.now(), thresholdEvent));
 
         when(config.notificationTimeBuffer()).thenReturn(15);
 
@@ -111,8 +106,8 @@ public class NotificationManagerTests {
     @Test
     public void testMultipleEventsOnSameDay() {
         // create future event
-        LocalDateTime futureEvent = LocalDateTime.now().plusMinutes(30);
-        LocalDateTime futureEventTwo = LocalDateTime.now().plusMinutes(40);
+        ZonedDateTime futureEvent = ZonedDateTime.now(ZoneId.of("America/New_York")).plusMinutes(30);
+        ZonedDateTime futureEventTwo = ZonedDateTime.now(ZoneId.of("America/New_York")).plusMinutes(40);
         String date = futureEvent.format(DateTimeFormatter.ofPattern("M/d/yyyy"));
         String time = futureEvent.format(DateTimeFormatter.ofPattern("h:mm a"));
 
@@ -138,7 +133,7 @@ public class NotificationManagerTests {
                 .thenReturn(future)
                 .thenAnswer(invocation -> mock(ScheduledFuture.class));
 
-        LocalDateTime futureEvent = LocalDateTime.now().plusMinutes(30);
+        ZonedDateTime futureEvent = ZonedDateTime.now(ZoneId.of("America/New_York")).plusMinutes(30);
         String date = futureEvent.format(DateTimeFormatter.ofPattern("M/d/yyyy"));
         String time = futureEvent.format(DateTimeFormatter.ofPattern("h:mm a"));
 

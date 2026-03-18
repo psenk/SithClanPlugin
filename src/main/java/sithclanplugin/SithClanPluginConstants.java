@@ -1,5 +1,7 @@
 package sithclanplugin;
 
+import java.time.format.DateTimeFormatter;
+
 public class SithClanPluginConstants {
 
     // status codes
@@ -22,4 +24,10 @@ public class SithClanPluginConstants {
     // discord
     public static final String SITH_DISCORD_SERVER_ID = "741153043776667658";
     public static final String DISCORD_CHANNEL_URL = "https://discord.com/channels/" + SITH_DISCORD_SERVER_ID + "/";
+
+    // timing
+    public static final String DATE_FORMAT = "M/d/yyyy";
+    public static final String TIME_FORMAT = "h:mm a";
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(TIME_FORMAT);
 }
