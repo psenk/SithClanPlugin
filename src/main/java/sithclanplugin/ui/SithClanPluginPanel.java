@@ -23,7 +23,9 @@ import sithclanplugin.eventschedule.SithClanEventSchedule;
 @Getter
 public class SithClanPluginPanel extends PluginPanel {
 
+    @Inject
     private SithClanEventSchedule eventSchedule;
+
     private final SithClanEventSchedulePanel schedulePanel;
     private final SithClanSenatePanel senatePanel;
 
@@ -40,7 +42,7 @@ public class SithClanPluginPanel extends PluginPanel {
     private static final String SENATE_TITLE = "senate";
 
     @Inject
-    SithClanPluginPanel(SithClanEventSchedule eventSchedule, SithClanEventSchedulePanel schedulePanel,
+    SithClanPluginPanel(SithClanEventSchedulePanel schedulePanel,
             SithClanSenatePanel senatePanel) {
         this.setLayout(new BorderLayout());
         getScrollPane().setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);

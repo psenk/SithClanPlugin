@@ -28,14 +28,15 @@ import sithclanplugin.eventschedule.SithClanEventSchedule;
 @Singleton
 public class SithClanSenatePanel extends JPanel {
 
+    @Inject
+    private SithClanEventSchedule eventSchedule;
+
     private final JLabel senatePanelLabel;
     private final JLabel senatePostScheduleLabel;
     private final JPanel senatePostSchedulePanel;
     private final JScrollPane senatePostScheduleScrollPane;
     private final JTextArea senatePostScheduleTextArea;
     private final JButton senatePostScheduleButton;
-
-    private SithClanEventSchedule eventSchedule;
 
     private static final String SENATE_OPTIONS_LABEL = "Senate Options";
     private static final String UPDATE_SCHEDULE_LABEL = "Update Schedule";
@@ -45,9 +46,7 @@ public class SithClanSenatePanel extends JPanel {
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
 
     @Inject
-    SithClanSenatePanel(SithClanEventSchedule eventSchedule) {
-
-        this.eventSchedule = eventSchedule;
+    SithClanSenatePanel() {
         final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
         final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
 
@@ -105,6 +104,13 @@ public class SithClanSenatePanel extends JPanel {
         senatePostSchedulePanel.setVisible(false);
         this.add(senatePostSchedulePanel);
 
+        attachActionListener();
+    }
+
+    /**
+     * Adds action listener to post schedule button.
+     */
+    private void attachActionListener() {
         // post event schedule action
         senatePostScheduleButton.addActionListener(e -> {
             new Thread(() -> {

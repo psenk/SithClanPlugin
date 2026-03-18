@@ -43,14 +43,15 @@ public class SithClanEventSchedulePanel extends JPanel {
     @Inject
     private SithClanPlugin plugin;
 
+    @Inject
+    private SithClanEventSchedule eventSchedule;
+
     private final JLabel schedulePanelLabel;
     private final JLabel scheduleExpiredLabel;
     private final JButton scheduleGetEventScheduleButton;
     private final JPanel scheduleContainer;
     private final JScrollPane scheduleContainerScrollPane;
     private Runnable onRefreshCallback;
-
-    private SithClanEventSchedule eventSchedule;
 
     private final Icon rightArrowIcon;
     private final Icon downArrowIcon;
@@ -63,9 +64,7 @@ public class SithClanEventSchedulePanel extends JPanel {
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
 
     @Inject
-    SithClanEventSchedulePanel(SithClanEventSchedule eventSchedule) {
-
-        this.eventSchedule = eventSchedule;
+    SithClanEventSchedulePanel() {
         rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
         downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
         this.setLayout(new BorderLayout());
