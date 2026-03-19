@@ -19,6 +19,7 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -31,8 +32,11 @@ import com.google.inject.Singleton;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
+import sithclanplugin.SithClanNotificationManager;
 import sithclanplugin.SithClanPlugin;
 import sithclanplugin.SithClanPluginConstants;
+import sithclanplugin.SithClanPluginFileManager;
+import sithclanplugin.SithClanPluginUtil;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
@@ -45,6 +49,12 @@ public class SithClanEventSchedulePanel extends JPanel {
 
     @Inject
     private SithClanEventSchedule eventSchedule;
+
+    @Inject
+    private SithClanPluginFileManager fileManager;
+
+    @Inject
+    private SithClanNotificationManager notificationManager;
 
     private final JLabel schedulePanelLabel;
     private final JLabel scheduleExpiredLabel;
@@ -235,13 +245,34 @@ public class SithClanEventSchedulePanel extends JPanel {
      * @return JPanel containing single event
      */
     private JPanel createEvent(SithClanEvent event, String day) {
+        String eventTitleString = SithClanPluginUtil.removeEmojis(event.getEventTitle());
+
+        JPanel eventContainer = new JPanel();
+        eventContainer.setLayout(new BorderLayout());
+
         JPanel singleEvent = new JPanel();
         singleEvent.setLayout(new BoxLayout(singleEvent, BoxLayout.Y_AXIS));
         singleEvent.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
 
-        String title = event.getEventTitle();
-        JLabel eventTitle = new JLabel(removeEmojis(title));
+        JCheckBox notificationCheckbox = new JCheckBox();
+        notificationCheckbox.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        notificationCheckbox.setToolTipText("Check box to receive notification before event start.");
+        notificationCheckbox.setSelected(fileManager.isSubscribed(eventTitleString));
+
+        notificationCheckbox.addActionListener(e -> {
+            if (notificationCheckbox.isSelected()) {
+                fileManager.addSubscription(eventTitleString);
+            } else {
+                fileManager.removeSubscription(eventTitleString);
+            }
+            notificationManager.scheduleNotifications(eventSchedule.getSchedule());
+        });
+
+        eventContainer.add(singleEvent, BorderLayout.WEST);
+        eventContainer.add(notificationCheckbox, BorderLayout.EAST);
+
+        JLabel eventTitle = new JLabel(eventTitleString);
         eventTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventTitle);
 
@@ -262,7 +293,7 @@ public class SithClanEventSchedulePanel extends JPanel {
 
         if (!event.getEventMiscInfo().isEmpty()) {
             for (String info : event.getEventMiscInfo()) {
-                JLabel eventInfo = createDiscordLink(removeEmojis(info));
+                JLabel eventInfo = createDiscordLink(SithClanPluginUtil.removeEmojis(info));
                 eventInfo.setAlignmentX(Component.LEFT_ALIGNMENT);
                 singleEvent.add(eventInfo);
             }
@@ -276,7 +307,7 @@ public class SithClanEventSchedulePanel extends JPanel {
             eventRepeated.setAlignmentX(Component.LEFT_ALIGNMENT);
             singleEvent.add(eventRepeated);
         }
-        return singleEvent;
+        return eventContainer;
     }
 
     /**
@@ -308,16 +339,6 @@ public class SithClanEventSchedulePanel extends JPanel {
             return channelLink;
         }
         return new JLabel(text);
-    }
-
-    /**
-     * Helper method, removes Discord emojis from text
-     * 
-     * @param text String text in to search for emojis using regex
-     * @return String output without emojis
-     */
-    private String removeEmojis(String text) {
-        return text.replaceAll(":[a-zA-Z0-9_]+:", "").trim();
     }
 
     /**
