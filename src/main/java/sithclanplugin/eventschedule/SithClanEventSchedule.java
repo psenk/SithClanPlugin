@@ -162,6 +162,28 @@ public class SithClanEventSchedule {
     }
 
     /**
+     * Gets event schedule from local file for display on panel
+     * 
+     * @return int SithClanPluginConstants status code value
+     */
+    public int parseScheduleFromFile() {
+        try {
+            String jsonSchedule = fileManager.readScheduleFile();
+            if (jsonSchedule == null || jsonSchedule.isBlank())
+                return SithClanPluginConstants.STATUS_BAD_INPUT;
+            Gson gson = new Gson();
+            Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
+            }.getType();
+            this.schedule = gson.fromJson(jsonSchedule, scheduleType);
+            notificationManager.scheduleNotifications(schedule);
+            return SithClanPluginConstants.STATUS_OK;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return SithClanPluginConstants.STATUS_NOT_FOUND;
+        }
+    }
+
+    /**
      * Helper function, converts event schedule String list into custom object
      * ArrayList output
      * 
