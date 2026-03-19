@@ -22,6 +22,9 @@ import sithclanplugin.eventschedule.SithClanEvent;
 @Singleton
 public class SithClanNotificationManager {
 
+    @Inject
+    private SithClanPluginFileManager fileManager;
+
     private final Notifier notifier;
     private final SithClanPluginConfig config;
     private final ScheduledExecutorService scheduler;
@@ -57,6 +60,8 @@ public class SithClanNotificationManager {
         for (SithClanDaySchedule day : schedule) {
             String currentDay = day.getDate();
             for (SithClanEvent event : day.getEvents()) {
+                String eventTitle = SithClanPluginUtil.removeEmojis(event.getEventTitle());
+                if (!fileManager.isSubscribed(eventTitle)) continue;
                 String currentTime = event.getEventTime();
 
                 try {
@@ -73,7 +78,7 @@ public class SithClanNotificationManager {
                     // schedule event
                     if (delay >= 0) {
                         ScheduledFuture<?> future = scheduler.schedule(() -> {
-                            notifier.notify("Clan event starting soon: " + event.getEventTitle());
+                            notifier.notify("Clan event starting soon: " + eventTitle);
                         }, delay, TimeUnit.MINUTES);
                         scheduledNotifications.add(future);
                     }
