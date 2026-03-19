@@ -34,6 +34,7 @@ import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
 import sithclanplugin.SithClanNotificationManager;
 import sithclanplugin.SithClanPlugin;
+import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.SithClanPluginConstants;
 import sithclanplugin.SithClanPluginFileManager;
 import sithclanplugin.SithClanPluginUtil;
@@ -48,7 +49,7 @@ public class SithClanEventSchedulePanel extends JPanel {
     private SithClanPlugin plugin;
 
     @Inject
-    private SithClanEventSchedule eventSchedule;
+    private SithClanPluginConfig config;
 
     @Inject
     private SithClanPluginFileManager fileManager;
@@ -56,9 +57,12 @@ public class SithClanEventSchedulePanel extends JPanel {
     @Inject
     private SithClanNotificationManager notificationManager;
 
+    @Inject
+    private SithClanEventSchedule eventSchedule;
+
     private final JLabel schedulePanelLabel;
     private final JLabel scheduleExpiredLabel;
-    private final JButton scheduleGetEventScheduleButton;
+    private final JButton scheduleRefreshScheduleButton;
     private final JPanel scheduleContainer;
     private final JScrollPane scheduleContainerScrollPane;
     private Runnable onRefreshCallback;
@@ -88,8 +92,8 @@ public class SithClanEventSchedulePanel extends JPanel {
 
         schedulePanelLabel = new JLabel(EVENT_SCHEDULE);
         schedulePanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        scheduleGetEventScheduleButton = new JButton(GET_SCHEDULE_BUTTON);
-        scheduleGetEventScheduleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        scheduleRefreshScheduleButton = new JButton(GET_SCHEDULE_BUTTON);
+        scheduleRefreshScheduleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         scheduleContainerScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         scheduleExpiredLabel = new JLabel(SCHEDULE_EXPIRED);
@@ -109,13 +113,13 @@ public class SithClanEventSchedulePanel extends JPanel {
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         bottomPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        bottomPanel.add(scheduleGetEventScheduleButton);
+        bottomPanel.add(scheduleRefreshScheduleButton);
 
         this.add(bottomPanel, BorderLayout.SOUTH);
         this.setVisible(true);
 
         // get event schedule action
-        scheduleGetEventScheduleButton.addActionListener(e -> {
+        scheduleRefreshScheduleButton.addActionListener(e -> {
             new Thread(() -> {
                 int status = eventSchedule.parseScheduleFromGet();
                 SwingUtilities.invokeLater(() -> {
@@ -258,6 +262,7 @@ public class SithClanEventSchedulePanel extends JPanel {
         JCheckBox notificationCheckbox = new JCheckBox();
         notificationCheckbox.setAlignmentX(Component.RIGHT_ALIGNMENT);
         notificationCheckbox.setToolTipText("Check box to receive notification before event start.");
+        notificationCheckbox.setEnabled(config.eventNotifications());
         notificationCheckbox.setSelected(fileManager.isSubscribed(eventTitleString));
 
         notificationCheckbox.addActionListener(e -> {

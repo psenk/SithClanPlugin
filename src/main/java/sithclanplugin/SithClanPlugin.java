@@ -45,25 +45,25 @@ public class SithClanPlugin extends Plugin {
 	private ClientToolbar clientToolbar;
 
 	@Inject
-	private SithClanPluginConfig config;
-
-	@Inject
 	private WorldService worldService;
 
 	@Inject
 	private ChatMessageManager chatMessageManager;
 
 	@Inject
-	private Provider<SithClanPluginPanel> uiPanel;
+	private SithClanPluginConfig config;
 
 	@Inject
-	private SithClanEventSchedule eventSchedule;
+	private SithClanPluginFileManager fileManager;
 
 	@Inject
 	private SithClanNotificationManager notificationManager;
 
 	@Inject
-	private SithClanPluginFileManager fileManager;
+	private Provider<SithClanPluginPanel> uiPanel;
+
+	@Inject
+	private SithClanEventSchedule eventSchedule;
 
 	private NavigationButton uiNavigationButton;
 	private net.runelite.api.World quickHopTargetWorld;
