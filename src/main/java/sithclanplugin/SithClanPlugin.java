@@ -1,7 +1,6 @@
 package sithclanplugin;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
@@ -12,10 +11,8 @@ import com.google.inject.Provides;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.client.RuneLite;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
@@ -69,7 +66,7 @@ public class SithClanPlugin extends Plugin {
 	private SithClanPluginFileManager fileManager;
 
 	private NavigationButton uiNavigationButton;
-	private net.runelite.api.World eventLocationWorld;
+	private net.runelite.api.World quickHopTargetWorld;
 	private int displaySwitcherAttempts = 0;
 
 	private static final String PLUGIN_ICON_PATH = "/icon.png";
@@ -89,27 +86,13 @@ public class SithClanPlugin extends Plugin {
 				.build();
 
 		clientToolbar.addNavigation(uiNavigationButton);
-
-		// create plugin folder if does not exist
-		File localDirectory = new File(RuneLite.RUNELITE_DIR, SithClanPluginConstants.LOCAL_DIRECTORY_NAME);
-		if (!localDirectory.exists())
-			localDirectory.mkdirs();
-
-		// create saved schedule file if does not exist
-		File storedSchedule = new File(localDirectory, SithClanPluginConstants.STORED_SCHEDULE_NAME);
-		if (!storedSchedule.exists())
-			storedSchedule.createNewFile();
-
-		// create file that saves preferred event notifications
-		File notifiedEvents = new File(localDirectory, SithClanPluginConstants.STORED_EVENTS_NOTIFIED);
-		if (!notifiedEvents.exists())
-			notifiedEvents.createNewFile();
+		fileManager.initializeFiles();
 
 		// load schedule if saved, else get new schedule
 		// validate API key of Senate members
-		boolean hasStoredSchedule = storedSchedule.length() > 0;
+		boolean hasStoredSchedule = fileManager.hasSavedSchedule();
 		new Thread(() -> {
-			int status = hasStoredSchedule ? fileManager.parseScheduleFromFile()
+			int status = hasStoredSchedule ? eventSchedule.parseScheduleFromFile()
 					: eventSchedule.parseScheduleFromGet();
 			boolean isSenateMember = eventSchedule.validateApiKey();
 			SwingUtilities.invokeLater(() -> {
@@ -129,23 +112,19 @@ public class SithClanPlugin extends Plugin {
 
 	@Subscribe
 	public void onGameTick(GameTick event) {
-		if (eventLocationWorld == null)
+		if (quickHopTargetWorld == null)
 			return;
 		if (client.getWidget(InterfaceID.Worldswitcher.BUTTONS) == null) {
 			client.openWorldHopper();
 			if (++displaySwitcherAttempts >= DISPLAY_SWITCHER_MAX_ATTEMPTS) {
-				eventLocationWorld = null;
+				quickHopTargetWorld = null;
 				displaySwitcherAttempts = 0;
 			}
 		} else {
-			client.hopToWorld(eventLocationWorld);
-			eventLocationWorld = null;
+			client.hopToWorld(quickHopTargetWorld);
+			quickHopTargetWorld = null;
 			displaySwitcherAttempts = 0;
 		}
-	}
-
-	@Subscribe
-	public void onGameStateChanged(GameStateChanged gameStateChanged) {
 	}
 
 	// allows config to be accessible from RL settings panel
@@ -214,7 +193,7 @@ public class SithClanPlugin extends Plugin {
 				.type(ChatMessageType.CONSOLE)
 				.runeLiteFormattedMessage(chatMessage)
 				.build());
-		eventLocationWorld = rsWorld;
+		quickHopTargetWorld = rsWorld;
 		displaySwitcherAttempts = 0;
 	}
 }
