@@ -32,28 +32,28 @@ public class SithClanEventSchedule {
     private SithClanPluginConfig config;
 
     @Inject
-    private SithClanNotificationManager notificationManager;
-
-    @Inject
     private SithClanPluginFileManager fileManager;
 
-    private boolean isSenateMember = false;
+    @Inject
+    private SithClanNotificationManager notificationManager;
+
     private ArrayList<SithClanDaySchedule> schedule;
-    private LocalDateTime lastScheduleFetch;
     private final HttpClient httpClient;
+    private boolean isSenateMember = false;
+    private LocalDateTime lastTimeScheduleFetched;
 
     private static final int SCHEDULE_FETCH_COOLDOWN_MINUTES = 5;
 
     public SithClanEventSchedule() {
         schedule = new ArrayList<>();
-        lastScheduleFetch = null;
+        lastTimeScheduleFetched = null;
         httpClient = HttpClient.newHttpClient();
     }
 
     /**
-     * Uses HTTP GET request to obtain event schedule
+     * Creates and sends an HTTP GET request to obtain the event schedule
      * 
-     * @return String event schedule
+     * @return String event schedule string in HTTP response body
      */
     private String getEventSchedule() {
         // build HTTP GET request
@@ -62,7 +62,7 @@ public class SithClanEventSchedule {
                 .GET()
                 .build();
         try {
-            // send request and return response
+            // send request and process response
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return response.body();
         } catch (Exception e) {
@@ -72,10 +72,10 @@ public class SithClanEventSchedule {
     }
 
     /**
-     * Uses HTTP POST request to post event schedule
+     * Creates and sends HTTP POST request to post new event schedule
      * 
-     * @param jsonData String event schedule
-     * @return String HTTP response body
+     * @param jsonData String JSON event schedule in string format
+     * @return String HTTP Response body with status code
      */
     private String postEventSchedule(String jsonData) {
         // build HTTP POST request
@@ -86,8 +86,11 @@ public class SithClanEventSchedule {
                 .POST(HttpRequest.BodyPublishers.ofString(jsonData))
                 .build();
         try {
-            // send request and return response
+            // send request and process response
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                return null;
+            }
             return response.body();
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,34 +99,33 @@ public class SithClanEventSchedule {
     }
 
     /**
-     * Gets event schedule for display on panel
+     * Gets event schedule
      * Includes 5 min rate limiting
      * Saves schedule locally
-     * Schedules notifications
+     * Schedules event notifications
      * 
      * @return int SithClanPluginConstants status code value
      */
     public int parseScheduleFromGet() {
         // rate limiting, 5 minutes
-        boolean rateLimited = lastScheduleFetch != null
-                && LocalDateTime.now().isBefore(lastScheduleFetch.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES));
+        boolean rateLimited = lastTimeScheduleFetched != null
+                && LocalDateTime.now().isBefore(lastTimeScheduleFetched.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES));
 
-        // senate members bypass rate limiting
+        // allows senate members to bypass rate limiting
         if (rateLimited && !isSenateMember)
             return SithClanPluginConstants.STATUS_RATE_LIMITED;
 
-        // get fresh schedule
+        // get fresh event schedule
         String jsonSchedule = getEventSchedule();
         if (jsonSchedule == null)
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         // convert schedule to JSON
-        Gson gson = new Gson();
-        // java generic type erasure workaround
-        Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
-        }.getType();
-        this.schedule = gson.fromJson(jsonSchedule, scheduleType);
+        this.schedule = deserializeSchedule(jsonSchedule);
+        // saves schedule
         fileManager.saveScheduleLocally(jsonSchedule);
-        this.lastScheduleFetch = LocalDateTime.now();
+        // refresh rate limiting
+        this.lastTimeScheduleFetched = LocalDateTime.now();
+        // schedule event notifications
         notificationManager.scheduleNotifications(schedule);
         return SithClanPluginConstants.STATUS_OK;
     }
@@ -133,48 +135,50 @@ public class SithClanEventSchedule {
      * Saves schedule locally
      * Schedules notifications
      * 
-     * @param text event schedule as String input from plugin
+     * @param scheduleInput String event schedule from plugin text box
      * @return int SithClanPluginConstants status code value
      */
-    public int parseScheduleForPost(String text) {
-        if (text.isBlank())
+    public int parseScheduleForPost(String scheduleInput) {
+        if (scheduleInput.isBlank())
             return SithClanPluginConstants.STATUS_BAD_INPUT;
 
         // split input into list of strings
-        String[] scheduleInput = text.split("\\r?\\n");
-
-        ArrayList<SithClanDaySchedule> newSchedule = convertSchedule(scheduleInput);
+        String[] scheduleInputList = scheduleInput.split("\\r?\\n");
+        // turn list into event schedule
+        ArrayList<SithClanDaySchedule> newSchedule = convertSchedule(scheduleInputList);
         if (newSchedule == null || newSchedule.isEmpty())
             return SithClanPluginConstants.STATUS_BAD_INPUT;
 
-        // storing schedule as JSON object
+        // store schedule as JSON object
         Gson gson = new Gson();
         String data = gson.toJson(newSchedule);
 
-        // posting schedule online
+        // post schedule
         String response = postEventSchedule(data);
         if (response == null)
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         this.schedule = newSchedule;
+        // save schedule
         fileManager.saveScheduleLocally(data);
+        // schedule event notifications
         notificationManager.scheduleNotifications(schedule);
         return SithClanPluginConstants.STATUS_OK;
     }
 
     /**
-     * Gets event schedule from local file for display on panel
+     * Gets event schedule from local file
      * 
      * @return int SithClanPluginConstants status code value
      */
     public int parseScheduleFromFile() {
         try {
+            // load schedule from local file
             String jsonSchedule = fileManager.readScheduleFile();
             if (jsonSchedule == null || jsonSchedule.isBlank())
                 return SithClanPluginConstants.STATUS_BAD_INPUT;
-            Gson gson = new Gson();
-            Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
-            }.getType();
-            this.schedule = gson.fromJson(jsonSchedule, scheduleType);
+            // convert schedule to JSON
+            this.schedule = deserializeSchedule(jsonSchedule);
+            // schedule event notifications
             notificationManager.scheduleNotifications(schedule);
             return SithClanPluginConstants.STATUS_OK;
         } catch (Exception e) {
@@ -184,64 +188,64 @@ public class SithClanEventSchedule {
     }
 
     /**
-     * Helper function, converts event schedule String list into custom object
-     * ArrayList output
+     * Converts event schedule String list into custom object list
      * 
-     * @param scheduleInput String[] event schedule in list
-     * @return ArrayList<SithClanDaySchedule> converted event schedule output
+     * @param scheduleInput event schedule in String[] list
+     * @return ArrayList<SithClanDaySchedule> converted event schedule
      */
     private ArrayList<SithClanDaySchedule> convertSchedule(String[] scheduleInput) {
         // tracking states
         SithClanDaySchedule currentDay = null;
         SithClanEvent currentEvent = null;
+
         ArrayList<SithClanDaySchedule> newSchedule = new ArrayList<>();
 
-        // iterate through parsed event list
+        // iterate through schedule list
         for (String line : scheduleInput) {
             line = line.trim();
             if (line.isBlank())
                 continue;
-            // event date and new day
+            // parse event date
             if (line.startsWith("--")) {
-                // next day in list
+                // add previous day created
                 if (currentDay != null)
                     newSchedule.add(currentDay);
 
-                // first day
+                // create and setup day
                 currentDay = new SithClanDaySchedule();
                 currentDay.setDate(line.substring(2));
                 currentDay.setEvents(new ArrayList<>());
             }
-            // event title and new event
+            // parse event title
             else if (line.startsWith("-")) {
                 if (currentDay == null)
                     return null;
-                // add last event to day
+                // add previous event created to day
                 if (currentEvent != null)
                     currentDay.getEvents().add(currentEvent);
 
-                // first event
+                // create and setup event
                 currentEvent = new SithClanEvent();
                 currentEvent.setEventTitle(line.substring(1));
                 currentEvent.setEventMiscInfo(new ArrayList<>());
             }
-            // event time
+            // parse event time
             else if (currentEvent != null && currentEvent.getEventTime() == null)
                 currentEvent.setEventTime(line);
 
-            // event host (optional)
+            // parse event host (optional info)
             else if (currentEvent != null && line.startsWith("Hosted by:"))
                 currentEvent.setEventHost(line.substring(11));
 
-            // event location
+            // parse event location
             else if (currentEvent != null && line.startsWith("🌎"))
                 currentEvent.setEventLocation(line);
 
-            // event repetition (optional)
+            // parse event repetition (optional)
             else if (currentEvent != null && line.startsWith("**"))
                 currentEvent.setEventRepeated(true);
 
-            // misc event info
+            // parse misc event info
             else {
                 if (currentEvent == null)
                     continue;
@@ -249,14 +253,14 @@ public class SithClanEventSchedule {
             }
         }
 
-        // add last event
+        // add final event
         if (currentEvent != null) {
             if (currentDay == null)
                 return null;
             currentDay.getEvents().add(currentEvent);
         }
 
-        // add last day
+        // add final day
         if (currentDay != null)
             newSchedule.add(currentDay);
 
@@ -264,12 +268,28 @@ public class SithClanEventSchedule {
     }
 
     /**
-     * Validates API key in config
+     * Deserializes JSON string to ArrayList of SithClanDaySchedule objects
+     * 
+     * @param jsonSchedule JSON String of event schedule
+     * @return ArrayList<SithClanDaySchedule> deserialized event schedule
+     */
+    private ArrayList<SithClanDaySchedule> deserializeSchedule(String jsonSchedule) {
+        // convert schedule to JSON
+        Gson gson = new Gson();
+        // java generic type erasure workaround
+        Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
+        }.getType();
+        return gson.fromJson(jsonSchedule, scheduleType);
+    }
+
+    /**
+     * Validates API key in plugin config via HTTP GET request
      * Saves senate member state
      * 
-     * @return boolean is key valid or not
+     * @return boolean is API key valid
      */
     public boolean validateApiKey() {
+        // create HTTP GET request
         HttpRequest validationRequest = HttpRequest.newBuilder()
                 .uri(URI.create(SithClanPluginConstants.VALIDATE_URI))
                 .header("Authorization", "Bearer " + config.apiKey())
@@ -277,8 +297,10 @@ public class SithClanEventSchedule {
                 .build();
 
         try {
+            // send request
             HttpResponse<String> validationResponse = httpClient.send(validationRequest,
                     HttpResponse.BodyHandlers.ofString());
+            // validate response
             this.isSenateMember = validationResponse.statusCode() == 200;
             return this.isSenateMember;
         } catch (Exception e) {
