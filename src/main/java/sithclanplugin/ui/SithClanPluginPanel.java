@@ -44,39 +44,35 @@ public class SithClanPluginPanel extends PluginPanel {
     @Inject
     SithClanPluginPanel(SithClanEventSchedulePanel schedulePanel,
             SithClanSenatePanel senatePanel) {
+        this.schedulePanel = schedulePanel;
+        this.senatePanel = senatePanel;
+
         this.setLayout(new BorderLayout());
         getScrollPane().setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        // create card panel and layout manager
+        // main panel
         cardPanel = new JPanel();
-        cardLayout = new CardLayout();
         cardPanel.setLayout(cardLayout);
+        cardPanel.add(schedulePanel, SCHEDULE_TITLE);
+        cardPanel.add(senatePanel, SENATE_TITLE);
+        cardLayout = new CardLayout();
 
-        // create cards and button panel
-        this.schedulePanel = schedulePanel;
-        this.senatePanel = senatePanel;
+        // create container panels
         buttonPanel = new JPanel();
-        navPanel = new JPanel();
-
-        // configure panel layouts
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        navPanel = new JPanel();
         navPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        navPanel.add(buttonPanel);
 
         // create panel buttons
         scheduleButton = new JButton(EVENT_SCHEDULE);
         senateButton = new JButton(SENATE_OPTIONS);
-
-        // add cards to card panel
-        cardPanel.add(schedulePanel, SCHEDULE_TITLE);
-        cardPanel.add(senatePanel, SENATE_TITLE);
 
         // adding buttons to button panel
         buttonPanel.add(scheduleButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(senateButton);
 
-        // add panels to main panel
-        navPanel.add(buttonPanel);
         this.add(navPanel, BorderLayout.NORTH);
         this.add(cardPanel, BorderLayout.CENTER);
 
@@ -89,6 +85,7 @@ public class SithClanPluginPanel extends PluginPanel {
             cardLayout.show(cardPanel, SENATE_TITLE);
         });
 
+        // show senate button if API key added
         schedulePanel.setOnRefreshCallback(() -> {
             new Thread(() -> {
                 boolean isSenateMember = eventSchedule.validateApiKey();
