@@ -62,45 +62,57 @@ public class SithClanEventSchedulePanel extends JPanel {
 
     private final JLabel schedulePanelLabel;
     private final JLabel scheduleExpiredLabel;
-    private final JButton scheduleRefreshScheduleButton;
     private final JPanel scheduleContainer;
     private final JScrollPane scheduleContainerScrollPane;
+    private final JButton scheduleRefreshScheduleButton;
     private Runnable onRefreshCallback;
 
     private final Icon rightArrowIcon;
     private final Icon downArrowIcon;
 
     private static final String EVENT_SCHEDULE = "Event Schedule";
-    private static final String SCHEDULE_EXPIRED = "Schedule Expired! Please Refresh.";
-    private static final String GET_SCHEDULE_BUTTON = "Refresh Schedule";
-    private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
-    private static final String ARROW_DOWN_PATH = "/arrow_down.png";
+    private static final String SCHEDULE_EXPIRED_WARNING = "This schedule is expired! Please refresh";
+    private static final String REFRESH_SCHEDULE_BUTTON = "Refresh Schedule";
+    private static final String ARROW_RIGHT_IMG_PATH = "/arrow_right.png";
+    private static final String ARROW_DOWN_IMG_PATH = "/arrow_down.png";
+    private static final String RATE_LIMITED_WARNING = "The schedule has been retrieved too recently.  Try again in a few minutes.";
+    private static final String SCHEDULE_UNOBTAINABLE_WARNING = "Unable to obtain schedule.";
+    private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
 
     SithClanEventSchedulePanel() {
-        rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
-        downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
+        // load collapse/expand arrow imgs
+        rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_IMG_PATH));
+        downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_IMG_PATH));
+        // main panel layout
         this.setLayout(new BorderLayout());
 
         // contains event schedule
         scheduleContainer = new JPanel();
         scheduleContainer.setLayout(new BoxLayout(scheduleContainer, BoxLayout.Y_AXIS));
-        scheduleContainerScrollPane = new JScrollPane(scheduleContainer);
         scheduleContainer.setVisible(true);
         scheduleContainer.setOpaque(true);
         scheduleContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        schedulePanelLabel = new JLabel(EVENT_SCHEDULE);
-        schedulePanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        scheduleRefreshScheduleButton = new JButton(GET_SCHEDULE_BUTTON);
-        scheduleRefreshScheduleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // allows schedule to scroll
+        scheduleContainerScrollPane = new JScrollPane(scheduleContainer);
         scheduleContainerScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        scheduleExpiredLabel = new JLabel(SCHEDULE_EXPIRED);
+        // top panel title
+        schedulePanelLabel = new JLabel(EVENT_SCHEDULE);
+        schedulePanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // warning if schedule is expired
+        scheduleExpiredLabel = new JLabel(SCHEDULE_EXPIRED_WARNING);
         scheduleExpiredLabel.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
         scheduleExpiredLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         scheduleExpiredLabel.setVisible(false);
 
+        // button to refresh schedule
+        scheduleRefreshScheduleButton = new JButton(REFRESH_SCHEDULE_BUTTON);
+        scheduleRefreshScheduleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // organization, contains panel title and expiration warning
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.add(schedulePanelLabel);
@@ -110,6 +122,7 @@ public class SithClanEventSchedulePanel extends JPanel {
         this.add(topPanel, BorderLayout.NORTH);
         this.add(scheduleContainerScrollPane, BorderLayout.CENTER);
 
+        // organization, contains refresh button
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         bottomPanel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -118,24 +131,16 @@ public class SithClanEventSchedulePanel extends JPanel {
         this.add(bottomPanel, BorderLayout.SOUTH);
         this.setVisible(true);
 
-        // get event schedule action
+        // refresh event schedule button action
         scheduleRefreshScheduleButton.addActionListener(e -> {
             new Thread(() -> {
+                // get and store schedule
                 int status = eventSchedule.parseScheduleFromGet();
                 SwingUtilities.invokeLater(() -> {
-                    switch (status) {
-                        case 429:
-                            JOptionPane.showMessageDialog(null,
-                                    "The schedule has been retrieved too recently.  Try again in a few minutes.");
-                            break;
-                        case 404:
-                            JOptionPane.showMessageDialog(null,
-                                    "Unable to obtain schedule.");
-                            break;
-                        default:
-                            break;
-                    }
+                    handleScheduleStatus(status);
+                    // display schedule on panel
                     displaySchedule();
+                    // callback to reveal senate options button if API key added later
                     if (onRefreshCallback != null) {
                         onRefreshCallback.run();
                     }
@@ -149,22 +154,14 @@ public class SithClanEventSchedulePanel extends JPanel {
      */
     public void displaySchedule() {
         String currentDay = "";
+
+        // get and store schedule if we don't have it and try again
         if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty()) {
             new Thread(() -> {
                 int status = eventSchedule.parseScheduleFromGet();
                 SwingUtilities.invokeLater(() -> {
-                    switch (status) {
-                        case 429:
-                            JOptionPane.showMessageDialog(null,
-                                    "The schedule has been retrieved too recently.  Try again in a few minutes.");
-                            break;
-                        case 404:
-                            JOptionPane.showMessageDialog(null,
-                                    "Unable to obtain schedule.");
-                            break;
-                        default:
-                            break;
-                    }
+                    handleScheduleStatus(status);
+                    // display schedule on panel
                     displaySchedule();
                 });
             }).start();
@@ -173,21 +170,27 @@ public class SithClanEventSchedulePanel extends JPanel {
         // fresh start
         scheduleContainer.removeAll();
 
+        // iterate through all days in schedule
         for (SithClanDaySchedule day : eventSchedule.getSchedule()) {
             currentDay = day.getDate();
+            // create panel for each days events
             JPanel dailyEvents = createDailyEventsPanel();
+            // create interactable date label to collapse/expand days events
             JLabel dateLabel = createDateLabel(currentDay, dailyEvents);
 
             scheduleContainer.add(dateLabel);
             scheduleContainer.add(dailyEvents);
 
+            // iterate through all events in day
             for (SithClanEvent event : day.getEvents()) {
+                // create each event
                 JPanel singleEvent = createEvent(event, day.getDate());
 
                 dailyEvents.add(singleEvent);
                 dailyEvents.add(Box.createRigidArea(new Dimension(0, 10)));
             }
         }
+        // check if schedule is expired
         checkScheduleExpired(currentDay);
 
         scheduleContainer.revalidate();
@@ -195,9 +198,9 @@ public class SithClanEventSchedulePanel extends JPanel {
     }
 
     /**
-     * Helper method, creates each days event panel
+     * Creates panel to hold each days events
      * 
-     * @return JPanel panel that holds each days events
+     * @return JPanel panel that holds events
      */
     private JPanel createDailyEventsPanel() {
         JPanel dailyEvents = new JPanel();
@@ -210,27 +213,29 @@ public class SithClanEventSchedulePanel extends JPanel {
     }
 
     /**
-     * Helper method, creates schedule date label
+     * Creates interactive date label for each day on schedule
      * 
-     * @param date        String date to be displayed on label
-     * @param dailyEvents JPanel that displays the days events
+     * @param date        String date of events for label
+     * @param dailyEvents JPanel panel that holds events
      * @return JLabel created date label
      */
     private JLabel createDateLabel(String date, JPanel dailyEvents) {
         JLabel dateLabel = new JLabel(date);
 
-        // date label properties
         dateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         dateLabel.setOpaque(true);
+        // collapsed by default
         dateLabel.setIcon(rightArrowIcon);
         dateLabel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         dateLabel
                 .setMaximumSize(new Dimension(Integer.MAX_VALUE, dateLabel.getPreferredSize().height));
 
+        // expand/collapse action
         dateLabel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 boolean isVisible = !dailyEvents.isVisible();
                 dailyEvents.setVisible(isVisible);
+                // change arrow icon
                 if (isVisible)
                     dateLabel.setIcon(downArrowIcon);
                 else
@@ -243,44 +248,52 @@ public class SithClanEventSchedulePanel extends JPanel {
     }
 
     /**
-     * Helper method, creates single event object
+     * Creates panel for single event
      * 
      * @param event SithClanEvent object with all event data
+     * @param day   String day of event
      * @return JPanel containing single event
      */
     private JPanel createEvent(SithClanEvent event, String day) {
         String eventTitleString = SithClanPluginUtil.removeEmojis(event.getEventTitle());
 
+        // container for event and notification checkbox
         JPanel eventContainer = new JPanel();
         eventContainer.setLayout(new BorderLayout());
 
+        // container for one event
         JPanel singleEvent = new JPanel();
         singleEvent.setLayout(new BoxLayout(singleEvent, BoxLayout.Y_AXIS));
         singleEvent.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
 
+        // checkbox to subscribe to event notifications
         JCheckBox notificationCheckbox = new JCheckBox();
         notificationCheckbox.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        notificationCheckbox.setToolTipText("Check box to receive notification before event start.");
+        notificationCheckbox.setToolTipText(CHECKBOX_TOOLTIP);
         notificationCheckbox.setEnabled(config.eventNotifications());
         notificationCheckbox.setSelected(fileManager.isSubscribed(eventTitleString));
 
+        // action listener for checkbox
         notificationCheckbox.addActionListener(e -> {
             if (notificationCheckbox.isSelected()) {
                 fileManager.addSubscription(eventTitleString);
             } else {
                 fileManager.removeSubscription(eventTitleString);
             }
+            // reschedule notifications after change
             notificationManager.scheduleNotifications(eventSchedule.getSchedule());
         });
 
         eventContainer.add(singleEvent, BorderLayout.WEST);
         eventContainer.add(notificationCheckbox, BorderLayout.EAST);
 
+        // event title
         JLabel eventTitle = new JLabel(eventTitleString);
         eventTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventTitle);
 
+        // event time, converted to user local time
         ZonedDateTime estTime = ZonedDateTime.of(
                 LocalDate.parse(day, SithClanPluginConstants.DATE_FORMATTER),
                 LocalTime.parse(event.getEventTime(), SithClanPluginConstants.TIME_FORMATTER),
@@ -290,23 +303,30 @@ public class SithClanEventSchedulePanel extends JPanel {
         eventTime.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventTime);
 
+        // event host (optional info)
         if (event.getEventHost() != null && !event.getEventHost().isBlank()) {
             JLabel eventHost = new JLabel("Hosted by: " + event.getEventHost());
             eventHost.setAlignmentX(Component.LEFT_ALIGNMENT);
             singleEvent.add(eventHost);
         }
 
+        // event misc info (optional info)
         if (!event.getEventMiscInfo().isEmpty()) {
             for (String info : event.getEventMiscInfo()) {
+                // creating link to travel to clan discord channels
                 JLabel eventInfo = createDiscordLink(SithClanPluginUtil.removeEmojis(info));
                 eventInfo.setAlignmentX(Component.LEFT_ALIGNMENT);
                 singleEvent.add(eventInfo);
             }
         }
+
+        // event location
+        // creating world hop link for location
         JLabel eventLocation = createWorldLink(event.getEventLocation());
         eventLocation.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventLocation);
 
+        // event repeated (optional info)
         if (event.isEventRepeated()) {
             JLabel eventRepeated = new JLabel(REPEATED_WEEKLY);
             eventRepeated.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -316,10 +336,10 @@ public class SithClanEventSchedulePanel extends JPanel {
     }
 
     /**
-     * Helper method, changes Discord channel IDs into links
+     * Converts Discord channel IDs into links
      * 
-     * @param text String text in to search for Discord channel IDs
-     * @return JLabel output
+     * @param text String text to search for Discord channel IDs
+     * @return JLabel output unchanged text or Discord channel link
      */
     private JLabel createDiscordLink(String text) {
         // check text for Discord link format
@@ -327,8 +347,9 @@ public class SithClanEventSchedulePanel extends JPanel {
 
         if (matcher.find()) {
             String channelId = matcher.group(1);
+            // create Discord channel URL
             String channelUrl = SithClanPluginConstants.DISCORD_CHANNEL_URL + channelId;
-            // replace <#id> with "View Channel"
+            // creating link
             JLabel channelLink = new JLabel(
                     "<html>" + text.replaceAll("<#\\d+>", "<a href=''>Discord Channel</a>") + "</html>");
             channelLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -347,16 +368,18 @@ public class SithClanEventSchedulePanel extends JPanel {
     }
 
     /**
-     * Turns world location into clickable link to hop worlds
+     * Turns world location into quick world hop link
      * 
      * @param location event location
-     * @return JLabel hyperlink to hop worlds
+     * @return JLabel world quick hop link
      */
     private JLabel createWorldLink(String location) {
+        // search for runescape world
         Matcher matcher = Pattern.compile("W(\\d{3}$)").matcher(location);
         if (!matcher.find())
             return new JLabel(location);
         String worldId = matcher.group(1);
+        // create clickable link
         JLabel worldLink = new JLabel(
                 "<html>" + location.replaceAll("W\\d{3}$", "<a href=''>W" + worldId + "</a>") + "</html>");
         worldLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -375,7 +398,7 @@ public class SithClanEventSchedulePanel extends JPanel {
     /**
      * Checks if event schedule is expired
      * 
-     * @param inputDay String last day of the event schedule
+     * @param inputDay String last day of the current event schedule
      */
     private void checkScheduleExpired(String inputDay) {
         if (inputDay.isBlank())
@@ -385,6 +408,26 @@ public class SithClanEventSchedulePanel extends JPanel {
             scheduleExpiredLabel.setVisible(true);
         else
             scheduleExpiredLabel.setVisible(false);
+    }
+
+    /**
+     * Handles the returned status of the schedule
+     * 
+     * @param status int status code
+     */
+    private void handleScheduleStatus(int status) {
+        switch (status) {
+            case SithClanPluginConstants.STATUS_RATE_LIMITED:
+                JOptionPane.showMessageDialog(null,
+                        RATE_LIMITED_WARNING);
+                break;
+            case SithClanPluginConstants.STATUS_NOT_FOUND:
+                JOptionPane.showMessageDialog(null,
+                        SCHEDULE_UNOBTAINABLE_WARNING);
+                break;
+            default:
+                break;
+        }
     }
 
     /**

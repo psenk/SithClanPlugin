@@ -241,11 +241,11 @@ public class SithClanEventSchedule {
             else if (currentEvent != null && line.startsWith("🌎"))
                 currentEvent.setEventLocation(line);
 
-            // parse event repetition (optional)
+            // parse event repetition (optional info)
             else if (currentEvent != null && line.startsWith("**"))
                 currentEvent.setEventRepeated(true);
 
-            // parse misc event info
+            // parse misc event info (optional info)
             else {
                 if (currentEvent == null)
                     continue;
