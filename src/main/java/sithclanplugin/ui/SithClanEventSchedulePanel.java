@@ -32,15 +32,15 @@ import com.google.inject.Singleton;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
-import sithclanplugin.SithClanNotificationManager;
 import sithclanplugin.SithClanPlugin;
 import sithclanplugin.SithClanPluginConfig;
-import sithclanplugin.SithClanPluginConstants;
-import sithclanplugin.SithClanPluginFileManager;
-import sithclanplugin.SithClanPluginUtil;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
+import sithclanplugin.managers.SithClanNotificationManager;
+import sithclanplugin.managers.SithClanPluginFileManager;
+import sithclanplugin.util.SithClanPluginConstants;
+import sithclanplugin.util.SithClanPluginUtil;
 
 @Singleton
 public class SithClanEventSchedulePanel extends JPanel {

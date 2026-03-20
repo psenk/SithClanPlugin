@@ -1,4 +1,4 @@
-package sithclanplugin;
+package sithclanplugin.managers;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,8 +16,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import net.runelite.client.Notifier;
+import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
+import sithclanplugin.util.SithClanPluginConstants;
+import sithclanplugin.util.SithClanPluginUtil;
 
 @Singleton
 public class SithClanNotificationManager {
@@ -41,7 +44,7 @@ public class SithClanNotificationManager {
     }
 
     // for testing
-    SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier,
+    public SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier,
             ScheduledExecutorService scheduler, SithClanPluginFileManager fileManager) {
         this.config = config;
         this.notifier = notifier;

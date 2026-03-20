@@ -30,7 +30,10 @@ import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
+import sithclanplugin.managers.SithClanNotificationManager;
+import sithclanplugin.managers.SithClanPluginFileManager;
 import sithclanplugin.ui.SithClanPluginPanel;
+import sithclanplugin.util.SithClanPluginConstants;
 
 @PluginDescriptor(name = "Sith Clan Plugin", description = "Enable the Sith Clan Plugin")
 public class SithClanPlugin extends Plugin {

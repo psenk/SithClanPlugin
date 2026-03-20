@@ -15,10 +15,10 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Singleton;
 
 import lombok.Getter;
-import sithclanplugin.SithClanNotificationManager;
 import sithclanplugin.SithClanPluginConfig;
-import sithclanplugin.SithClanPluginConstants;
-import sithclanplugin.SithClanPluginFileManager;
+import sithclanplugin.managers.SithClanNotificationManager;
+import sithclanplugin.managers.SithClanPluginFileManager;
+import sithclanplugin.util.SithClanPluginConstants;
 
 /**
  * Event Schedule Object

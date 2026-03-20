@@ -1,4 +1,4 @@
-package sithclanplugin;
+package sithclanplugin.managers;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -12,6 +12,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Singleton;
 
 import net.runelite.client.RuneLite;
+import sithclanplugin.util.SithClanPluginConstants;
 
 @Singleton
 public class SithClanPluginFileManager {

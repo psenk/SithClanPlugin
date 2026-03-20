@@ -22,8 +22,8 @@ import com.google.inject.Singleton;
 
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
-import sithclanplugin.SithClanPluginConstants;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
+import sithclanplugin.util.SithClanPluginConstants;
 
 @Singleton
 public class SithClanSenatePanel extends JPanel {

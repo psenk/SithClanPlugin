@@ -24,6 +24,9 @@ import org.mockito.MockitoAnnotations;
 import net.runelite.client.Notifier;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
+import sithclanplugin.managers.SithClanNotificationManager;
+import sithclanplugin.managers.SithClanPluginFileManager;
+import sithclanplugin.util.SithClanPluginConstants;
 
 public class NotificationManagerTests {
 

@@ -1,4 +1,4 @@
-package sithclanplugin;
+package sithclanplugin.util;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;

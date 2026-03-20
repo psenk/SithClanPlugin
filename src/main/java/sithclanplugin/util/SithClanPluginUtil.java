@@ -1,4 +1,4 @@
-package sithclanplugin;
+package sithclanplugin.util;
 
 public class SithClanPluginUtil {
 
