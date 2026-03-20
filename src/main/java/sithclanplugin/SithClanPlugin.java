@@ -72,11 +72,15 @@ public class SithClanPlugin extends Plugin {
 	private static final String PLUGIN_ICON_PATH = "/icon.png";
 	private static final String PLUGIN_TOOLTIP = "Sith Clan Plugin";
 	private static final int DISPLAY_SWITCHER_MAX_ATTEMPTS = 3;
+	private static final String QUICK_HOP_MESSAGE = "Quick hopping to World "; // trailing space intentional
 
+	/**
+	 * Runs when plugin starts up
+	 */
 	@Override
 	protected void startUp() throws Exception {
 
-		// navigation bar plugin icon
+		// navigation bar icon
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), PLUGIN_ICON_PATH);
 		uiNavigationButton = NavigationButton.builder()
 				.tooltip(PLUGIN_TOOLTIP)
@@ -86,34 +90,46 @@ public class SithClanPlugin extends Plugin {
 				.build();
 
 		clientToolbar.addNavigation(uiNavigationButton);
+		// create plugin directory and config files
 		fileManager.initializeFiles();
 
 		// load schedule if saved, else get new schedule
-		// validate API key of Senate members
 		boolean hasStoredSchedule = fileManager.hasSavedSchedule();
 		new Thread(() -> {
 			int status = hasStoredSchedule ? eventSchedule.parseScheduleFromFile()
 					: eventSchedule.parseScheduleFromGet();
+			// validate API key of Senate members
 			boolean isSenateMember = eventSchedule.validateApiKey();
 			SwingUtilities.invokeLater(() -> {
 				if (status == SithClanPluginConstants.STATUS_OK) {
 					uiPanel.get().getSchedulePanel().displaySchedule();
 				}
+				// display senate options button if senate
 				uiPanel.get().getSenateButton().setVisible(isSenateMember);
 			});
 		}).start();
 	}
 
+	/**
+	 * Runs when plugin shuts down
+	 */
 	@Override
 	protected void shutDown() throws Exception {
 		clientToolbar.removeNavigation(uiNavigationButton);
 		notificationManager.shutDown();
 	}
 
+	/**
+	 * Runs every game tick
+	 * 
+	 * @param event GameTick gametick event object
+	 */
 	@Subscribe
 	public void onGameTick(GameTick event) {
+		// world hopping logic
 		if (quickHopTargetWorld == null)
 			return;
+		// open worlds list
 		if (client.getWidget(InterfaceID.Worldswitcher.BUTTONS) == null) {
 			client.openWorldHopper();
 			if (++displaySwitcherAttempts >= DISPLAY_SWITCHER_MAX_ATTEMPTS) {
@@ -127,7 +143,12 @@ public class SithClanPlugin extends Plugin {
 		}
 	}
 
-	// allows config to be accessible from RL settings panel
+	/**
+	 * Allows config to be accessible from RL settings panel
+	 * 
+	 * @param configManager ConfigManager configuration manager object
+	 * @return ConfigManager plugin configuration
+	 */
 	@Provides
 	SithClanPluginConfig provideConfig(ConfigManager configManager) {
 		return configManager.getConfig(SithClanPluginConfig.class);
@@ -136,8 +157,7 @@ public class SithClanPlugin extends Plugin {
 	// CUSTOM FUNCTIONS
 
 	/**
-	 * Entry point for world hopping to run on client thread
-	 * Transfer from EDT to client thread
+	 * Entry point to transfer from EDT to client thread
 	 * 
 	 * @param worldId int id of world to hop to
 	 */
@@ -168,7 +188,9 @@ public class SithClanPlugin extends Plugin {
 	 * @param world World world to hop to in game
 	 */
 	private void hop(World world) {
-		assert client.isClientThread();
+		assert client.isClientThread(); // must be run on client thread
+
+		// creating world object
 		final net.runelite.api.World rsWorld = client.createWorld();
 		rsWorld.setActivity(world.getActivity());
 		rsWorld.setAddress(world.getAddress());
@@ -177,18 +199,22 @@ public class SithClanPlugin extends Plugin {
 		rsWorld.setLocation(world.getLocation());
 		rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
 
+		// if logged out can just swap worlds
 		if (client.getGameState() == GameState.LOGIN_SCREEN) {
 			client.changeWorld(rsWorld);
 			return;
 		}
+
+		// crafting quick hop chat message
 		String chatMessage = new ChatMessageBuilder()
 				.append(ChatColorType.NORMAL)
-				.append("Quick hopping to World ")
+				.append(QUICK_HOP_MESSAGE)
 				.append(ChatColorType.HIGHLIGHT)
 				.append(Integer.toString(world.getId()))
 				.append("..")
 				.build();
 
+		// posting
 		chatMessageManager.queue(QueuedMessage.builder()
 				.type(ChatMessageType.CONSOLE)
 				.runeLiteFormattedMessage(chatMessage)

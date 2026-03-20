@@ -297,7 +297,7 @@ public class SithClanEventSchedulePanel extends JPanel {
         ZonedDateTime estTime = ZonedDateTime.of(
                 LocalDate.parse(day, SithClanPluginConstants.DATE_FORMATTER),
                 LocalTime.parse(event.getEventTime(), SithClanPluginConstants.TIME_FORMATTER),
-                ZoneId.of("America/New_York"));
+                SithClanPluginConstants.EST_ZONE);
         ZonedDateTime localTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
         JLabel eventTime = new JLabel(localTime.format(SithClanPluginConstants.TIME_FORMATTER));
         eventTime.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -348,7 +348,7 @@ public class SithClanEventSchedulePanel extends JPanel {
         if (matcher.find()) {
             String channelId = matcher.group(1);
             // create Discord channel URL
-            String channelUrl = SithClanPluginConstants.DISCORD_CHANNEL_URL + channelId;
+            String channelUrl = SithClanPluginConstants.DISCORD_CHANNEL_URI + channelId;
             // creating link
             JLabel channelLink = new JLabel(
                     "<html>" + text.replaceAll("<#\\d+>", "<a href=''>Discord Channel</a>") + "</html>");

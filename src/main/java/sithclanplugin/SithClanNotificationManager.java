@@ -31,6 +31,8 @@ public class SithClanNotificationManager {
 
     private final List<ScheduledFuture<?>> scheduledNotifications = new ArrayList<>();
 
+    private static final String EVENT_NOTIFICATION = "Clan event starting soon: ";
+
     @Inject
     public SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier) {
         this.config = config;
@@ -40,10 +42,11 @@ public class SithClanNotificationManager {
 
     // for testing
     SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier,
-            ScheduledExecutorService scheduler) {
+            ScheduledExecutorService scheduler, SithClanPluginFileManager fileManager) {
         this.config = config;
         this.notifier = notifier;
         this.scheduler = scheduler;
+        this.fileManager = fileManager;
     }
 
     /**
@@ -52,8 +55,10 @@ public class SithClanNotificationManager {
      * @param schedule ArrayList<SithClanDaySchedule> clan event schedule
      */
     public void scheduleNotifications(ArrayList<SithClanDaySchedule> schedule) {
+        // dont continue if setting off in configs
         if (!config.eventNotifications())
             return;
+        // fresh start
         cancelAllNotifications();
 
         // iterate thru schedule
@@ -61,24 +66,27 @@ public class SithClanNotificationManager {
             String currentDay = day.getDate();
             for (SithClanEvent event : day.getEvents()) {
                 String eventTitle = SithClanPluginUtil.removeEmojis(event.getEventTitle());
-                if (!fileManager.isSubscribed(eventTitle)) continue;
+                // checks if event subscribed to in config file
+                if (!fileManager.isSubscribed(eventTitle))
+                    continue;
                 String currentTime = event.getEventTime();
 
                 try {
+                    // convert to users local time
                     ZonedDateTime estTime = ZonedDateTime.of(
                             LocalDate.parse(currentDay, SithClanPluginConstants.DATE_FORMATTER),
                             LocalTime.parse(currentTime, SithClanPluginConstants.TIME_FORMATTER),
-                            ZoneId.of("America/New_York"));
+                            SithClanPluginConstants.EST_ZONE);
                     ZonedDateTime localDateTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
 
-                    // has event past yet?
+                    // checks if event has already passed
                     long delay = ChronoUnit.MINUTES.between(ZonedDateTime.now(), localDateTime)
                             - config.notificationTimeBuffer();
 
                     // schedule event
                     if (delay >= 0) {
                         ScheduledFuture<?> future = scheduler.schedule(() -> {
-                            notifier.notify("Clan event starting soon: " + eventTitle);
+                            notifier.notify(EVENT_NOTIFICATION + eventTitle);
                         }, delay, TimeUnit.MINUTES);
                         scheduledNotifications.add(future);
                     }
