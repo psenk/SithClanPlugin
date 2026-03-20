@@ -51,9 +51,6 @@ public class SithClanPlugin extends Plugin {
 	private ChatMessageManager chatMessageManager;
 
 	@Inject
-	private SithClanPluginConfig config;
-
-	@Inject
 	private SithClanPluginFileManager fileManager;
 
 	@Inject

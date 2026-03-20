@@ -2,6 +2,7 @@ package sithclanplugin;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -28,26 +29,26 @@ public class SithClanPluginFileManager {
     /**
      * Creates plugin specific files and directories
      * 
-     * @throws Exception
+     * @throws IOException
      */
-    public void initializeFiles() throws Exception {
-        // create plugin folder if does not exist
+    public void initializeFiles() throws IOException {
+        // create main plugin directory
         if (!localDirectory.exists())
             localDirectory.mkdirs();
 
-        // create saved schedule file if does not exist
+        // create saved schedule file
         if (!storedScheduleFile.exists())
             storedScheduleFile.createNewFile();
 
-        // create file that saves event notification subscriptions
+        // create event subscriptions file
         if (!storedSubscriptionsFile.exists())
             storedSubscriptionsFile.createNewFile();
     }
 
     /**
-     * Checks if user has a saved schedule for loading
+     * Checks if user has a saved schedule to load
      * 
-     * @return boolean if saved schedule exists
+     * @return boolean if schedule is saved
      */
     public boolean hasSavedSchedule() {
         return storedScheduleFile.length() > 0;
@@ -56,7 +57,7 @@ public class SithClanPluginFileManager {
     /**
      * Saves schedule to local file for cached loading
      * 
-     * @param data String Schedule as JSON string
+     * @param data String schedule as JSON string
      */
     public void saveScheduleLocally(String data) {
         try (FileWriter fileWriter = new FileWriter(storedScheduleFile)) {
@@ -67,9 +68,9 @@ public class SithClanPluginFileManager {
     }
 
     /**
-     * Gets event schedule from local file for display on panel
+     * Gets event schedule from local file for display
      * 
-     * @return String json schedule as string
+     * @return String JSON schedule as string
      */
     public String readScheduleFile() {
         try {
@@ -108,7 +109,6 @@ public class SithClanPluginFileManager {
             Type listType = new TypeToken<ArrayList<String>>() {
             }.getType();
             ArrayList<String> subscriptions = gson.fromJson(input, listType);
-
             return subscriptions != null ? subscriptions : new ArrayList<>();
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,7 +130,7 @@ public class SithClanPluginFileManager {
     }
 
     /**
-     * Remove subscription to event
+     * Remove event subscription
      * 
      * @param eventTitle String name of event
      */
