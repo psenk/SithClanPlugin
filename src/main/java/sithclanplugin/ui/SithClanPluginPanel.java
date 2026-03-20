@@ -20,19 +20,22 @@ import net.runelite.client.ui.PluginPanel;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
 
 @Singleton
-@Getter
 public class SithClanPluginPanel extends PluginPanel {
 
     @Inject
     private SithClanEventSchedule eventSchedule;
 
+    @Getter
     private final SithClanEventSchedulePanel schedulePanel;
+
+    @Getter
     private final SithClanSenatePanel senatePanel;
 
     private final JPanel cardPanel;
     private final JPanel navPanel;
     private final JPanel buttonPanel;
     private final JButton scheduleButton;
+    @Getter
     private final JButton senateButton;
     private CardLayout cardLayout;
 
@@ -51,11 +54,11 @@ public class SithClanPluginPanel extends PluginPanel {
         getScrollPane().setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // main panel
+        cardLayout = new CardLayout();
         cardPanel = new JPanel();
         cardPanel.setLayout(cardLayout);
         cardPanel.add(schedulePanel, SCHEDULE_TITLE);
         cardPanel.add(senatePanel, SENATE_TITLE);
-        cardLayout = new CardLayout();
 
         // create container panels
         buttonPanel = new JPanel();

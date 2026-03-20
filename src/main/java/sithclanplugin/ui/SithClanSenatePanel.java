@@ -44,7 +44,11 @@ public class SithClanSenatePanel extends JPanel {
     private static final String TEXT_AREA_DEFAULT = "Post Event Schedule Here";
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
+    private static final String SCHEDULE_POSTED_MESSAGE = "Schedule posted successfully.";
+    private static final String BAD_INPUT_WARNING = "There is a problem with the schedule input.";
+    private static final String NOT_FOUND_WARNING = "Unable to post schedule.";
 
+    // TODO: callback after post schedule
     SithClanSenatePanel() {
         final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
         final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
@@ -60,9 +64,9 @@ public class SithClanSenatePanel extends JPanel {
         // label for schedule panel
         senatePostScheduleLabel = new JLabel(UPDATE_SCHEDULE_LABEL);
         senatePostScheduleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        senatePostScheduleLabel.setOpaque(true);
         senatePostScheduleLabel.setIcon(rightArrowIcon);
         senatePostScheduleLabel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        senatePostScheduleLabel.setOpaque(true);
         senatePostScheduleLabel
                 .setMaximumSize(new Dimension(Integer.MAX_VALUE, senatePostScheduleLabel.getPreferredSize().height));
         this.add(senatePostScheduleLabel);
@@ -84,6 +88,7 @@ public class SithClanSenatePanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 boolean isVisible = !senatePostSchedulePanel.isVisible();
                 senatePostSchedulePanel.setVisible(isVisible);
+                // change arrow icon
                 if (isVisible)
                     senatePostScheduleLabel.setIcon(downArrowIcon);
                 else
@@ -93,7 +98,6 @@ public class SithClanSenatePanel extends JPanel {
             }
         });
 
-        // adding to main panel
         senatePostSchedulePanel.add(Box.createRigidArea(new Dimension(0, 10)));
         senatePostSchedulePanel.add(senatePostScheduleScrollPane);
 
@@ -103,13 +107,6 @@ public class SithClanSenatePanel extends JPanel {
         senatePostSchedulePanel.setVisible(false);
         this.add(senatePostSchedulePanel);
 
-        attachActionListener();
-    }
-
-    /**
-     * Adds action listener to post schedule button.
-     */
-    private void attachActionListener() {
         // post event schedule action
         senatePostScheduleButton.addActionListener(e -> {
             new Thread(() -> {
@@ -118,15 +115,16 @@ public class SithClanSenatePanel extends JPanel {
                     switch (status) {
                         case SithClanPluginConstants.STATUS_OK:
                             JOptionPane.showMessageDialog(null,
-                                    "Schedule posted successfully.");
+                                    SCHEDULE_POSTED_MESSAGE);
+                            senatePostScheduleTextArea.setText(TEXT_AREA_DEFAULT);
                             break;
                         case SithClanPluginConstants.STATUS_BAD_INPUT:
                             JOptionPane.showMessageDialog(null,
-                                    "There is a problem with the schedule input.");
+                                    BAD_INPUT_WARNING);
                             break;
                         case SithClanPluginConstants.STATUS_NOT_FOUND:
                             JOptionPane.showMessageDialog(null,
-                                    "Unable to post schedule.");
+                                    NOT_FOUND_WARNING);
                             break;
                         default:
                             break;
