@@ -153,7 +153,6 @@ public class SithClanPlugin extends Plugin {
 				SwingUtilities.invokeLater(() -> {
 					if (!isMember) {
 						uiPanel.get().userNotInClan();
-						;
 					}
 				});
 			}
