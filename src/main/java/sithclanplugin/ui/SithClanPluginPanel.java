@@ -2,6 +2,7 @@ package sithclanplugin.ui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
@@ -35,6 +36,7 @@ public class SithClanPluginPanel extends PluginPanel {
     private final JPanel cardPanel;
     private final JPanel navPanel;
     private final JPanel buttonPanel;
+    private final JPanel buttonContainer;
     private final JButton scheduleButton;
     @Getter
     private final JButton senateButton;
@@ -42,6 +44,7 @@ public class SithClanPluginPanel extends PluginPanel {
     private final JPanel notClanMemberPanel;
     private final JLabel notClanMemberLabel;
 
+    private static final String PLUGIN_LABEL = "Sith Clan Plugin";
     private static final String EVENT_SCHEDULE = "Event Schedule";
     private static final String SENATE_OPTIONS = "Senate Options";
     private static final String SCHEDULE_TITLE = "schedule";
@@ -64,21 +67,28 @@ public class SithClanPluginPanel extends PluginPanel {
         cardPanel.add(schedulePanel, SCHEDULE_TITLE);
         cardPanel.add(senatePanel, SENATE_TITLE);
 
-        // create container panels
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        navPanel = new JPanel();
-        navPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        navPanel.add(buttonPanel);
 
-        // create panel buttons
+        navPanel = new JPanel();
+        navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
+
+        JLabel pluginLabel = new JLabel(PLUGIN_LABEL);
+        pluginLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         scheduleButton = new JButton(EVENT_SCHEDULE);
         senateButton = new JButton(SENATE_OPTIONS);
 
-        // adding buttons to button panel
         buttonPanel.add(scheduleButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(senateButton);
+
+        buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonContainer.add(buttonPanel);
+
+        navPanel.add(pluginLabel);
+        navPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        navPanel.add(buttonContainer);
 
         this.add(navPanel, BorderLayout.NORTH);
         this.add(cardPanel, BorderLayout.CENTER);
@@ -105,7 +115,6 @@ public class SithClanPluginPanel extends PluginPanel {
         notClanMemberLabel = new JLabel(NON_MEMBER_MESSAGE);
         notClanMemberPanel.add(notClanMemberLabel);
         notClanMemberPanel.setVisible(false);
-        this.add(notClanMemberPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -115,6 +124,9 @@ public class SithClanPluginPanel extends PluginPanel {
         cardPanel.setVisible(false);
         buttonPanel.setVisible(false);
         navPanel.setVisible(false);
+        this.add(notClanMemberPanel, BorderLayout.CENTER);
         notClanMemberPanel.setVisible(true);
+        revalidate();
+        repaint();
     }
 }
