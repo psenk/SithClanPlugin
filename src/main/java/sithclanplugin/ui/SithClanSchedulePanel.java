@@ -43,7 +43,7 @@ import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
 
 @Singleton
-public class SithClanEventSchedulePanel extends JPanel {
+public class SithClanSchedulePanel extends JPanel {
 
     @Inject
     private SithClanPlugin plugin;
@@ -60,11 +60,8 @@ public class SithClanEventSchedulePanel extends JPanel {
     @Inject
     private SithClanEventSchedule eventSchedule;
 
-    private final JLabel schedulePanelLabel;
     private final JLabel scheduleExpiredLabel;
     private final JPanel scheduleContainer;
-    private final JScrollPane scheduleContainerScrollPane;
-    private final JButton scheduleRefreshScheduleButton;
     private Runnable onRefreshCallback;
 
     private final Icon rightArrowIcon;
@@ -80,7 +77,7 @@ public class SithClanEventSchedulePanel extends JPanel {
     private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
 
-    SithClanEventSchedulePanel() {
+    SithClanSchedulePanel() {
         // load collapse/expand arrow imgs
         rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_IMG_PATH));
         downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_IMG_PATH));
@@ -95,11 +92,11 @@ public class SithClanEventSchedulePanel extends JPanel {
         scheduleContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // allows schedule to scroll
-        scheduleContainerScrollPane = new JScrollPane(scheduleContainer);
+        JScrollPane scheduleContainerScrollPane = new JScrollPane(scheduleContainer);
         scheduleContainerScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // top panel title
-        schedulePanelLabel = new JLabel(EVENT_SCHEDULE);
+        JLabel schedulePanelLabel = new JLabel(EVENT_SCHEDULE);
         schedulePanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // warning if schedule is expired
@@ -109,7 +106,7 @@ public class SithClanEventSchedulePanel extends JPanel {
         scheduleExpiredLabel.setVisible(false);
 
         // button to refresh schedule
-        scheduleRefreshScheduleButton = new JButton(REFRESH_SCHEDULE_BUTTON);
+        JButton scheduleRefreshScheduleButton = new JButton(REFRESH_SCHEDULE_BUTTON);
         scheduleRefreshScheduleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // organization, contains panel title and expiration warning
