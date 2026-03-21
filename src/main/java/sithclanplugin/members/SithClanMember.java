@@ -17,11 +17,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SithClanMember {
 
-    private String username;
-    private int clanRank;
-    private int clanCredits;
-    private long discordUserId;
-    private LocalDate dateJoinedClan;
-    private String altUsername = null;
-    private LocalDate datePromoted = null;
+    private String memberName;
+    private int memberRank;
+    private int memberCredits;
+    private long memberDiscordId;
+    private LocalDate memberDateJoined;
+    private String memberAltName = null;
+    private LocalDate memberDatePromoted = null;
 }
