@@ -127,8 +127,7 @@ public class SithClanSchedulePanel extends JPanel {
         bottomPanel.add(scheduleRefreshScheduleButton);
 
         this.add(bottomPanel, BorderLayout.SOUTH);
-        this.setVisible(true);
-
+        
         // refresh event schedule button action
         scheduleRefreshScheduleButton.addActionListener(e -> {
             new Thread(() -> {
@@ -145,6 +144,8 @@ public class SithClanSchedulePanel extends JPanel {
                 });
             }).start();
         });
+        
+        this.setVisible(true);
     }
 
     /**

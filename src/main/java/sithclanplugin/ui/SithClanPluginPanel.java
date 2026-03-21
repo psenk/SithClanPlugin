@@ -99,6 +99,7 @@ public class SithClanPluginPanel extends PluginPanel {
         buttonPanel.add(membersButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(senateButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         // button container to center buttons
         JPanel buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
