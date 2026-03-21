@@ -84,6 +84,25 @@ public class SithClanSchedulePanel extends JPanel {
         // main panel layout
         this.setLayout(new BorderLayout());
 
+        // top panel title
+        JLabel schedulePanelLabel = new JLabel(EVENT_SCHEDULE);
+        schedulePanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // warning if schedule is expired
+        scheduleExpiredLabel = new JLabel(SCHEDULE_EXPIRED_WARNING);
+        scheduleExpiredLabel.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
+        scheduleExpiredLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        scheduleExpiredLabel.setVisible(false);
+
+        // organization, contains panel title and expiration warning
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.add(schedulePanelLabel);
+        topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        topPanel.add(scheduleExpiredLabel);
+
+        this.add(topPanel, BorderLayout.NORTH);
+
         // contains event schedule
         scheduleContainer = new JPanel();
         scheduleContainer.setLayout(new BoxLayout(scheduleContainer, BoxLayout.Y_AXIS));
@@ -95,29 +114,11 @@ public class SithClanSchedulePanel extends JPanel {
         JScrollPane scheduleContainerScrollPane = new JScrollPane(scheduleContainer);
         scheduleContainerScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // top panel title
-        JLabel schedulePanelLabel = new JLabel(EVENT_SCHEDULE);
-        schedulePanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // warning if schedule is expired
-        scheduleExpiredLabel = new JLabel(SCHEDULE_EXPIRED_WARNING);
-        scheduleExpiredLabel.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
-        scheduleExpiredLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        scheduleExpiredLabel.setVisible(false);
+        this.add(scheduleContainerScrollPane, BorderLayout.CENTER);
 
         // button to refresh schedule
         JButton scheduleRefreshScheduleButton = new JButton(REFRESH_SCHEDULE_BUTTON);
         scheduleRefreshScheduleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // organization, contains panel title and expiration warning
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
-        topPanel.add(schedulePanelLabel);
-        topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        topPanel.add(scheduleExpiredLabel);
-
-        this.add(topPanel, BorderLayout.NORTH);
-        this.add(scheduleContainerScrollPane, BorderLayout.CENTER);
 
         // organization, contains refresh button
         JPanel bottomPanel = new JPanel();
