@@ -28,7 +28,7 @@ public class SithClanPluginPanel extends PluginPanel {
     private SithClanEventSchedule eventSchedule;
 
     @Getter
-    private final SithClanEventSchedulePanel schedulePanel;
+    private final SithClanSchedulePanel schedulePanel;
 
     @Getter
     private final SithClanMembersPanel membersPanel;
@@ -42,12 +42,8 @@ public class SithClanPluginPanel extends PluginPanel {
     private final JPanel cardPanel;
     private final JPanel navPanel;
     private final JPanel buttonPanel;
-    private final JPanel buttonContainer;
-    private final JButton scheduleButton;
-    private final JButton membersButton;
     private CardLayout cardLayout;
     private final JPanel notClanMemberPanel;
-    private final JLabel notClanMemberLabel;
 
     private static final String PLUGIN_LABEL = "Sith Clan Plugin";
     private static final String SCHEDULE_BUTTON = "Event Schedule";
@@ -59,7 +55,7 @@ public class SithClanPluginPanel extends PluginPanel {
     private static final String NON_MEMBER_MESSAGE = "Sorry, this plugin is for members of the Sith clan only.";
 
     @Inject
-    SithClanPluginPanel(SithClanEventSchedulePanel schedulePanel,
+    SithClanPluginPanel(SithClanSchedulePanel schedulePanel,
             SithClanSenatePanel senatePanel, SithClanMembersPanel membersPanel) {
         this.schedulePanel = schedulePanel;
         this.membersPanel = membersPanel;
@@ -91,21 +87,21 @@ public class SithClanPluginPanel extends PluginPanel {
         pluginLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // card buttons
-        scheduleButton = new JButton(SCHEDULE_BUTTON);
+        JButton scheduleButton = new JButton(SCHEDULE_BUTTON);
         scheduleButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
-        membersButton = new JButton(MEMBERS_BUTTON);
+        JButton membersButton = new JButton(MEMBERS_BUTTON);
         membersButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
         senateButton = new JButton(SENATE_BUTTON);
         senateButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        senateButton.setVisible(false);
         buttonPanel.add(scheduleButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(membersButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(senateButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // button container to center buttons
-        buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonContainer.add(buttonPanel);
 
         // top panel
@@ -139,7 +135,7 @@ public class SithClanPluginPanel extends PluginPanel {
 
         // panel for users not in the clan
         notClanMemberPanel = new JPanel();
-        notClanMemberLabel = new JLabel(NON_MEMBER_MESSAGE);
+        JLabel notClanMemberLabel = new JLabel(NON_MEMBER_MESSAGE);
         notClanMemberPanel.add(notClanMemberLabel);
         notClanMemberPanel.setVisible(false);
     }

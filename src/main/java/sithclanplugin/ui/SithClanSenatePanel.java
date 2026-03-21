@@ -36,9 +36,7 @@ public class SithClanSenatePanel extends JPanel {
     private SithClanMemberRoster memberRoster;
 
     private final JTextArea senatePostScheduleTextArea;
-    private final JButton senatePostScheduleButton;
     private final JTextArea senatePostRosterTextArea;
-    private final JButton senatePostRosterButton;
 
     private static final String SENATE_OPTIONS_LABEL = "Senate Options";
     private static final String UPDATE_SCHEDULE_LABEL = "Update Schedule";
@@ -67,7 +65,7 @@ public class SithClanSenatePanel extends JPanel {
 
         // post event schedule functionality
         senatePostScheduleTextArea = new JTextArea();
-        senatePostScheduleButton = new JButton(UPDATE_BUTTON);
+        JButton senatePostScheduleButton = new JButton(UPDATE_BUTTON);
         senatePostScheduleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // post event schedule section
@@ -88,7 +86,7 @@ public class SithClanSenatePanel extends JPanel {
 
         // post member roster functionality
         senatePostRosterTextArea = new JTextArea();
-        senatePostRosterButton = new JButton(UPDATE_BUTTON);
+        JButton senatePostRosterButton = new JButton(UPDATE_BUTTON);
         senatePostRosterButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // post member roster section
