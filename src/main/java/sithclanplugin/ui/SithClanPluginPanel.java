@@ -31,61 +31,84 @@ public class SithClanPluginPanel extends PluginPanel {
     private final SithClanEventSchedulePanel schedulePanel;
 
     @Getter
+    private final SithClanMembersPanel membersPanel;
+
+    @Getter
     private final SithClanSenatePanel senatePanel;
+
+    @Getter
+    private final JButton senateButton;
 
     private final JPanel cardPanel;
     private final JPanel navPanel;
     private final JPanel buttonPanel;
     private final JPanel buttonContainer;
     private final JButton scheduleButton;
-    @Getter
-    private final JButton senateButton;
+    private final JButton membersButton;
     private CardLayout cardLayout;
     private final JPanel notClanMemberPanel;
     private final JLabel notClanMemberLabel;
 
     private static final String PLUGIN_LABEL = "Sith Clan Plugin";
-    private static final String EVENT_SCHEDULE = "Event Schedule";
-    private static final String SENATE_OPTIONS = "Senate Options";
+    private static final String SCHEDULE_BUTTON = "Event Schedule";
+    private static final String MEMBERS_BUTTON = "Member Info";
+    private static final String SENATE_BUTTON = "Senate Options";
     private static final String SCHEDULE_TITLE = "schedule";
+    private static final String MEMBERS_TITLE = "members";
     private static final String SENATE_TITLE = "senate";
     private static final String NON_MEMBER_MESSAGE = "Sorry, this plugin is for members of the Sith clan only.";
 
     @Inject
     SithClanPluginPanel(SithClanEventSchedulePanel schedulePanel,
-            SithClanSenatePanel senatePanel) {
+            SithClanSenatePanel senatePanel, SithClanMembersPanel membersPanel) {
         this.schedulePanel = schedulePanel;
+        this.membersPanel = membersPanel;
         this.senatePanel = senatePanel;
+
+        // main panel
+        cardLayout = new CardLayout();
 
         this.setLayout(new BorderLayout());
         getScrollPane().setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        // main panel
-        cardLayout = new CardLayout();
+        // cards for each panel
         cardPanel = new JPanel();
         cardPanel.setLayout(cardLayout);
         cardPanel.add(schedulePanel, SCHEDULE_TITLE);
+        cardPanel.add(membersPanel, MEMBERS_TITLE);
         cardPanel.add(senatePanel, SENATE_TITLE);
 
+        // button container
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
+        // navigation area
         navPanel = new JPanel();
         navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
 
+        // main plugin title
         JLabel pluginLabel = new JLabel(PLUGIN_LABEL);
         pluginLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        scheduleButton = new JButton(EVENT_SCHEDULE);
-        senateButton = new JButton(SENATE_OPTIONS);
-
+        // card buttons
+        scheduleButton = new JButton(SCHEDULE_BUTTON);
+        scheduleButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        membersButton = new JButton(MEMBERS_BUTTON);
+        membersButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        senateButton = new JButton(SENATE_BUTTON);
+        senateButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
         buttonPanel.add(scheduleButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        buttonPanel.add(membersButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(senateButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
+        // button container to center buttons
         buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonContainer.add(buttonPanel);
 
+        // top panel
         navPanel.add(pluginLabel);
         navPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         navPanel.add(buttonContainer);
@@ -98,11 +121,15 @@ public class SithClanPluginPanel extends PluginPanel {
             cardLayout.show(cardPanel, SCHEDULE_TITLE);
         });
 
+        membersButton.addActionListener(e -> {
+            cardLayout.show(cardPanel, MEMBERS_TITLE);
+        });
+
         senateButton.addActionListener(e -> {
             cardLayout.show(cardPanel, SENATE_TITLE);
         });
 
-        // show senate button if API key added
+        // show senate button if API key added LATER
         schedulePanel.setOnRefreshCallback(() -> {
             new Thread(() -> {
                 boolean isSenateMember = eventSchedule.validateApiKey();
