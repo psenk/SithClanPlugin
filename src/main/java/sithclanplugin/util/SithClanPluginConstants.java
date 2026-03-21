@@ -5,6 +5,9 @@ import java.time.format.DateTimeFormatter;
 
 public class SithClanPluginConstants {
 
+    // clan info
+    public static final String CLAN_NAME = "Sith";
+
     // status codes
     public static final int STATUS_OK = 200;
     public static final int STATUS_BAD_INPUT = 400;

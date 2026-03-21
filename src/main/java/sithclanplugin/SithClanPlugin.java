@@ -11,6 +11,8 @@ import com.google.inject.Provides;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.clan.ClanChannel;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.client.callback.ClientThread;
@@ -66,6 +68,7 @@ public class SithClanPlugin extends Plugin {
 	private SithClanEventSchedule eventSchedule;
 
 	private NavigationButton uiNavigationButton;
+	private boolean pendingClanCheck = false;
 	private net.runelite.api.World quickHopTargetWorld;
 	private int displaySwitcherAttempts = 0;
 
@@ -90,6 +93,7 @@ public class SithClanPlugin extends Plugin {
 				.build();
 
 		clientToolbar.addNavigation(uiNavigationButton);
+
 		// create plugin directory and config files
 		fileManager.initializeFiles();
 
@@ -120,12 +124,41 @@ public class SithClanPlugin extends Plugin {
 	}
 
 	/**
+	 * Runs whenever game state has been changed
+	 * 
+	 * @param event game state event
+	 */
+	@Subscribe
+	public void onGameStateChanged(GameStateChanged event) {
+		if (event.getGameState() == GameState.LOGGED_IN) {
+			pendingClanCheck = true;
+		}
+	}
+
+	/**
 	 * Runs every game tick
 	 * 
 	 * @param event GameTick gametick event object
 	 */
 	@Subscribe
 	public void onGameTick(GameTick event) {
+
+		// clan check logic
+		if (pendingClanCheck) {
+			ClanChannel clanChannel = client.getClanChannel();
+			if (clanChannel != null) {
+				pendingClanCheck = false;
+				boolean isMember = clanChannel.getName().equalsIgnoreCase(SithClanPluginConstants.CLAN_NAME);
+				// if not in clan hide panels
+				SwingUtilities.invokeLater(() -> {
+					if (!isMember) {
+						uiPanel.get().userNotInClan();
+						;
+					}
+				});
+			}
+		}
+
 		// world hopping logic
 		if (quickHopTargetWorld == null)
 			return;
@@ -153,8 +186,6 @@ public class SithClanPlugin extends Plugin {
 	SithClanPluginConfig provideConfig(ConfigManager configManager) {
 		return configManager.getConfig(SithClanPluginConfig.class);
 	}
-
-	// CUSTOM FUNCTIONS
 
 	/**
 	 * Entry point to transfer from EDT to client thread

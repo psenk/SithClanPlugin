@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -38,11 +39,14 @@ public class SithClanPluginPanel extends PluginPanel {
     @Getter
     private final JButton senateButton;
     private CardLayout cardLayout;
+    private final JPanel notClanMemberPanel;
+    private final JLabel notClanMemberLabel;
 
     private static final String EVENT_SCHEDULE = "Event Schedule";
     private static final String SENATE_OPTIONS = "Senate Options";
     private static final String SCHEDULE_TITLE = "schedule";
     private static final String SENATE_TITLE = "senate";
+    private static final String NON_MEMBER_MESSAGE = "Sorry, this plugin is for members of the Sith clan only.";
 
     @Inject
     SithClanPluginPanel(SithClanEventSchedulePanel schedulePanel,
@@ -95,5 +99,22 @@ public class SithClanPluginPanel extends PluginPanel {
                 SwingUtilities.invokeLater(() -> senateButton.setVisible(isSenateMember));
             }).start();
         });
+
+        // panel for users not in the clan
+        notClanMemberPanel = new JPanel();
+        notClanMemberLabel = new JLabel(NON_MEMBER_MESSAGE);
+        notClanMemberPanel.add(notClanMemberLabel);
+        notClanMemberPanel.setVisible(false);
+        this.add(notClanMemberPanel, BorderLayout.CENTER);
+    }
+
+    /**
+     * Hide all if user is not in clan
+     */
+    public void userNotInClan() {
+        cardPanel.setVisible(false);
+        buttonPanel.setVisible(false);
+        navPanel.setVisible(false);
+        notClanMemberPanel.setVisible(true);
     }
 }
