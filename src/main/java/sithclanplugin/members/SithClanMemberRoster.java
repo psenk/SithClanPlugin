@@ -1,13 +1,26 @@
 package sithclanplugin.members;
 
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 
+import com.google.inject.Singleton;
+
+import lombok.Getter;
+
+/**
+ * Member Roster Object
+ */
+
+@Getter
+@Singleton
 public class SithClanMemberRoster {
 
     private HashMap<String, SithClanMember> roster;
+    private ZonedDateTime dateRosterPosted;
 
     public SithClanMemberRoster() {
         roster = new HashMap<>();
+        dateRosterPosted = ZonedDateTime.now();
     }
 
     /**
