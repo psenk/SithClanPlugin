@@ -19,6 +19,7 @@ import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.managers.SithClanNotificationManager;
 import sithclanplugin.managers.SithClanPluginFileManager;
 import sithclanplugin.util.SithClanPluginConstants;
+import sithclanplugin.util.SithClanPluginUtil;
 
 /**
  * Event Schedule Object
@@ -56,19 +57,7 @@ public class SithClanEventSchedule {
      * @return String event schedule string in HTTP response body
      */
     private String getEventSchedule() {
-        // build HTTP GET request
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(SithClanPluginConstants.EVENT_SCHEDULE_GET_URI))
-                .GET()
-                .build();
-        try {
-            // send request and process response
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.EVENT_SCHEDULE_GET_URI);
     }
 
     /**
@@ -78,24 +67,8 @@ public class SithClanEventSchedule {
      * @return String HTTP Response body with status code
      */
     private String postEventSchedule(String jsonData) {
-        // build HTTP POST request
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(SithClanPluginConstants.EVENT_SCHEDULE_POST_URI))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + config.apiKey())
-                .POST(HttpRequest.BodyPublishers.ofString(jsonData))
-                .build();
-        try {
-            // send request and process response
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                return null;
-            }
-            return response.body();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return SithClanPluginUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
+                SithClanPluginConstants.EVENT_SCHEDULE_POST_URI);
     }
 
     /**
