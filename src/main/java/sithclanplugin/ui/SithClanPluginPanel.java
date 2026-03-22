@@ -5,6 +5,7 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.net.http.HttpClient;
 
 import javax.inject.Inject;
 import javax.swing.Box;
@@ -19,10 +20,18 @@ import com.google.inject.Singleton;
 
 import lombok.Getter;
 import net.runelite.client.ui.PluginPanel;
+import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
+import sithclanplugin.util.SithClanPluginUtil;
 
 @Singleton
 public class SithClanPluginPanel extends PluginPanel {
+
+    @Inject
+    private SithClanPluginConfig config;
+
+    @Inject
+    private HttpClient httpClient;
 
     @Inject
     private SithClanEventSchedule eventSchedule;
@@ -129,7 +138,7 @@ public class SithClanPluginPanel extends PluginPanel {
         // show senate button if API key added LATER
         schedulePanel.setOnRefreshCallback(() -> {
             new Thread(() -> {
-                boolean isSenateMember = eventSchedule.validateApiKey();
+                boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
                 SwingUtilities.invokeLater(() -> senateButton.setVisible(isSenateMember));
             }).start();
         });

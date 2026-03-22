@@ -1,10 +1,7 @@
 package sithclanplugin.eventschedule;
 
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -38,8 +35,10 @@ public class SithClanEventSchedule {
     @Inject
     private SithClanNotificationManager notificationManager;
 
+    @Inject
+    private HttpClient httpClient;
+
     private ArrayList<SithClanDaySchedule> schedule;
-    private final HttpClient httpClient;
     private boolean isSenateMember = false;
     private LocalDateTime lastTimeScheduleFetched;
 
@@ -48,7 +47,6 @@ public class SithClanEventSchedule {
     public SithClanEventSchedule() {
         schedule = new ArrayList<>();
         lastTimeScheduleFetched = null;
-        httpClient = HttpClient.newHttpClient();
     }
 
     /**
@@ -253,31 +251,5 @@ public class SithClanEventSchedule {
         Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
         }.getType();
         return gson.fromJson(jsonSchedule, scheduleType);
-    }
-
-    /**
-     * Validates API key in plugin config via HTTP GET request
-     * Saves senate member state
-     * 
-     * @return boolean is API key valid
-     */
-    public boolean validateApiKey() {
-        // create HTTP GET request
-        HttpRequest validationRequest = HttpRequest.newBuilder()
-                .uri(URI.create(SithClanPluginConstants.VALIDATE_URI))
-                .header("Authorization", "Bearer " + config.apiKey())
-                .GET()
-                .build();
-
-        try {
-            // send request
-            HttpResponse<String> validationResponse = httpClient.send(validationRequest,
-                    HttpResponse.BodyHandlers.ofString());
-            // validate response
-            this.isSenateMember = validationResponse.statusCode() == 200;
-            return this.isSenateMember;
-        } catch (Exception e) {
-            return false;
-        }
     }
 }

@@ -5,8 +5,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import com.google.inject.Inject;
-
 import sithclanplugin.SithClanPluginConfig;
 
 public class SithClanPluginUtil {
@@ -72,6 +70,32 @@ public class SithClanPluginUtil {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * Validates API key in plugin config via HTTP GET request
+     * Saves senate member state
+     * 
+     * @return boolean is API key valid
+     */
+    public static boolean validateApiKey(HttpClient client, SithClanPluginConfig config) {
+        // create HTTP GET request
+        HttpRequest validationRequest = HttpRequest.newBuilder()
+                .uri(URI.create(SithClanPluginConstants.VALIDATE_URI))
+                .header("Authorization", "Bearer " + config.apiKey())
+                .GET()
+                .build();
+
+        try {
+            // send request
+            HttpResponse<String> validationResponse = client.send(validationRequest,
+                    HttpResponse.BodyHandlers.ofString());
+            // validate response
+            boolean isSenateMember = validationResponse.statusCode() == 200;
+            return isSenateMember;
+        } catch (Exception e) {
+            return false;
         }
     }
 }

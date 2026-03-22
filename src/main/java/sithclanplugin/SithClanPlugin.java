@@ -1,12 +1,14 @@
 package sithclanplugin;
 
 import java.awt.image.BufferedImage;
+import java.net.http.HttpClient;
 
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Provider;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -36,6 +38,7 @@ import sithclanplugin.managers.SithClanNotificationManager;
 import sithclanplugin.managers.SithClanPluginFileManager;
 import sithclanplugin.ui.SithClanPluginPanel;
 import sithclanplugin.util.SithClanPluginConstants;
+import sithclanplugin.util.SithClanPluginUtil;
 
 @PluginDescriptor(name = "Sith Clan Plugin", description = "Enable the Sith Clan Plugin")
 public class SithClanPlugin extends Plugin {
@@ -56,6 +59,9 @@ public class SithClanPlugin extends Plugin {
 	private ChatMessageManager chatMessageManager;
 
 	@Inject
+	private SithClanPluginConfig config;
+
+	@Inject
 	private SithClanPluginFileManager fileManager;
 
 	@Inject
@@ -67,6 +73,7 @@ public class SithClanPlugin extends Plugin {
 	@Inject
 	private SithClanEventSchedule eventSchedule;
 
+	private HttpClient httpClient;
 	private NavigationButton uiNavigationButton;
 	private boolean pendingClanCheck = false;
 	private net.runelite.api.World quickHopTargetWorld;
@@ -97,13 +104,16 @@ public class SithClanPlugin extends Plugin {
 		// create plugin directory and config files
 		fileManager.initializeFiles();
 
+		// create HttpClient object
+		httpClient = HttpClient.newHttpClient();
+
 		// load schedule if saved, else get new schedule
 		boolean hasStoredSchedule = fileManager.hasSavedSchedule();
 		new Thread(() -> {
 			int status = hasStoredSchedule ? eventSchedule.parseScheduleFromFile()
 					: eventSchedule.parseScheduleFromGet();
 			// validate API key of Senate members
-			boolean isSenateMember = eventSchedule.validateApiKey();
+			boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
 			SwingUtilities.invokeLater(() -> {
 				if (status == SithClanPluginConstants.STATUS_OK) {
 					uiPanel.get().getSchedulePanel().displaySchedule();
@@ -184,6 +194,17 @@ public class SithClanPlugin extends Plugin {
 	@Provides
 	SithClanPluginConfig provideConfig(ConfigManager configManager) {
 		return configManager.getConfig(SithClanPluginConfig.class);
+	}
+
+	/**
+	 * Creates HttpClient object for rest of plugin to utilize
+	 * 
+	 * @return HttpClient client object
+	 */
+	@Provides
+	@Singleton
+	HttpClient provideHttpClient() {
+		return HttpClient.newHttpClient();
 	}
 
 	/**
