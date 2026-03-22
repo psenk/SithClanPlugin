@@ -24,6 +24,8 @@ public class SithClanPluginConstants {
     // uris
     public static final String EVENT_SCHEDULE_GET_URI = "https://sithclanplugin.psenk168.workers.dev/api/eventschedule";
     public static final String EVENT_SCHEDULE_POST_URI = "https://sithclanplugin.psenk168.workers.dev/api/eventschedule/post";
+    public static final String MEMBER_ROSTER_GET_URI = "https://sithclanplugin.psenk168.workers.dev/api/memberroster";
+    public static final String MEMBER_ROSTER_POST_URI = "https://sithclanplugin.psenk168.workers.dev/api/memberroster/post";
     public static final String VALIDATE_URI = "https://sithclanplugin.psenk168.workers.dev/api/validate";
 
     // discord
@@ -36,4 +38,24 @@ public class SithClanPluginConstants {
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
     public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(TIME_FORMAT);
     public static final ZoneId EST_ZONE = ZoneId.of("America/New_York");
+
+    // enums
+    // clan ranks
+    public enum ClanRanks {
+        CHILDREN_OF_THE_WATCH,
+        SITH_LOYALIST,
+        TIE_PILOT,
+        SITH_TROOPER,
+        DEATH_TROOPER,
+        SOVEREIGN_PROTECTOR,
+        SOVEREIGN_CHAMPION,
+        SITH_ACOLYTE,
+        SITH_KNIGHT,
+        SITH_MARAUDER,
+        SITH_LORD,
+        SITH_OVERSEER,
+        IMPERIAL_INQUISITOR,
+        GRAND_INQUISITOR,
+        SHADOW_HAND
+    }
 }
