@@ -2,8 +2,12 @@ package sithclanplugin.members;
 
 import java.util.ArrayList;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class RosterResponse {
-    
-    ArrayList<SithClanMember> roster;
-    String date;
+
+    private ArrayList<SithClanMember> roster;
+    private String date;
 }

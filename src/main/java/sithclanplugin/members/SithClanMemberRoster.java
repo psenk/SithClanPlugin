@@ -158,10 +158,10 @@ public class SithClanMemberRoster {
         // convert roster to JSON
         Gson gson = new Gson();
         RosterResponse rosterResponse = gson.fromJson(jsonRoster, RosterResponse.class);
-        ZonedDateTime utcTime = ZonedDateTime.parse(rosterResponse.date);
+        ZonedDateTime utcTime = ZonedDateTime.parse(rosterResponse.getDate());
         this.dateRosterPosted = utcTime.withZoneSameInstant(ZoneId.systemDefault());
         HashMap<String, SithClanMember> roster = new HashMap<>();
-        for (SithClanMember member : rosterResponse.roster) {
+        for (SithClanMember member : rosterResponse.getRoster()) {
             roster.put(member.getMemberName().toLowerCase(), member);
         }
         return roster;
