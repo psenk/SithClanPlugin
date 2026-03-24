@@ -76,6 +76,7 @@ public class SithClanSchedulePanel extends JPanel {
     private static final String SCHEDULE_UNOBTAINABLE_WARNING = "Unable to obtain schedule.";
     private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
+    private static final String NO_SCHEDULE_AVAILABLE = "No schedule available. Please refresh.";
 
     SithClanSchedulePanel() {
         // load collapse/expand arrow imgs
@@ -127,7 +128,7 @@ public class SithClanSchedulePanel extends JPanel {
         bottomPanel.add(scheduleRefreshScheduleButton);
 
         this.add(bottomPanel, BorderLayout.SOUTH);
-        
+
         // refresh event schedule button action
         scheduleRefreshScheduleButton.addActionListener(e -> {
             new Thread(() -> {
@@ -144,7 +145,7 @@ public class SithClanSchedulePanel extends JPanel {
                 });
             }).start();
         });
-        
+
         this.setVisible(true);
     }
 
@@ -153,21 +154,18 @@ public class SithClanSchedulePanel extends JPanel {
      */
     public void displaySchedule() {
         String currentDay = "";
-
-        // get and store schedule if we don't have it and try again
-        if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty()) {
-            new Thread(() -> {
-                int status = eventSchedule.parseScheduleFromGet();
-                SwingUtilities.invokeLater(() -> {
-                    handleScheduleStatus(status);
-                    // display schedule on panel
-                    displaySchedule();
-                });
-            }).start();
-            return;
-        }
         // fresh start
         scheduleContainer.removeAll();
+
+        // if there is no schedule
+        if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty()) {
+            JLabel noScheduleLabel = new JLabel(NO_SCHEDULE_AVAILABLE);
+            noScheduleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            scheduleContainer.add(noScheduleLabel);
+            scheduleContainer.revalidate();
+            scheduleContainer.repaint();
+            return;
+        }
 
         // iterate through all days in schedule
         for (SithClanDaySchedule day : eventSchedule.getSchedule()) {
