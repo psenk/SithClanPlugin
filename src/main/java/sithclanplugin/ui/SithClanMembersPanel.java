@@ -3,7 +3,10 @@ package sithclanplugin.ui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.util.HashMap;
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -14,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -35,10 +39,14 @@ public class SithClanMembersPanel extends JPanel {
     private SithClanMemberRoster memberRoster;
 
     private Icon[] rankIcons;
+    private final JScrollPane membersAreaScrollPane;
     private final JTextField membersSearchTextField;
     private final JButton membersSearchButton;
     private final JButton membersShowAllButton;
     private final JPanel membersAreaPanel;
+    private ArrayList<SithClanMember> rosterList;
+    private int pageIndex;
+    private boolean isLoading;
 
     private static final String CURRENT_GOLD_KEY = "Faca";
 
@@ -55,6 +63,7 @@ public class SithClanMembersPanel extends JPanel {
     private static final String MEMBER_ALT = "Alt: "; // leading space intentional
     private static final String MEMBER_UNKNOWN_DATA = "Unknown";
     private static final int AVATAR_SIZE = 64;
+    private static final int PAGE_SIZE = 5;
 
     // rank icons
     private static final String ICON_CHILDREN_OF_THE_WATCH = "/cotw.png";
@@ -144,7 +153,7 @@ public class SithClanMembersPanel extends JPanel {
         membersAreaPanel.setOpaque(true);
         membersAreaPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JScrollPane membersAreaScrollPane = new JScrollPane(membersAreaPanel);
+        membersAreaScrollPane = new JScrollPane(membersAreaPanel);
         membersAreaScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         membersAreaScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
         membersAreaScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 400));
@@ -197,30 +206,45 @@ public class SithClanMembersPanel extends JPanel {
                     }
                 }
                 // get all members
-                HashMap<String, SithClanMember> roster = memberRoster.getRoster();
                 SwingUtilities.invokeLater(() -> {
-                    displayAllMembers(roster);
+                    displayAllMembers(memberRoster.getRoster().values());
                 });
             }).start();
+        });
+
+        // pagination for show all members
+        JScrollBar membersAreaScrollBar = membersAreaScrollPane.getVerticalScrollBar();
+        membersAreaScrollBar.addAdjustmentListener(e -> {
+            // if already loading stop
+            if (isLoading) {
+                return;
+            }
+            // if no list or everything loaded
+            if (rosterList == null || pageIndex >= rosterList.size()) {
+                return;
+            }
+            // load next page if at the bottom
+            if (membersAreaScrollBar.getValue() + membersAreaScrollBar.getVisibleAmount() >= membersAreaScrollBar
+                    .getMaximum()) {
+                loadNextPage();
+            }
         });
 
         this.setVisible(true);
     }
 
     /**
-     * Creates panel with inputted member info and posts to display
+     * Creates a single member card panel for display
      * 
-     * @param member SithClanMember member to display
+     * @param member SithClanMember member to place on card
+     * @return JPanel built member card panel
      */
-    private void displaySingleMember(SithClanMember member) {
-        // fresh panel
-        membersAreaPanel.removeAll();
-
+    private JPanel buildMemberCard(SithClanMember member) {
         // container for all info
         JPanel singleMemberPanel = new JPanel();
-        singleMemberPanel.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 150));
-        singleMemberPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 150));
-        singleMemberPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 150));
+        singleMemberPanel.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 130));
+        singleMemberPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 130));
+        singleMemberPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 130));
         singleMemberPanel.setLayout(new BoxLayout(singleMemberPanel, BoxLayout.X_AXIS));
         singleMemberPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR),
@@ -232,8 +256,11 @@ public class SithClanMembersPanel extends JPanel {
         // avatar panel (rank icon right now)
         JLabel avatar;
         JPanel memberAvatar = new JPanel();
-        memberAvatar.setPreferredSize(new Dimension(AVATAR_SIZE, AVATAR_SIZE));
+        memberAvatar.setLayout(new BorderLayout());
         memberAvatar.setAlignmentY(Component.CENTER_ALIGNMENT);
+        memberAvatar.setPreferredSize(new Dimension(AVATAR_SIZE - 5, 130));
+        memberAvatar.setMaximumSize(new Dimension(AVATAR_SIZE - 5, 130));
+        memberAvatar.setMinimumSize(new Dimension(AVATAR_SIZE - 5, 130));
         int rankInt = member.getMemberRank();
         memberAvatar.setOpaque(false);
         if (rankInt == 15 && member.getMemberName().equalsIgnoreCase(CURRENT_GOLD_KEY)) {
@@ -242,15 +269,19 @@ public class SithClanMembersPanel extends JPanel {
             avatar = new JLabel(rankIcons[rankInt - 1]);
         }
         avatar.setPreferredSize(new Dimension(AVATAR_SIZE, AVATAR_SIZE));
-        memberAvatar.add(avatar);
+        memberAvatar.add(avatar, BorderLayout.CENTER);
         singleMemberPanel.add(memberAvatar);
 
         // member info container
         JPanel rightPanel = new JPanel();
+        rightPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
+        rightPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 
         // member name
         JLabel memberName = new JLabel(member.getMemberName());
+        Font customFont = memberName.getFont().deriveFont(Font.BOLD, 16);
+        memberName.setFont(customFont);
         rightPanel.add(memberName);
 
         // member rank
@@ -280,6 +311,19 @@ public class SithClanMembersPanel extends JPanel {
         }
 
         singleMemberPanel.add(rightPanel);
+        return singleMemberPanel;
+    }
+
+    /**
+     * Adds single member card to display
+     * 
+     * @param member SithClanMember member to display
+     */
+    private void displaySingleMember(SithClanMember member) {
+        // fresh panel
+        membersAreaPanel.removeAll();
+
+        JPanel singleMemberPanel = buildMemberCard(member);
 
         // add for display
         membersAreaPanel.add(singleMemberPanel);
@@ -288,10 +332,38 @@ public class SithClanMembersPanel extends JPanel {
     }
 
     /**
-     * TODO: FUNCTIONALITY
-     * TODO: JAVADOC
+     * Lazily displays a list of all members in clan
+     * 
+     * @param rosterCollection collection of clan members
      */
-    private void displayAllMembers(HashMap<String, SithClanMember> roster) {
+    private void displayAllMembers(Collection<SithClanMember> rosterCollection) {
+        // fresh panel
+        membersAreaPanel.removeAll();
 
+        // sort roster by clan rank descending
+        rosterList = new ArrayList<>(rosterCollection);
+        rosterList.sort(Comparator.comparingInt(SithClanMember::getMemberRank).reversed());
+
+        // reset pagination and load first page
+        pageIndex = 0;
+        loadNextPage();
+
+    }
+
+    /**
+     * Loads the next page of member cards
+     */
+    private void loadNextPage() {
+        int pageEnd = Math.min(pageIndex + PAGE_SIZE, rosterList.size());
+
+        isLoading = true;
+        // create member card and display page
+        for (int i = pageIndex; i < pageEnd; i++) {
+            membersAreaPanel.add(buildMemberCard(rosterList.get(i)));
+        }
+        pageIndex = pageEnd;
+        membersAreaPanel.revalidate();
+        membersAreaPanel.repaint();
+        isLoading = false;
     }
 }
