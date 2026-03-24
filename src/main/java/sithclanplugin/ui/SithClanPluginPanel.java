@@ -21,7 +21,6 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.runelite.client.ui.PluginPanel;
 import sithclanplugin.SithClanPluginConfig;
-import sithclanplugin.eventschedule.SithClanEventSchedule;
 import sithclanplugin.util.SithClanPluginUtil;
 
 @Singleton
@@ -32,9 +31,6 @@ public class SithClanPluginPanel extends PluginPanel {
 
     @Inject
     private HttpClient httpClient;
-
-    @Inject
-    private SithClanEventSchedule eventSchedule;
 
     @Getter
     private final SithClanSchedulePanel schedulePanel;
