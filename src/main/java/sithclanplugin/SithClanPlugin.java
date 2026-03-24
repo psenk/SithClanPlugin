@@ -104,9 +104,6 @@ public class SithClanPlugin extends Plugin {
 		// create plugin directory and config files
 		fileManager.initializeFiles();
 
-		// create HttpClient object
-		httpClient = HttpClient.newHttpClient();
-
 		// load schedule if saved, else get new schedule
 		boolean hasStoredSchedule = fileManager.hasSavedSchedule();
 		new Thread(() -> {
