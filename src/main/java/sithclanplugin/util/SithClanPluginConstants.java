@@ -39,23 +39,22 @@ public class SithClanPluginConstants {
     public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(TIME_FORMAT);
     public static final ZoneId EST_ZONE = ZoneId.of("America/New_York");
 
-    // enums
     // clan ranks
-    public enum ClanRanks {
-        CHILDREN_OF_THE_WATCH,
-        SITH_LOYALIST,
-        TIE_PILOT,
-        SITH_TROOPER,
-        DEATH_TROOPER,
-        SOVEREIGN_PROTECTOR,
-        SOVEREIGN_CHAMPION,
-        SITH_ACOLYTE,
-        SITH_KNIGHT,
-        SITH_MARAUDER,
-        SITH_LORD,
-        SITH_OVERSEER,
-        IMPERIAL_INQUISITOR,
-        GRAND_INQUISITOR,
-        SHADOW_HAND
-    }
+    public static final String[] CLAN_RANKS = {
+            "Children of the Watch",
+            "Sith Loyalist",
+            "TIE Pilot",
+            "Sith Trooper",
+            "Death Trooper",
+            "Sovereign Protector",
+            "Sovereign Champion",
+            "Sith Acolyte",
+            "Sith Knight",
+            "Sith Marauder",
+            "Sith Lord",
+            "Sith Overseer",
+            "Imperial Inquisitor",
+            "Grand Inquisitor",
+            "Shadow Hand"
+    };
 }
