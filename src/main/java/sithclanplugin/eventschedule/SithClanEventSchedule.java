@@ -12,6 +12,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Singleton;
 
 import lombok.Getter;
+import lombok.Setter;
 import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.managers.SithClanNotificationManager;
 import sithclanplugin.managers.SithClanPluginFileManager;
@@ -38,8 +39,10 @@ public class SithClanEventSchedule {
     @Inject
     private HttpClient httpClient;
 
-    private ArrayList<SithClanDaySchedule> schedule;
+    @Setter
     private boolean isSenateMember = false;
+
+    private ArrayList<SithClanDaySchedule> schedule;
     private LocalDateTime lastTimeScheduleFetched;
 
     private static final int SCHEDULE_FETCH_COOLDOWN_MINUTES = 5;
