@@ -24,8 +24,12 @@ public class SithClanPluginConstants {
     // uris
     public static final String EVENT_SCHEDULE_GET_URI = "https://sithclanplugin.psenk168.workers.dev/api/eventschedule";
     public static final String EVENT_SCHEDULE_POST_URI = "https://sithclanplugin.psenk168.workers.dev/api/eventschedule/post";
+    //public static final String EVENT_SCHEDULE_GET_URI = "http://127.0.0.1:8787/api/eventschedule";
+    //public static final String EVENT_SCHEDULE_POST_URI = "http://127.0.0.1:8787/api/eventschedule/post";
     public static final String MEMBER_ROSTER_GET_URI = "https://sithclanplugin.psenk168.workers.dev/api/memberroster";
     public static final String MEMBER_ROSTER_POST_URI = "https://sithclanplugin.psenk168.workers.dev/api/memberroster/post";
+    //public static final String MEMBER_ROSTER_GET_URI = "http://127.0.0.1:8787/api/memberroster";
+    //public static final String MEMBER_ROSTER_POST_URI = "http://127.0.0.1:8787/api/memberroster/post";
     public static final String VALIDATE_URI = "https://sithclanplugin.psenk168.workers.dev/api/validate";
 
     // discord
@@ -34,8 +38,10 @@ public class SithClanPluginConstants {
 
     // timing
     private static final String DATE_FORMAT = "M/d/yyyy";
+    private static final String SHORT_DATE_FORMAT = "M/d/yy";
     private static final String TIME_FORMAT = "h:mm a";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    public static final DateTimeFormatter SHORT_DATE_FORMATTER = DateTimeFormatter.ofPattern(SHORT_DATE_FORMAT);
     public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(TIME_FORMAT);
     public static final ZoneId EST_ZONE = ZoneId.of("America/New_York");
 
