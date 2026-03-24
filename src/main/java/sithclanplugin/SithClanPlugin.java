@@ -114,6 +114,7 @@ public class SithClanPlugin extends Plugin {
 					: eventSchedule.parseScheduleFromGet();
 			// validate API key of Senate members
 			boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
+			eventSchedule.setSenateMember(isSenateMember);
 			SwingUtilities.invokeLater(() -> {
 				if (status == SithClanPluginConstants.STATUS_OK) {
 					uiPanel.get().getSchedulePanel().displaySchedule();
