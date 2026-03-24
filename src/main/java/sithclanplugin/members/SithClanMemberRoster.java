@@ -1,7 +1,6 @@
 package sithclanplugin.members;
 
 import java.net.http.HttpClient;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -131,16 +130,16 @@ public class SithClanMemberRoster {
                 continue;
             }
             // parse member info
-            String[] memberInfo = member.split(",");
+            String[] memberInfo = member.split(",", -1);
             SithClanMember newMember = new SithClanMember();
             newMember.setMemberName(memberInfo[0]);
             newMember.setMemberRank(Integer.parseInt(memberInfo[1]));
             newMember.setMemberCredits(Integer.parseInt(memberInfo[2]));
             newMember.setMemberDiscordId(Long.parseLong(memberInfo[3]));
-            newMember.setMemberDateJoined(LocalDate.parse(memberInfo[4], SithClanPluginConstants.DATE_FORMATTER));
+            newMember.setMemberDateJoined(memberInfo[4]);
             newMember.setMemberAltName(memberInfo[5].isBlank() ? null : memberInfo[5]);
             newMember.setMemberDatePromoted(memberInfo[6].isBlank() ? null
-                    : LocalDate.parse(memberInfo[6], SithClanPluginConstants.DATE_FORMATTER));
+                    : memberInfo[6]);
 
             // add member to roster
             newRoster.put(newMember.getMemberName().toLowerCase(), newMember);
@@ -158,11 +157,11 @@ public class SithClanMemberRoster {
     private HashMap<String, SithClanMember> deserializeRoster(String jsonRoster) {
         // convert roster to JSON
         Gson gson = new Gson();
-        RosterResponse response = gson.fromJson(jsonRoster, RosterResponse.class);
-        ZonedDateTime utcTime = ZonedDateTime.parse(response.date);
+        RosterResponse rosterResponse = gson.fromJson(jsonRoster, RosterResponse.class);
+        ZonedDateTime utcTime = ZonedDateTime.parse(rosterResponse.date);
         this.dateRosterPosted = utcTime.withZoneSameInstant(ZoneId.systemDefault());
         HashMap<String, SithClanMember> roster = new HashMap<>();
-        for (SithClanMember member : response.roster) {
+        for (SithClanMember member : rosterResponse.roster) {
             roster.put(member.getMemberName().toLowerCase(), member);
         }
         return roster;
