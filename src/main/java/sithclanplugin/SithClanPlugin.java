@@ -73,7 +73,9 @@ public class SithClanPlugin extends Plugin {
 	@Inject
 	private SithClanEventSchedule eventSchedule;
 
+	@Inject
 	private HttpClient httpClient;
+
 	private NavigationButton uiNavigationButton;
 	private boolean pendingClanCheck = false;
 	private net.runelite.api.World quickHopTargetWorld;
