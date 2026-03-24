@@ -37,6 +37,7 @@ public class SithClanSenatePanel extends JPanel {
 
     private final JTextArea senatePostScheduleTextArea;
     private final JTextArea senatePostRosterTextArea;
+    private final JLabel uploadingLabel;
 
     private static final String SENATE_OPTIONS_LABEL = "Senate Options";
     private static final String UPDATE_SCHEDULE_LABEL = "Update Schedule";
@@ -49,8 +50,8 @@ public class SithClanSenatePanel extends JPanel {
     private static final String SUCCESSFUL_POST = "Posted successfully.";
     private static final String BAD_INPUT_WARNING = "There is a problem with your input.";
     private static final String NOT_FOUND_WARNING = "Unable to post.";
+    private static final String UPLOADING = "Uploading...";
 
-    // TODO: callback after post schedule
     SithClanSenatePanel() {
         final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
         final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
@@ -62,6 +63,11 @@ public class SithClanSenatePanel extends JPanel {
         senatePanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         this.add(senatePanelLabel);
         this.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // status label when uploading
+        uploadingLabel = new JLabel(UPLOADING);
+        uploadingLabel.setVisible(false);
+        this.add(uploadingLabel);
 
         // post event schedule functionality
         senatePostScheduleTextArea = new JTextArea();
@@ -75,6 +81,7 @@ public class SithClanSenatePanel extends JPanel {
         // post event schedule action
         senatePostScheduleButton.addActionListener(e -> {
             new Thread(() -> {
+                uploadingLabel.setVisible(true);
                 int status = eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
                 SwingUtilities.invokeLater(() -> {
                     handlePostStatus(status, senatePostScheduleTextArea, EVENT_TEXT_AREA_DEFAULT);
@@ -96,6 +103,7 @@ public class SithClanSenatePanel extends JPanel {
         // post member roster action
         senatePostRosterButton.addActionListener(e -> {
             new Thread(() -> {
+                uploadingLabel.setVisible(true);
                 int status = memberRoster.parseRosterForPost(senatePostRosterTextArea.getText());
                 SwingUtilities.invokeLater(() -> {
                     handlePostStatus(status, senatePostRosterTextArea, ROSTER_TEXT_AREA_DEFAULT);
@@ -179,14 +187,17 @@ public class SithClanSenatePanel extends JPanel {
                 JOptionPane.showMessageDialog(null,
                         SUCCESSFUL_POST);
                 textArea.setText(defaultText);
+                uploadingLabel.setVisible(false);
                 break;
             case SithClanPluginConstants.STATUS_BAD_INPUT:
                 JOptionPane.showMessageDialog(null,
                         BAD_INPUT_WARNING);
+                uploadingLabel.setVisible(false);
                 break;
             case SithClanPluginConstants.STATUS_NOT_FOUND:
                 JOptionPane.showMessageDialog(null,
                         NOT_FOUND_WARNING);
+                uploadingLabel.setVisible(false);
                 break;
             default:
                 break;
