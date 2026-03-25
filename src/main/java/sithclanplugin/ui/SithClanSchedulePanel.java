@@ -110,15 +110,8 @@ public class SithClanSchedulePanel extends JPanel {
         scheduleContainer.setLayout(new BoxLayout(scheduleContainer, BoxLayout.Y_AXIS));
         scheduleContainer.setVisible(false);
         scheduleContainer.setOpaque(true);
-        scheduleContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // allows schedule to scroll
-        JScrollPane scheduleContainerScrollPane = new JScrollPane(scheduleContainer);
-        scheduleContainerScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
-        scheduleContainerScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 400));
-        scheduleContainerScrollPane.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 600));
-
-        this.add(scheduleContainerScrollPane);
+        scheduleContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
+        this.add(scheduleContainer);
 
         // button to refresh schedule
         JButton scheduleRefreshScheduleButton = new JButton(REFRESH_SCHEDULE_BUTTON);
