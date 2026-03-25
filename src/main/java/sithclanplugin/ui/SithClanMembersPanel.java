@@ -4,6 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -44,6 +48,9 @@ public class SithClanMembersPanel extends JPanel {
     private final JButton membersSearchButton;
     private final JButton membersShowAllButton;
     private final JPanel membersAreaPanel;
+    private final JPanel statusPanel;
+    private final JLabel rosterDateLabel;
+    private final JLabel memberDoesNotExistLabel;
     private ArrayList<SithClanMember> rosterList;
     private int pageIndex;
     private boolean isLoading;
@@ -53,15 +60,16 @@ public class SithClanMembersPanel extends JPanel {
     private static final String MEMBERS_PANEL_TITLE = "Sith Member Info";
     private static final String MEMBERS_SEARCH_BUTTON = "Search Members";
     private static final String MEMBERS_SHOW_ALL_BUTTON = "Show All Members";
-    private static final String MEMBERS_AREA_LABEL = "Members";
+    private static final String MEMBERS_AREA_LABEL = "Member(s)";
     private static final String ROSTER_UNOBTAINABLE_WARNING = "Unable to obtain roster.";
-    private static final String MEMBER_DOES_NOT_EXIST = "Member does not exist.";
+    private static final String MEMBER_DOES_NOT_EXIST = "Member does not exist!";
     private static final String MEMBER_RANK = "Rank: "; // trailing space intentional
     private static final String MEMBER_PROMOTED = "Promoted On: "; // trailing space intentional
     private static final String MEMBER_CREDITS = " Imperial Credits"; // leading space intentional
-    private static final String MEMBER_JOINED = "Joined: "; // leading space intentional
-    private static final String MEMBER_ALT = "Alt: "; // leading space intentional
+    private static final String MEMBER_JOINED = "Joined: "; // trailing space intentional
+    private static final String MEMBER_ALT = "Alt: "; // trailing space intentional
     private static final String MEMBER_UNKNOWN_DATA = "Unknown";
+    private static final String ROSTER_DATE_PREFIX = "Roster last updated on "; // trailing space intentional
     private static final int AVATAR_SIZE = 64;
     private static final int PAGE_SIZE = 5;
 
@@ -108,6 +116,23 @@ public class SithClanMembersPanel extends JPanel {
         JLabel membersPanelLabel = new JLabel(MEMBERS_PANEL_TITLE);
         membersPanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // status label panel
+        statusPanel = new JPanel();
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+
+        // current roster date
+        rosterDateLabel = new JLabel();
+        rosterDateLabel.setVisible(false);
+        rosterDateLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        memberDoesNotExistLabel = new JLabel(MEMBER_DOES_NOT_EXIST);
+        memberDoesNotExistLabel.setVisible(false);
+        memberDoesNotExistLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        statusPanel.add(rosterDateLabel);
+        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        statusPanel.add(memberDoesNotExistLabel);
+
         // contains search area and search button
         JPanel membersSearchArea = new JPanel();
         membersSearchArea.setLayout(new BoxLayout(membersSearchArea, BoxLayout.Y_AXIS));
@@ -116,6 +141,13 @@ public class SithClanMembersPanel extends JPanel {
         membersSearchArea.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         membersSearchTextField = new JTextField();
+        // highlights all text when box focused
+        membersSearchTextField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                membersSearchTextField.selectAll();
+            }
+        });
 
         membersSearchButton = new JButton(MEMBERS_SEARCH_BUTTON);
         membersSearchButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -134,6 +166,8 @@ public class SithClanMembersPanel extends JPanel {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.add(membersPanelLabel);
+        topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        topPanel.add(statusPanel);
         topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         topPanel.add(membersSearchArea);
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -173,6 +207,7 @@ public class SithClanMembersPanel extends JPanel {
                 // get roster if not already in memory
                 if (memberRoster.getRoster().isEmpty()) {
                     int status = memberRoster.parseRosterFromGet();
+
                     if (status == SithClanPluginConstants.STATUS_NOT_FOUND) {
                         SwingUtilities.invokeLater(() -> {
                             JOptionPane.showMessageDialog(null, ROSTER_UNOBTAINABLE_WARNING);
@@ -184,8 +219,10 @@ public class SithClanMembersPanel extends JPanel {
                 SithClanMember member = memberRoster.getMemberByName(membersSearchTextField.getText());
                 SwingUtilities.invokeLater(() -> {
                     if (member == null) {
-                        JOptionPane.showMessageDialog(null, MEMBER_DOES_NOT_EXIST);
+                        memberDoesNotExistLabel.setVisible(true);
                     } else {
+                        memberDoesNotExistLabel.setVisible(false);
+                        updateRosterDateLabel(memberRoster.getDateRosterPosted());
                         displaySingleMember(member);
                     }
                 });
@@ -207,6 +244,7 @@ public class SithClanMembersPanel extends JPanel {
                 }
                 // get all members
                 SwingUtilities.invokeLater(() -> {
+                    updateRosterDateLabel(memberRoster.getDateRosterPosted());
                     displayAllMembers(memberRoster.getRoster().values());
                 });
             }).start();
@@ -342,7 +380,8 @@ public class SithClanMembersPanel extends JPanel {
 
         // sort roster by clan rank descending
         rosterList = new ArrayList<>(rosterCollection);
-        rosterList.sort(Comparator.comparingInt(SithClanMember::getMemberRank).reversed());
+        rosterList.sort(Comparator.comparingInt(SithClanMember::getMemberRank).reversed()
+                .thenComparing(SithClanMember::getMemberName));
 
         // reset pagination and load first page
         pageIndex = 0;
@@ -365,5 +404,18 @@ public class SithClanMembersPanel extends JPanel {
         membersAreaPanel.revalidate();
         membersAreaPanel.repaint();
         isLoading = false;
+    }
+
+    /**
+     * Converts roster date into user local time
+     * 
+     * @param time ZonedDateTime roster date
+     */
+    private void updateRosterDateLabel(ZonedDateTime time) {
+        ZonedDateTime timeStamp = time
+                .withZoneSameInstant(ZoneId.systemDefault());
+        rosterDateLabel
+                .setText(ROSTER_DATE_PREFIX + timeStamp.format(SithClanPluginConstants.DATE_FORMATTER));
+        rosterDateLabel.setVisible(true);
     }
 }
