@@ -71,7 +71,7 @@ public class SithClanMembersPanel extends JPanel {
     private static final String MEMBER_UNKNOWN_DATA = "Unknown";
     private static final String ROSTER_DATE_PREFIX = "Roster last updated on "; // trailing space intentional
     private static final int AVATAR_SIZE = 64;
-    private static final int PAGE_SIZE = 5;
+    private static final int PAGE_SIZE = 6;
 
     // rank icons
     private static final String ICON_CHILDREN_OF_THE_WATCH = "/children_of_the_watch.png";
@@ -190,7 +190,7 @@ public class SithClanMembersPanel extends JPanel {
         membersAreaScrollPane = new JScrollPane(membersAreaPanel);
         membersAreaScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         membersAreaScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
-        membersAreaScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 400));
+        membersAreaScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 600));
 
         // members label and scroll pane
         JPanel bottomPanel = new JPanel();
