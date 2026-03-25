@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +31,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
 import sithclanplugin.SithClanPlugin;
@@ -76,14 +78,13 @@ public class SithClanSchedulePanel extends JPanel {
     private static final String SCHEDULE_UNOBTAINABLE_WARNING = "Unable to obtain schedule.";
     private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
-    private static final String NO_SCHEDULE_AVAILABLE = "No schedule available. Please refresh.";
 
     SithClanSchedulePanel() {
         // load collapse/expand arrow imgs
         rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_IMG_PATH));
         downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_IMG_PATH));
         // main panel layout
-        this.setLayout(new BorderLayout());
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // top panel title
         JLabel schedulePanelLabel = new JLabel(EVENT_SCHEDULE);
@@ -102,32 +103,30 @@ public class SithClanSchedulePanel extends JPanel {
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         topPanel.add(scheduleExpiredLabel);
 
-        this.add(topPanel, BorderLayout.NORTH);
+        this.add(topPanel);
 
         // contains event schedule
         scheduleContainer = new JPanel();
         scheduleContainer.setLayout(new BoxLayout(scheduleContainer, BoxLayout.Y_AXIS));
-        scheduleContainer.setVisible(true);
+        scheduleContainer.setVisible(false);
         scheduleContainer.setOpaque(true);
         scheduleContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // allows schedule to scroll
         JScrollPane scheduleContainerScrollPane = new JScrollPane(scheduleContainer);
         scheduleContainerScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        scheduleContainerScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 400));
+        scheduleContainerScrollPane.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 600));
 
-        this.add(scheduleContainerScrollPane, BorderLayout.CENTER);
+        this.add(scheduleContainerScrollPane);
 
         // button to refresh schedule
         JButton scheduleRefreshScheduleButton = new JButton(REFRESH_SCHEDULE_BUTTON);
         scheduleRefreshScheduleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // organization, contains refresh button
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
-        bottomPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        bottomPanel.add(scheduleRefreshScheduleButton);
-
-        this.add(bottomPanel, BorderLayout.SOUTH);
+        // refresh button
+        this.add(Box.createRigidArea(new Dimension(0, 10)));
+        this.add(scheduleRefreshScheduleButton);
 
         // refresh event schedule button action
         scheduleRefreshScheduleButton.addActionListener(e -> {
@@ -159,13 +158,13 @@ public class SithClanSchedulePanel extends JPanel {
 
         // if there is no schedule
         if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty()) {
-            JLabel noScheduleLabel = new JLabel(NO_SCHEDULE_AVAILABLE);
-            noScheduleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            scheduleContainer.add(noScheduleLabel);
+            scheduleContainer.setVisible(false);
             scheduleContainer.revalidate();
             scheduleContainer.repaint();
             return;
         }
+
+        scheduleContainer.setVisible(true);
 
         // iterate through all days in schedule
         for (SithClanDaySchedule day : eventSchedule.getSchedule()) {
@@ -178,8 +177,13 @@ public class SithClanSchedulePanel extends JPanel {
             scheduleContainer.add(dateLabel);
             scheduleContainer.add(dailyEvents);
 
+            // sort events by time
+            ArrayList<SithClanEvent> events = new ArrayList<>(day.getEvents());
+            events.sort((e1, e2) -> LocalTime.parse(e1.getEventTime(), SithClanPluginConstants.TIME_FORMATTER)
+                    .compareTo(LocalTime.parse(e2.getEventTime(), SithClanPluginConstants.TIME_FORMATTER)));
+
             // iterate through all events in day
-            for (SithClanEvent event : day.getEvents()) {
+            for (SithClanEvent event : events) {
                 // create each event
                 JPanel singleEvent = createEvent(event, day.getDate());
 
@@ -203,7 +207,6 @@ public class SithClanSchedulePanel extends JPanel {
         JPanel dailyEvents = new JPanel();
         dailyEvents.setLayout(new BoxLayout(dailyEvents, BoxLayout.Y_AXIS));
         dailyEvents.setAlignmentX(Component.LEFT_ALIGNMENT);
-        dailyEvents.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         dailyEvents.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
         dailyEvents.setVisible(false);
         return dailyEvents;
@@ -329,6 +332,11 @@ public class SithClanSchedulePanel extends JPanel {
             eventRepeated.setAlignmentX(Component.LEFT_ALIGNMENT);
             singleEvent.add(eventRepeated);
         }
+
+        // size constraints after children added
+        eventContainer.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 100));
+        eventContainer.setMaximumSize(new Dimension(Short.MAX_VALUE, eventContainer.getPreferredSize().height));
+
         return eventContainer;
     }
 

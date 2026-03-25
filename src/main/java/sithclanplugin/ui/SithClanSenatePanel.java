@@ -37,6 +37,7 @@ public class SithClanSenatePanel extends JPanel {
 
     private final JTextArea senatePostScheduleTextArea;
     private final JTextArea senatePostRosterTextArea;
+    private final JPanel statusPanel;
     private final JLabel uploadingLabel;
 
     private static final String SENATE_OPTIONS_LABEL = "Senate Options";
@@ -64,10 +65,16 @@ public class SithClanSenatePanel extends JPanel {
         this.add(senatePanelLabel);
         this.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // status label when uploading
+        // status label panel
+        statusPanel = new JPanel();
+
+        // uploading schedule/roster
         uploadingLabel = new JLabel(UPLOADING);
         uploadingLabel.setVisible(false);
-        this.add(uploadingLabel);
+        uploadingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        statusPanel.add(uploadingLabel);
+        statusPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         // post event schedule functionality
         senatePostScheduleTextArea = new JTextArea();
