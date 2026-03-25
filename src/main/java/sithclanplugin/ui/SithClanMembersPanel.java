@@ -66,22 +66,22 @@ public class SithClanMembersPanel extends JPanel {
     private static final int PAGE_SIZE = 5;
 
     // rank icons
-    private static final String ICON_CHILDREN_OF_THE_WATCH = "/cotw.png";
-    private static final String ICON_SITH_LOYALIST = "/loyal.png";
-    private static final String ICON_TIE_PILOT = "/tie.png";
-    private static final String ICON_SITH_TROOPER = "/stroop.png";
-    private static final String ICON_DEATH_TROOPER = "/dtroop.png";
-    private static final String ICON_SOVEREIGN_PROTECTOR = "/sovpro.png";
-    private static final String ICON_SOVEREIGN_CHAMPION = "/sovch.png";
-    private static final String ICON_SITH_ACOLYTE = "/aco.png";
-    private static final String ICON_SITH_KNIGHT = "/kni.png";
-    private static final String ICON_SITH_MARAUDER = "/mara.png";
-    private static final String ICON_SITH_LORD = "/lord.png";
-    private static final String ICON_SITH_OVERSEER = "/ovr.png";
-    private static final String ICON_IMPERIAL_INQUISITOR = "/inq.png";
-    private static final String ICON_GRAND_INQUISITOR = "/ginq.png";
-    private static final String ICON_SILVER_KEY = "/skey.png";
-    private static final String ICON_GOLD_KEY = "/gkey.png";
+    private static final String ICON_CHILDREN_OF_THE_WATCH = "/children_of_the_watch.png";
+    private static final String ICON_SITH_LOYALIST = "/sith_loyalist.png";
+    private static final String ICON_TIE_PILOT = "/tie_pilot.png";
+    private static final String ICON_SITH_TROOPER = "/storm_trooper.png";
+    private static final String ICON_DEATH_TROOPER = "/death_trooper.png";
+    private static final String ICON_SOVEREIGN_PROTECTOR = "/sovereign_protector.png";
+    private static final String ICON_SOVEREIGN_CHAMPION = "/sovereign_champion.png";
+    private static final String ICON_SITH_ACOLYTE = "/sith_acolyte.png";
+    private static final String ICON_SITH_KNIGHT = "/sith_knight.png";
+    private static final String ICON_SITH_MARAUDER = "/sith_marauder.png";
+    private static final String ICON_SITH_LORD = "/sith_lord.png";
+    private static final String ICON_SITH_OVERSEER = "/sith_overseer.png";
+    private static final String ICON_IMPERIAL_INQUISITOR = "/imperial_inquisitor.png";
+    private static final String ICON_GRAND_INQUISITOR = "/grand_inquisitor.png";
+    private static final String ICON_SILVER_KEY = "/silver_key.png";
+    private static final String ICON_GOLD_KEY = "/gold_key.png";
 
     SithClanMembersPanel() {
         rankIcons = new Icon[] {
