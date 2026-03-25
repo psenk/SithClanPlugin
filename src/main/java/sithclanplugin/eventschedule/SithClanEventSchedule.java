@@ -176,14 +176,19 @@ public class SithClanEventSchedule {
 
         // iterate through schedule list
         for (String line : scheduleInput) {
-            line = line.trim();
             if (line.isBlank())
                 continue;
+            line = line.trim();
             // parse event date
             if (line.startsWith("--")) {
                 // add previous day created
-                if (currentDay != null)
+                if (currentDay != null) {
+                    if (currentEvent != null) {
+                        currentDay.getEvents().add(currentEvent);
+                        currentEvent = null;
+                    }
                     newSchedule.add(currentDay);
+                }
 
                 // create and setup day
                 currentDay = new SithClanDaySchedule();
