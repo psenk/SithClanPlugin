@@ -166,7 +166,9 @@ public class SithClanPlugin extends Plugin {
 				boolean isMember = clanChannel.getName().equalsIgnoreCase(SithClanPluginConstants.CLAN_NAME);
 				// if not in clan hide panels
 				SwingUtilities.invokeLater(() -> {
-					if (!isMember) {
+					if (isMember) {
+						uiPanel.get().showMainPanel();
+					} else {
 						uiPanel.get().userNotInClan();
 					}
 				});

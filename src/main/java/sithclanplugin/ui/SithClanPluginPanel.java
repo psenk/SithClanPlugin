@@ -44,11 +44,12 @@ public class SithClanPluginPanel extends PluginPanel {
     @Getter
     private final JButton senateButton;
 
+    private CardLayout cardLayout;
     private final JPanel cardPanel;
     private final JPanel navPanel;
     private final JPanel buttonPanel;
-    private CardLayout cardLayout;
     private final JPanel notClanMemberPanel;
+    private final JPanel notLoggedInPanel;
 
     private static final String PLUGIN_LABEL = "Sith Clan Plugin";
     private static final String SCHEDULE_BUTTON = "Event Schedule";
@@ -57,7 +58,8 @@ public class SithClanPluginPanel extends PluginPanel {
     private static final String SCHEDULE_TITLE = "schedule";
     private static final String MEMBERS_TITLE = "members";
     private static final String SENATE_TITLE = "senate";
-    private static final String NON_MEMBER_MESSAGE = "Sorry, this plugin is for members of the Sith clan only.";
+    private static final String NOT_LOGGED_IN_MESSAGE = "<html><center>Please log in and turn on clan chat to use this plugin.</center></html>";
+    private static final String NON_MEMBER_MESSAGE = "<html><center>Sorry, this plugin is for members of the Sith clan only.  Message Kyanize in-game or kyanize. in Discord for joining info!</center></html>";
 
     @Inject
     SithClanPluginPanel(SithClanSchedulePanel schedulePanel,
@@ -117,6 +119,8 @@ public class SithClanPluginPanel extends PluginPanel {
 
         this.add(navPanel, BorderLayout.NORTH);
         this.add(cardPanel, BorderLayout.CENTER);
+        cardPanel.setVisible(false);
+        buttonPanel.setVisible(false);
 
         // action listeners
         scheduleButton.addActionListener(e -> {
@@ -139,6 +143,13 @@ public class SithClanPluginPanel extends PluginPanel {
             }).start();
         });
 
+        // panel for users not logged in
+        notLoggedInPanel = new JPanel();
+        JLabel notLoggedInLabel = new JLabel(NOT_LOGGED_IN_MESSAGE);
+        notLoggedInPanel.add(notLoggedInLabel);
+        this.add(notLoggedInPanel, BorderLayout.CENTER);
+        notLoggedInPanel.setVisible(true);
+
         // panel for users not in the clan
         notClanMemberPanel = new JPanel();
         JLabel notClanMemberLabel = new JLabel(NON_MEMBER_MESSAGE);
@@ -147,11 +158,25 @@ public class SithClanPluginPanel extends PluginPanel {
     }
 
     /**
+     * Shows main panel after successful clan verification
+     */
+    public void showMainPanel() {
+        notLoggedInPanel.setVisible(false);
+        notClanMemberPanel.setVisible(false);
+        navPanel.setVisible(true);
+        cardPanel.setVisible(true);
+        buttonPanel.setVisible(true);
+        revalidate();
+        repaint();
+    }
+
+    /**
      * Hide all if user is not in clan
      */
     public void userNotInClan() {
         cardPanel.setVisible(false);
         buttonPanel.setVisible(false);
+        notLoggedInPanel.setVisible(false);
         navPanel.setVisible(false);
         this.add(notClanMemberPanel, BorderLayout.CENTER);
         notClanMemberPanel.setVisible(true);
