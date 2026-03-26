@@ -260,4 +260,21 @@ public class SithClanEventSchedule {
         }.getType();
         return gson.fromJson(jsonSchedule, scheduleType);
     }
+
+    /**
+     * Loads schedule received during plugin startup
+     * 
+     * @param startupSchedule ArrayList<SithClanDaySchedule> event schedule
+     * @param startupJson     String json string for saving
+     */
+    public void loadStartupSchedule(ArrayList<SithClanDaySchedule> startupSchedule, String startupJson) {
+        // save schedule
+        this.schedule = startupSchedule;
+        // save schedule locally
+        fileManager.saveScheduleLocally(startupJson);
+        // refresh rate limiting
+        this.lastTimeScheduleFetched = LocalDateTime.now();
+        // schedule event notifications
+        notificationManager.scheduleNotifications(schedule);
+    }
 }
