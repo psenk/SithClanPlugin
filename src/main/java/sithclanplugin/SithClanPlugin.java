@@ -36,6 +36,7 @@ import net.runelite.http.api.worlds.WorldResult;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
 import sithclanplugin.managers.SithClanPluginFileManager;
 import sithclanplugin.managers.SithClanPluginNotificationManager;
+import sithclanplugin.managers.SithClanPluginStartupManager;
 import sithclanplugin.ui.SithClanPluginPanel;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
@@ -60,6 +61,9 @@ public class SithClanPlugin extends Plugin {
 
 	@Inject
 	private SithClanPluginConfig config;
+
+	@Inject
+	private SithClanPluginStartupManager startupManager;
 
 	@Inject
 	private SithClanPluginFileManager fileManager;
@@ -106,18 +110,19 @@ public class SithClanPlugin extends Plugin {
 		// create plugin directory and config files
 		fileManager.initializeFiles();
 
-		// load schedule if saved, else get new schedule
-		boolean hasStoredSchedule = fileManager.hasSavedSchedule();
+		// startup loading
 		new Thread(() -> {
-			int status = hasStoredSchedule ? eventSchedule.parseScheduleFromFile()
-					: eventSchedule.parseScheduleFromGet();
+			// get startup info and parse
+			int status = startupManager.parseStartupInfoFromGet();
+			// if fails, load from local file
+			if (status != SithClanPluginConstants.STATUS_OK) {
+				eventSchedule.parseScheduleFromFile();
+			}
 			// validate API key of Senate members
 			boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
 			eventSchedule.setSenateMember(isSenateMember);
 			SwingUtilities.invokeLater(() -> {
-				if (status == SithClanPluginConstants.STATUS_OK) {
-					uiPanel.get().getSchedulePanel().displaySchedule();
-				}
+				uiPanel.get().getSchedulePanel().displaySchedule();
 				// display senate options button if senate
 				uiPanel.get().getSenateButton().setVisible(isSenateMember);
 			});
