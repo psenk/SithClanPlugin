@@ -24,7 +24,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
@@ -70,7 +69,7 @@ public class SithClanSchedulePanel extends JPanel {
     private final Icon downArrowIcon;
 
     private static final String EVENT_SCHEDULE = "Event Schedule";
-    private static final String SCHEDULE_EXPIRED_WARNING = "This schedule is expired! Please refresh";
+    private static final String SCHEDULE_EXPIRED_WARNING = "Schedule is expired! Please refresh";
     private static final String REFRESH_SCHEDULE_BUTTON = "Refresh Schedule";
     private static final String ARROW_RIGHT_IMG_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_IMG_PATH = "/arrow_down.png";
@@ -95,6 +94,7 @@ public class SithClanSchedulePanel extends JPanel {
         scheduleExpiredLabel.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
         scheduleExpiredLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         scheduleExpiredLabel.setVisible(false);
+        this.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // organization, contains panel title and expiration warning
         JPanel topPanel = new JPanel();
