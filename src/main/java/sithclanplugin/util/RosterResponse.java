@@ -1,4 +1,4 @@
-package sithclanplugin.members;
+package sithclanplugin.util;
 
 import java.util.ArrayList;
 
@@ -6,9 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sithclanplugin.members.SithClanMember;
 
 /**
- * Custom class for roster posting response
+ * Roster response DTO
  */
 
 @Setter
