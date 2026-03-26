@@ -1,4 +1,4 @@
-package sithclanplugin.announcements;
+package sithclanplugin.dto;
 
 import java.util.ArrayList;
 
@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sithclanplugin.announcements.SithClanAnnouncement;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 
 /**
