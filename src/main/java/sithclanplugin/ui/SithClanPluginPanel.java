@@ -45,7 +45,6 @@ public class SithClanPluginPanel extends PluginPanel {
     private final JButton senateButton;
 
     private CardLayout cardLayout;
-    private CardLayout cardLayout;
     private final JPanel cardPanel;
     private final JPanel navPanel;
     private final JPanel buttonPanel;
