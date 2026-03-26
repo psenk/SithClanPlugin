@@ -14,7 +14,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import sithclanplugin.SithClanPluginConfig;
-import sithclanplugin.managers.SithClanNotificationManager;
+import sithclanplugin.managers.SithClanPluginNotificationManager;
 import sithclanplugin.managers.SithClanPluginFileManager;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
@@ -34,7 +34,7 @@ public class SithClanEventSchedule {
     private SithClanPluginFileManager fileManager;
 
     @Inject
-    private SithClanNotificationManager notificationManager;
+    private SithClanPluginNotificationManager notificationManager;
 
     @Inject
     private HttpClient httpClient;

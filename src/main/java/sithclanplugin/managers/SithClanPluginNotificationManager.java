@@ -23,7 +23,7 @@ import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
 
 @Singleton
-public class SithClanNotificationManager {
+public class SithClanPluginNotificationManager {
 
     @Inject
     private SithClanPluginFileManager fileManager;
@@ -37,14 +37,14 @@ public class SithClanNotificationManager {
     private static final String EVENT_NOTIFICATION = "Clan event starting soon: ";
 
     @Inject
-    public SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier) {
+    public SithClanPluginNotificationManager(SithClanPluginConfig config, Notifier notifier) {
         this.config = config;
         this.notifier = notifier;
         this.scheduler = Executors.newScheduledThreadPool(1);
     }
 
     // for testing
-    public SithClanNotificationManager(SithClanPluginConfig config, Notifier notifier,
+    public SithClanPluginNotificationManager(SithClanPluginConfig config, Notifier notifier,
             ScheduledExecutorService scheduler, SithClanPluginFileManager fileManager) {
         this.config = config;
         this.notifier = notifier;

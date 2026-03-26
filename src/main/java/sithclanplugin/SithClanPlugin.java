@@ -34,8 +34,8 @@ import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
-import sithclanplugin.managers.SithClanNotificationManager;
 import sithclanplugin.managers.SithClanPluginFileManager;
+import sithclanplugin.managers.SithClanPluginNotificationManager;
 import sithclanplugin.ui.SithClanPluginPanel;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
@@ -65,7 +65,7 @@ public class SithClanPlugin extends Plugin {
 	private SithClanPluginFileManager fileManager;
 
 	@Inject
-	private SithClanNotificationManager notificationManager;
+	private SithClanPluginNotificationManager notificationManager;
 
 	@Inject
 	private Provider<SithClanPluginPanel> uiPanel;

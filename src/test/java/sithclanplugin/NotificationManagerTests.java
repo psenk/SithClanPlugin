@@ -24,7 +24,7 @@ import org.mockito.MockitoAnnotations;
 import net.runelite.client.Notifier;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
-import sithclanplugin.managers.SithClanNotificationManager;
+import sithclanplugin.managers.SithClanPluginNotificationManager;
 import sithclanplugin.managers.SithClanPluginFileManager;
 import sithclanplugin.util.SithClanPluginConstants;
 
@@ -42,7 +42,7 @@ public class NotificationManagerTests {
     @Mock
     private SithClanPluginFileManager fileManager;
 
-    private SithClanNotificationManager notificationManager;
+    private SithClanPluginNotificationManager notificationManager;
 
     @Before
     public void setUp() {
@@ -58,7 +58,7 @@ public class NotificationManagerTests {
                         task.run();
                     return mock(ScheduledFuture.class);
                 });
-        notificationManager = new SithClanNotificationManager(config, notifier, scheduler, fileManager);
+        notificationManager = new SithClanPluginNotificationManager(config, notifier, scheduler, fileManager);
     }
 
     @Test

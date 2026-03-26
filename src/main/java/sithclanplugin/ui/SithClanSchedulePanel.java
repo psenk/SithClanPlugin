@@ -38,7 +38,7 @@ import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
-import sithclanplugin.managers.SithClanNotificationManager;
+import sithclanplugin.managers.SithClanPluginNotificationManager;
 import sithclanplugin.managers.SithClanPluginFileManager;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
@@ -56,7 +56,7 @@ public class SithClanSchedulePanel extends JPanel {
     private SithClanPluginFileManager fileManager;
 
     @Inject
-    private SithClanNotificationManager notificationManager;
+    private SithClanPluginNotificationManager notificationManager;
 
     @Inject
     private SithClanEventSchedule eventSchedule;
