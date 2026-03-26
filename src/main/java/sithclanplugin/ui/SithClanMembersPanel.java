@@ -6,8 +6,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -65,6 +67,9 @@ public class SithClanMembersPanel extends JPanel {
     private static final String MEMBER_DOES_NOT_EXIST = "Member does not exist!";
     private static final String MEMBER_RANK = "Rank: "; // trailing space intentional
     private static final String MEMBER_PROMOTED = "Promoted On: "; // trailing space intentional
+    private static final String MEMBER_CREDITS_NEEDED = "Credits until promotion: "; // trailing space intentional
+    private static final String MEMBER_DAYS_NEEDED = "Days until promotion: "; // trailing space intentional
+    private static final String MEMBER_NONE_NEEDED = "None! Coming soon..";
     private static final String MEMBER_CREDITS = " Imperial Credits"; // leading space intentional
     private static final String MEMBER_JOINED = "Joined: "; // trailing space intentional
     private static final String MEMBER_ALT = "Alt: "; // trailing space intentional
@@ -280,9 +285,9 @@ public class SithClanMembersPanel extends JPanel {
     private JPanel buildMemberCard(SithClanMember member) {
         // container for all info
         JPanel singleMemberPanel = new JPanel();
-        singleMemberPanel.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 130));
-        singleMemberPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 130));
-        singleMemberPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 130));
+        singleMemberPanel.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 160));
+        singleMemberPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 160));
+        singleMemberPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 160));
         singleMemberPanel.setLayout(new BoxLayout(singleMemberPanel, BoxLayout.X_AXIS));
         singleMemberPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR),
@@ -294,14 +299,19 @@ public class SithClanMembersPanel extends JPanel {
         // avatar panel (rank icon right now)
         JLabel avatar;
         JPanel memberAvatar = new JPanel();
+        String memberName = member.getMemberName();
+        int rankInt = member.getMemberRank();
+        int creditsInt = member.getMemberCredits();
+        String promotionDate = member.getMemberDatePromoted();
+
         memberAvatar.setLayout(new BorderLayout());
         memberAvatar.setAlignmentY(Component.CENTER_ALIGNMENT);
         memberAvatar.setPreferredSize(new Dimension(AVATAR_SIZE - 5, 130));
         memberAvatar.setMaximumSize(new Dimension(AVATAR_SIZE - 5, 130));
         memberAvatar.setMinimumSize(new Dimension(AVATAR_SIZE - 5, 130));
-        int rankInt = member.getMemberRank();
+
         memberAvatar.setOpaque(false);
-        if (rankInt == 15 && member.getMemberName().equalsIgnoreCase(CURRENT_GOLD_KEY)) {
+        if (rankInt == 15 && memberName.equalsIgnoreCase(CURRENT_GOLD_KEY)) {
             avatar = new JLabel(rankIcons[15]);
         } else {
             avatar = new JLabel(rankIcons[rankInt - 1]);
@@ -317,25 +327,57 @@ public class SithClanMembersPanel extends JPanel {
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 
         // member name
-        JLabel memberName = new JLabel(member.getMemberName());
-        Font customFont = memberName.getFont().deriveFont(Font.BOLD, 16);
-        memberName.setFont(customFont);
-        rightPanel.add(memberName);
+        JLabel memberNameLabel = new JLabel(memberName);
+        Font customFont = memberNameLabel.getFont().deriveFont(Font.BOLD, 16);
+        memberNameLabel.setFont(customFont);
+        rightPanel.add(memberNameLabel);
 
         // member rank
         JLabel memberRank = new JLabel(MEMBER_RANK + SithClanPluginConstants.CLAN_RANKS[rankInt - 1]);
         rightPanel.add(memberRank);
 
+        // member credits
+        JLabel memberCredits = new JLabel(creditsInt + MEMBER_CREDITS);
+        rightPanel.add(memberCredits);
+
         // member promoted date
-        String promotionDate = member.getMemberDatePromoted();
         JLabel memberPromoted = new JLabel(MEMBER_PROMOTED
                 + (promotionDate == null ? MEMBER_UNKNOWN_DATA : promotionDate));
 
         rightPanel.add(memberPromoted);
 
-        // member credits
-        JLabel memberCredits = new JLabel(member.getMemberCredits() + MEMBER_CREDITS);
-        rightPanel.add(memberCredits);
+        // until next promotion
+        if (rankInt <= 10) { // sith marauder and below
+            // credits
+            int creditsNeeded = SithClanPluginConstants.CREDITS_TO_PROMOTE[rankInt] - creditsInt;
+            if (creditsNeeded > 0) {
+                JLabel creditsUntilPromotion = new JLabel(MEMBER_CREDITS_NEEDED + creditsNeeded);
+                rightPanel.add(creditsUntilPromotion);
+            } else {
+                if (rankInt >= 5 && rankInt <= 10) // between death trooper and sith marauder
+                {
+                    JLabel daysUntilPromotion = null;
+                    if (promotionDate == null) {
+                        daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + MEMBER_UNKNOWN_DATA);
+                    } else {
+                        long daysInRank = ChronoUnit.DAYS.between(
+                                LocalDate.parse(promotionDate, SithClanPluginConstants.SHORT_DATE_FORMATTER),
+                                LocalDate.now());
+                        long daysNeeded = SithClanPluginConstants.DAYS_TO_PROMOTE[rankInt - 1] - daysInRank;
+                        if (daysNeeded <= 0) {
+                            daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + MEMBER_NONE_NEEDED);
+                        } else {
+                            daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + daysNeeded);
+                        }
+                    }
+                    rightPanel.add(daysUntilPromotion);
+                }
+                else {
+                    JLabel noneNeeded = new JLabel(MEMBER_CREDITS_NEEDED + MEMBER_NONE_NEEDED);
+                    rightPanel.add(noneNeeded);
+                }
+            }
+        }
 
         // member date joined
         JLabel memberJoined = new JLabel(MEMBER_JOINED + member.getMemberDateJoined());
