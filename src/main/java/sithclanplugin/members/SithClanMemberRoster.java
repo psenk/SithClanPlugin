@@ -12,7 +12,6 @@ import com.google.inject.Singleton;
 
 import lombok.Getter;
 import sithclanplugin.SithClanPluginConfig;
-import sithclanplugin.util.RosterResponse;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
 
