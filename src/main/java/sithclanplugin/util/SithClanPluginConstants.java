@@ -78,6 +78,8 @@ public class SithClanPluginConstants {
         public static final String MEMBER_ROSTER_POST_URI = URI_PREFIX + "/api/memberroster/post";
         public static final String ANNOUNCEMENTS_GET_URI = URI_PREFIX + "/api/announcements";
         public static final String ANNOUNCEMENTS_POST_URI = URI_PREFIX + "/api/announcements/post";
+        public static final String ANNOUNCEMENTS_EDIT_URI = URI_PREFIX + "/api/announcements/edit/";
+        public static final String ANNOUNCEMENTS_DELETE_URI = URI_PREFIX + "/api/announcements/delete/";
         public static final String VALIDATE_URI = URI_PREFIX + "/api/validate";
         // public static final String TEST_PREFIX = "http://127.0.0.1:8787";
         // public static final String EVENT_SCHEDULE_GET_URI =
