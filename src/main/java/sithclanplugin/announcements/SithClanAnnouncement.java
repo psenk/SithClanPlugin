@@ -15,6 +15,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SithClanAnnouncement {
 
+    private int announcementId;
     private String announcementDate;
     private String announcementText;
+    private String lastEdited;
 }
