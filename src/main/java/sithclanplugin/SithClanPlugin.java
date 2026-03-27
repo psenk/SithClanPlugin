@@ -110,6 +110,12 @@ public class SithClanPlugin extends Plugin {
 		// create plugin directory and config files
 		fileManager.initializeFiles();
 
+		// bypass check for testing
+		if (SithClanPluginConstants.BYPASS_CLAN_CHECK) {
+			pendingClanCheck = false;
+			SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
+		}
+
 		// startup loading
 		new Thread(() -> {
 			// get startup info and parse
@@ -157,7 +163,6 @@ public class SithClanPlugin extends Plugin {
 	 */
 	@Subscribe
 	public void onGameTick(GameTick event) {
-
 		// clan check logic
 		if (pendingClanCheck) {
 			ClanChannel clanChannel = client.getClanChannel();
@@ -173,6 +178,7 @@ public class SithClanPlugin extends Plugin {
 					}
 				});
 			}
+
 		}
 
 		// world hopping logic
