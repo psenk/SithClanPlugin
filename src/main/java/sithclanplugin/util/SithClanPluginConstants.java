@@ -60,6 +60,7 @@ public class SithClanPluginConstants {
 
         // status codes
         public static final int STATUS_OK = 200;
+        public static final int STATUS_RESOURCE_CREATED = 201;
         public static final int STATUS_BAD_INPUT = 400;
         public static final int STATUS_NOT_FOUND = 404;
         public static final int STATUS_RATE_LIMITED = 429;
@@ -72,12 +73,9 @@ public class SithClanPluginConstants {
         // uris
         public static final String URI_PREFIX = "https://sithclanplugin.psenk168.workers.dev";
         public static final String STARTUP_URI = URI_PREFIX + "/api/startup";
-        public static final String EVENT_SCHEDULE_GET_URI = URI_PREFIX + "/api/eventschedule";
-        public static final String EVENT_SCHEDULE_POST_URI = URI_PREFIX + "/api/eventschedule/post";
-        public static final String MEMBER_ROSTER_GET_URI = URI_PREFIX + "/api/memberroster";
-        public static final String MEMBER_ROSTER_POST_URI = URI_PREFIX + "/api/memberroster/post";
-        public static final String ANNOUNCEMENTS_GET_URI = URI_PREFIX + "/api/announcements";
-        public static final String ANNOUNCEMENTS_POST_URI = URI_PREFIX + "/api/announcements/post";
+        public static final String EVENT_SCHEDULE_GET_POST_URI = URI_PREFIX + "/api/eventschedule";
+        public static final String MEMBER_ROSTER_GET_POST_URI = URI_PREFIX + "/api/memberroster";
+        public static final String ANNOUNCEMENTS_GET_POST_URI = URI_PREFIX + "/api/announcements";
         public static final String ANNOUNCEMENTS_EDIT_URI = URI_PREFIX + "/api/announcements/edit/";
         public static final String ANNOUNCEMENTS_DELETE_URI = URI_PREFIX + "/api/announcements/delete/";
         public static final String VALIDATE_URI = URI_PREFIX + "/api/validate";
