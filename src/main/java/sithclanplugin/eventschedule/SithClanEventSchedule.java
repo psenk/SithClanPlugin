@@ -58,7 +58,7 @@ public class SithClanEventSchedule {
      * @return String event schedule string in HTTP response body
      */
     private String getEventSchedule() {
-        return SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.EVENT_SCHEDULE_GET_URI);
+        return SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.EVENT_SCHEDULE_URI);
     }
 
     /**
@@ -69,7 +69,7 @@ public class SithClanEventSchedule {
      */
     private String postEventSchedule(String jsonData) {
         return SithClanPluginUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
-                SithClanPluginConstants.EVENT_SCHEDULE_POST_URI);
+                SithClanPluginConstants.EVENT_SCHEDULE_URI);
     }
 
     /**

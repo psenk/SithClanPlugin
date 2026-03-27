@@ -44,7 +44,7 @@ public class SithClanMemberRoster {
      * @return String member roster in an HTTP response body
      */
     private String getMemberRoster() {
-        return SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.MEMBER_ROSTER_GET_URI);
+        return SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.MEMBER_ROSTER_URI);
     }
 
     /**
@@ -55,7 +55,7 @@ public class SithClanMemberRoster {
      */
     private String postMemberRoster(String jsonData) {
         return SithClanPluginUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
-                SithClanPluginConstants.MEMBER_ROSTER_POST_URI);
+                SithClanPluginConstants.MEMBER_ROSTER_URI);
     }
 
     /**

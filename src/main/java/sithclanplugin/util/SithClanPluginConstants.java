@@ -5,6 +5,15 @@ import java.time.format.DateTimeFormatter;
 
 public class SithClanPluginConstants {
 
+        // testing
+        // TODO: set false before release
+        public static final boolean BYPASS_CLAN_CHECK = true;
+        public static final String TEST_PREFIX = "http://127.0.0.1:8787";
+        public static final String EVENT_SCHEDULE_GET_URI = TEST_PREFIX + "/api/eventschedule";
+        public static final String EVENT_SCHEDULE_POST_URI = TEST_PREFIX + "/api/eventschedule/post";
+        public static final String MEMBER_ROSTER_GET_URI = TEST_PREFIX + "/api/memberroster";
+        public static final String MEMBER_ROSTER_POST_URI = TEST_PREFIX + "/api/memberroster/post";
+
         // clan info
         // name
         public static final String CLAN_NAME = "Sith";
@@ -73,21 +82,12 @@ public class SithClanPluginConstants {
         // uris
         public static final String URI_PREFIX = "https://sithclanplugin.psenk168.workers.dev";
         public static final String STARTUP_URI = URI_PREFIX + "/api/startup";
-        public static final String EVENT_SCHEDULE_GET_POST_URI = URI_PREFIX + "/api/eventschedule";
-        public static final String MEMBER_ROSTER_GET_POST_URI = URI_PREFIX + "/api/memberroster";
-        public static final String ANNOUNCEMENTS_GET_POST_URI = URI_PREFIX + "/api/announcements";
+        public static final String EVENT_SCHEDULE_URI = URI_PREFIX + "/api/eventschedule";
+        public static final String MEMBER_ROSTER_URI = URI_PREFIX + "/api/memberroster";
+        public static final String ANNOUNCEMENTS_URI = URI_PREFIX + "/api/announcements";
         public static final String ANNOUNCEMENTS_EDIT_URI = URI_PREFIX + "/api/announcements/edit/";
         public static final String ANNOUNCEMENTS_DELETE_URI = URI_PREFIX + "/api/announcements/delete/";
         public static final String VALIDATE_URI = URI_PREFIX + "/api/validate";
-        // public static final String TEST_PREFIX = "http://127.0.0.1:8787";
-        // public static final String EVENT_SCHEDULE_GET_URI =
-        // TEST_PREFIX + "/api/eventschedule";
-        // public static final String EVENT_SCHEDULE_POST_URI =
-        // TEST_PREFIX + "/api/eventschedule/post";
-        // public static final String MEMBER_ROSTER_GET_URI =
-        // TEST_PREFIX + "/api/memberroster";
-        // public static final String MEMBER_ROSTER_POST_URI =
-        // TEST_PREFIX + "/api/memberroster/post";
 
         // discord
         public static final String SITH_DISCORD_SERVER_ID = "741153043776667658";
