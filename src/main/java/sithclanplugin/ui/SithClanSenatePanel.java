@@ -37,14 +37,17 @@ public class SithClanSenatePanel extends JPanel {
     @Inject
     private SithClanMemberRoster memberRoster;
 
+    @Inject
+    private SithClanAnnouncementsPanelSenate announcementsPanelSenate;
+
     private final JTextArea senatePostScheduleTextArea;
     private final JTextArea senatePostRosterTextArea;
     private final JPanel statusPanel;
     private final JLabel uploadingLabel;
 
     private static final String SENATE_OPTIONS_LABEL = "Senate Options";
-    private static final String UPDATE_SCHEDULE_LABEL = "Update Schedule";
-    private static final String UPDATE_ROSTER_LABEL = "Update Member Roster";
+    private static final String UPDATE_SCHEDULE_LABEL = "Event Schedule";
+    private static final String UPDATE_ROSTER_LABEL = "Member Roster";
     private static final String UPDATE_BUTTON = "Update";
     private static final String EVENT_TEXT_AREA_DEFAULT = "Post Event Schedule Here";
     private static final String ROSTER_TEXT_AREA_DEFAULT = "Post Member Roster Here";
@@ -121,6 +124,11 @@ public class SithClanSenatePanel extends JPanel {
                 });
             }).start();
         });
+
+        this.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // post announcements functionality
+        this.add(announcementsPanelSenate);
     }
 
     /**
