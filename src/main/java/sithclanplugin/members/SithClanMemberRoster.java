@@ -91,8 +91,9 @@ public class SithClanMemberRoster {
         String[] rosterInputList = rosterInput.split("\\r?\\n");
         // turn list into member roster
         HashMap<String, SithClanMember> newRoster = convertRoster(rosterInputList);
-        if (newRoster == null || newRoster.isEmpty())
+        if (newRoster == null || newRoster.isEmpty()) {
             return SithClanPluginConstants.STATUS_BAD_INPUT;
+        }
 
         // convert roster to array for worker
         Collection<SithClanMember> rosterOutput = newRoster.values();

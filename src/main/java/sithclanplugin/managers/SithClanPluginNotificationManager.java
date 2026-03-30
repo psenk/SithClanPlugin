@@ -59,8 +59,9 @@ public class SithClanPluginNotificationManager {
      */
     public void scheduleNotifications(ArrayList<SithClanDaySchedule> schedule) {
         // dont continue if setting off in configs
-        if (!config.eventNotifications())
+        if (!config.eventNotifications()) {
             return;
+        }
         // fresh start
         cancelAllNotifications();
 
@@ -70,8 +71,9 @@ public class SithClanPluginNotificationManager {
             for (SithClanEvent event : day.getEvents()) {
                 String eventTitle = SithClanPluginUtil.removeEmojis(event.getEventTitle());
                 // checks if event subscribed to in config file
-                if (!fileManager.isSubscribed(eventTitle))
+                if (!fileManager.isSubscribed(eventTitle)) {
                     continue;
+                }
                 String currentTime = event.getEventTime();
 
                 try {

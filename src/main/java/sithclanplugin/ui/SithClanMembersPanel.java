@@ -354,8 +354,7 @@ public class SithClanMembersPanel extends JPanel {
                 JLabel creditsUntilPromotion = new JLabel(MEMBER_CREDITS_NEEDED + creditsNeeded);
                 rightPanel.add(creditsUntilPromotion);
             } else {
-                if (rankInt >= 5 && rankInt <= 10) // between death trooper and sith marauder
-                {
+                if (rankInt >= 5 && rankInt <= 10) {// between death trooper and sith marauder
                     JLabel daysUntilPromotion = null;
                     if (promotionDate == null) {
                         daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + MEMBER_UNKNOWN_DATA);
@@ -371,8 +370,7 @@ public class SithClanMembersPanel extends JPanel {
                         }
                     }
                     rightPanel.add(daysUntilPromotion);
-                }
-                else {
+                } else {
                     JLabel noneNeeded = new JLabel(MEMBER_CREDITS_NEEDED + MEMBER_NONE_NEEDED);
                     rightPanel.add(noneNeeded);
                 }

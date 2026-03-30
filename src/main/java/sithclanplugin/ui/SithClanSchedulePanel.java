@@ -38,8 +38,8 @@ import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
-import sithclanplugin.managers.SithClanPluginNotificationManager;
 import sithclanplugin.managers.SithClanPluginFileManager;
+import sithclanplugin.managers.SithClanPluginNotificationManager;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
 
@@ -229,10 +229,11 @@ public class SithClanSchedulePanel extends JPanel {
                 boolean isVisible = !dailyEvents.isVisible();
                 dailyEvents.setVisible(isVisible);
                 // change arrow icon
-                if (isVisible)
+                if (isVisible) {
                     dateLabel.setIcon(downArrowIcon);
-                else
+                } else {
                     dateLabel.setIcon(rightArrowIcon);
+                }
                 revalidate();
                 repaint();
             }
@@ -374,8 +375,9 @@ public class SithClanSchedulePanel extends JPanel {
     private JLabel createWorldLink(String location) {
         // search for runescape world
         Matcher matcher = Pattern.compile("W(\\d{3}$)").matcher(location);
-        if (!matcher.find())
+        if (!matcher.find()) {
             return new JLabel(location);
+        }
         String worldId = matcher.group(1);
         // create clickable link
         JLabel worldLink = new JLabel(
@@ -399,13 +401,15 @@ public class SithClanSchedulePanel extends JPanel {
      * @param inputDay String last day of the current event schedule
      */
     private void checkScheduleExpired(String inputDay) {
-        if (inputDay.isBlank())
+        if (inputDay.isBlank()) {
             return;
+        }
         LocalDate finalDate = LocalDate.parse(inputDay, SithClanPluginConstants.DATE_FORMATTER);
-        if (finalDate.isBefore(LocalDate.now()))
+        if (finalDate.isBefore(LocalDate.now())) {
             scheduleExpiredLabel.setVisible(true);
-        else
+        } else {
             scheduleExpiredLabel.setVisible(false);
+        }
     }
 
     /**

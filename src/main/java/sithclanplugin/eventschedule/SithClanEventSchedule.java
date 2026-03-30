@@ -14,8 +14,8 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import sithclanplugin.SithClanPluginConfig;
-import sithclanplugin.managers.SithClanPluginNotificationManager;
 import sithclanplugin.managers.SithClanPluginFileManager;
+import sithclanplugin.managers.SithClanPluginNotificationManager;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
 
@@ -86,13 +86,14 @@ public class SithClanEventSchedule {
                 && LocalDateTime.now().isBefore(lastTimeScheduleFetched.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES));
 
         // allows senate members to bypass rate limiting
-        if (rateLimited && !isSenateMember)
+        if (rateLimited && !isSenateMember) {
             return SithClanPluginConstants.STATUS_RATE_LIMITED;
-
+        }
         // get fresh event schedule
         String jsonSchedule = getEventSchedule();
-        if (jsonSchedule == null)
+        if (jsonSchedule == null) {
             return SithClanPluginConstants.STATUS_NOT_FOUND;
+        }
         // convert schedule to JSON
         this.schedule = deserializeSchedule(jsonSchedule);
         // saves schedule
@@ -113,24 +114,25 @@ public class SithClanEventSchedule {
      * @return int SithClanPluginConstants status code value
      */
     public int parseScheduleForPost(String scheduleInput) {
-        if (scheduleInput.isBlank())
+        if (scheduleInput.isBlank()) {
             return SithClanPluginConstants.STATUS_BAD_INPUT;
-
+        }
         // split input into list of strings
         String[] scheduleInputList = scheduleInput.split("\\r?\\n");
         // turn list into event schedule
         ArrayList<SithClanDaySchedule> newSchedule = convertSchedule(scheduleInputList);
-        if (newSchedule == null || newSchedule.isEmpty())
+        if (newSchedule == null || newSchedule.isEmpty()) {
             return SithClanPluginConstants.STATUS_BAD_INPUT;
-
+        }
         // store schedule as JSON object
         Gson gson = new Gson();
         String data = gson.toJson(newSchedule);
 
         // post schedule
         String response = postEventSchedule(data);
-        if (response == null)
+        if (response == null) {
             return SithClanPluginConstants.STATUS_NOT_FOUND;
+        }
         this.schedule = newSchedule;
         // save schedule
         fileManager.saveScheduleLocally(data);
@@ -148,8 +150,9 @@ public class SithClanEventSchedule {
         try {
             // load schedule from local file
             String jsonSchedule = fileManager.readScheduleFile();
-            if (jsonSchedule == null || jsonSchedule.isBlank())
+            if (jsonSchedule == null || jsonSchedule.isBlank()) {
                 return SithClanPluginConstants.STATUS_BAD_INPUT;
+            }
             // convert schedule to JSON
             this.schedule = deserializeSchedule(jsonSchedule);
             // schedule event notifications
@@ -176,8 +179,9 @@ public class SithClanEventSchedule {
 
         // iterate through schedule list
         for (String line : scheduleInput) {
-            if (line.isBlank())
+            if (line.isBlank()) {
                 continue;
+            }
             line = line.trim();
             // parse event date
             if (line.startsWith("--")) {
@@ -197,51 +201,59 @@ public class SithClanEventSchedule {
             }
             // parse event title
             else if (line.startsWith("-")) {
-                if (currentDay == null)
+                if (currentDay == null) {
                     return null;
+                }
                 // add previous event created to day
-                if (currentEvent != null)
+                if (currentEvent != null) {
                     currentDay.getEvents().add(currentEvent);
-
+                }
                 // create and setup event
                 currentEvent = new SithClanEvent();
                 currentEvent.setEventTitle(line.substring(1));
                 currentEvent.setEventMiscInfo(new ArrayList<>());
             }
             // parse event time
-            else if (currentEvent != null && currentEvent.getEventTime() == null)
+            else if (currentEvent != null && currentEvent.getEventTime() == null) {
                 currentEvent.setEventTime(line);
+            }
 
             // parse event host (optional info)
-            else if (currentEvent != null && line.startsWith("Hosted by:"))
+            else if (currentEvent != null && line.startsWith("Hosted by:")) {
                 currentEvent.setEventHost(line.substring(11));
+            }
 
             // parse event location
-            else if (currentEvent != null && line.startsWith("🌎"))
+            else if (currentEvent != null && line.startsWith("🌎")) {
                 currentEvent.setEventLocation(line);
+            }
 
             // parse event repetition (optional info)
-            else if (currentEvent != null && line.startsWith("**"))
+            else if (currentEvent != null && line.startsWith("**")) {
                 currentEvent.setEventRepeated(true);
+            }
 
             // parse misc event info (optional info)
             else {
-                if (currentEvent == null)
+                if (currentEvent == null) {
                     continue;
+                }
                 currentEvent.getEventMiscInfo().add(line);
             }
         }
 
         // add final event
         if (currentEvent != null) {
-            if (currentDay == null)
+            if (currentDay == null) {
                 return null;
+            }
             currentDay.getEvents().add(currentEvent);
         }
 
         // add final day
-        if (currentDay != null)
+        if (currentDay != null) {
             newSchedule.add(currentDay);
+        }
 
         return newSchedule;
     }

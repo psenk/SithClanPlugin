@@ -34,16 +34,19 @@ public class SithClanPluginFileManager {
      */
     public void initializeFiles() throws IOException {
         // create main plugin directory
-        if (!localDirectory.exists())
+        if (!localDirectory.exists()) {
             localDirectory.mkdirs();
+        }
 
         // create saved schedule file
-        if (!storedScheduleFile.exists())
+        if (!storedScheduleFile.exists()) {
             storedScheduleFile.createNewFile();
+        }
 
         // create event subscriptions file
-        if (!storedSubscriptionsFile.exists())
+        if (!storedSubscriptionsFile.exists()) {
             storedSubscriptionsFile.createNewFile();
+        }
     }
 
     /**
@@ -104,8 +107,9 @@ public class SithClanPluginFileManager {
     private ArrayList<String> loadSubscriptions() {
         try {
             String input = new String(Files.readAllBytes(storedSubscriptionsFile.toPath()));
-            if (input.isBlank())
+            if (input.isBlank()) {
                 return new ArrayList<>();
+            }
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<String>>() {
             }.getType();

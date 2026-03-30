@@ -182,8 +182,9 @@ public class SithClanPlugin extends Plugin {
 		}
 
 		// world hopping logic
-		if (quickHopTargetWorld == null)
+		if (quickHopTargetWorld == null) {
 			return;
+		}
 		// open worlds list
 		if (client.getWidget(InterfaceID.Worldswitcher.BUTTONS) == null) {
 			client.openWorldHopper();
