@@ -57,11 +57,14 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
         final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
         final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
 
+        // this panel
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+
         // main panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-
-        // TODO: scroll pane needed?
+        mainPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
         // announcements interactive label
         JLabel announcementsPanelLabel = new JLabel(ANNOUNCEMENTS_LABEL);
@@ -93,6 +96,9 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
         JPanel newAnnouncementPanel = new JPanel();
         newAnnouncementPanel.setLayout(new BoxLayout(newAnnouncementPanel, BoxLayout.Y_AXIS));
         newAnnouncementTextArea = new JTextArea(NEW_ANNOUNCEMENT_DEFAULT_TEXT);
+        newAnnouncementTextArea.setRows(1);
+        newAnnouncementTextArea.setLineWrap(true);
+        newAnnouncementTextArea.setWrapStyleWord(true);
 
         // highlights all text when box focused
         newAnnouncementTextArea.addFocusListener(new FocusAdapter() {
@@ -103,20 +109,20 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
         });
 
         JButton postAnnouncementButton = new JButton(POST_ANNOUNCEMENT_BUTTON);
+        postAnnouncementButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         newAnnouncementPanel.add(newAnnouncementTextArea);
         newAnnouncementPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         newAnnouncementPanel.add(postAnnouncementButton);
         newAnnouncementPanel.setVisible(false);
 
-        announcementsListPanel.add(newAnnouncementPanel);
-        announcementsListPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
         // setup collapsible panel
         JPanel announcementsCollapsiblePanel = new JPanel();
         announcementsCollapsiblePanel.setLayout((new BoxLayout(announcementsCollapsiblePanel, BoxLayout.Y_AXIS)));
         announcementsCollapsiblePanel.add(Box.createRigidArea(new Dimension(0, 5)));
         announcementsCollapsiblePanel.add(topButtonPanel);
+        announcementsCollapsiblePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        announcementsCollapsiblePanel.add(newAnnouncementPanel);
         announcementsCollapsiblePanel.add(Box.createRigidArea(new Dimension(0, 5)));
         announcementsCollapsiblePanel.add(announcementsScrollPane);
         announcementsCollapsiblePanel.setVisible(false);
@@ -129,7 +135,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
                 // change arrow icon
                 announcementsPanelLabel.setIcon(isVisible ? downArrowIcon : rightArrowIcon);
                 if (isVisible) {
-                    displayAnnouncements(announcements.getAnnouncements());
+                    displayAnnouncements(announcements.getAnnouncementsList());
                 }
                 revalidate();
                 repaint();
@@ -149,6 +155,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
                 int status = announcements.parseAnnouncementForPost(newAnnouncementTextArea.getText());
                 SwingUtilities.invokeLater(() -> {
                     handleStatus(status);
+                    displayAnnouncements(announcements.getAnnouncementsList());
                     newAnnouncementPanel.setVisible(false);
                 });
             }).start();
@@ -211,7 +218,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
         // delete button action
         deleteAnnouncementButton.addActionListener(e -> {
             new Thread(() -> {
-                int status = announcements.deleteAnnouncement(announcement.getAnnouncementId());
+                int status = announcements.parseAnnouncementForDelete(announcement.getAnnouncementId());
                 SwingUtilities.invokeLater(() -> {
                     handleStatus(status);
                 });
