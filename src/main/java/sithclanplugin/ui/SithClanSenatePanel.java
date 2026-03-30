@@ -37,9 +37,7 @@ public class SithClanSenatePanel extends JPanel {
     @Inject
     private SithClanMemberRoster memberRoster;
 
-    @Inject
-    private SithClanAnnouncementsPanelSenate announcementsPanelSenate;
-
+    private final SithClanAnnouncementsPanelSenate announcementsPanelSenate;
     private final JTextArea senatePostScheduleTextArea;
     private final JTextArea senatePostRosterTextArea;
     private final JPanel statusPanel;
@@ -58,11 +56,16 @@ public class SithClanSenatePanel extends JPanel {
     private static final String NOT_FOUND_WARNING = "Unable to post.";
     private static final String UPLOADING = "Uploading...";
 
-    SithClanSenatePanel() {
+    @Inject
+    SithClanSenatePanel(SithClanAnnouncementsPanelSenate announcementsPanelSenate) {
+
+        this.announcementsPanelSenate = announcementsPanelSenate;
+
         final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
         final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
         // title panel label at top
         JLabel senatePanelLabel = new JLabel(SENATE_OPTIONS_LABEL);
