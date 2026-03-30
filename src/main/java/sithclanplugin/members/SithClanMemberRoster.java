@@ -123,9 +123,6 @@ public class SithClanMemberRoster {
         HashMap<String, SithClanMember> newRoster = new HashMap<>();
 
         // iterate through roster list
-
-        // name,userRank,credits,discordUser,dateJoined,altName,datePromoted
-        // 10hp Vibe,2,27,182971719944896512,10/23/23,,03/21/24
         for (String member : rosterInput) {
             member = member.trim();
             if (member.isBlank() || member.startsWith("name,")) {
@@ -137,7 +134,7 @@ public class SithClanMemberRoster {
             newMember.setMemberName(memberInfo[0]);
             newMember.setMemberRank(Integer.parseInt(memberInfo[1]));
             newMember.setMemberCredits(Integer.parseInt(memberInfo[2]));
-            newMember.setMemberDiscordId(Long.parseLong(memberInfo[3]));
+            // memberInfo[3] is users Discord ID which we are not storing
             newMember.setMemberDateJoined(memberInfo[4]);
             newMember.setMemberAltName(memberInfo[5].isBlank() ? null : memberInfo[5]);
             newMember.setMemberDatePromoted(memberInfo[6].isBlank() ? null

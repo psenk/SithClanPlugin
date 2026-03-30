@@ -18,7 +18,6 @@ public class SithClanMember {
     private String memberName;
     private int memberRank;
     private int memberCredits;
-    private long memberDiscordId;
     private String memberDateJoined;
     private String memberAltName = null;
     private String memberDatePromoted = null;
