@@ -23,7 +23,7 @@ public class SithClanPluginUtil {
      * Creates and sends an HTTP GET request
      * 
      * @param client HttpClient object
-     * @param uri    String GET uri
+     * @param uri    String GET URI
      * @return String HTTP response body
      */
     public static String sendGetRequest(HttpClient client, String uri) {
@@ -48,7 +48,7 @@ public class SithClanPluginUtil {
      * @param client HttpClient object
      * @param apiKey String auth API key
      * @param data   String data to post
-     * @param uri    String GET uri
+     * @param uri    String POST URI
      * @return String HTTP Response body with status code
      */
     public static String sendPostRequest(HttpClient client, String apiKey, String data, String uri) {
@@ -61,7 +61,67 @@ public class SithClanPluginUtil {
                 .build();
 
         try {
-            // sent request and process response
+            // send request and process response
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200 && response.statusCode() != 201) {
+                return null;
+            }
+            return response.body();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Creates and sends HTTP PUT request
+     * 
+     * @param client HttpClient object
+     * @param apiKey String auth API key
+     * @param data   String data to put
+     * @param uri    String PUT URI
+     * @return String HTTP Response body with status code
+     */
+    public static String sendPutRequest(HttpClient client, String apiKey, String data, String uri) {
+        // build HTTP PUT request
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(uri))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .PUT(HttpRequest.BodyPublishers.ofString(data))
+                .build();
+
+        try {
+            // send request and process response
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                return null;
+            }
+            return response.body();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Creates and sends HTTP DELETE request
+     * 
+     * @param client HttpClient object
+     * @param apiKey String auth API key
+     * @param uri    String DELETE URI
+     * @return String HTTP Response body with status code
+     */
+    public static String sendDeleteRequest(HttpClient client, String apiKey, String uri) {
+        // build HTTP DELETE request
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(uri))
+                .header("Authorization", "Bearer " + apiKey)
+                .DELETE()
+                .build();
+
+        try {
+            // send request and process response
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
                 return null;
