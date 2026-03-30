@@ -30,6 +30,9 @@ public class SithClanMemberRoster {
     @Inject
     private HttpClient httpClient;
 
+    @Inject
+    private Gson gson;
+
     private HashMap<String, SithClanMember> roster;
     private ZonedDateTime dateRosterPosted;
 
@@ -99,7 +102,6 @@ public class SithClanMemberRoster {
         Collection<SithClanMember> rosterOutput = newRoster.values();
 
         // store roster as JSON object
-        Gson gson = new Gson();
         String data = gson.toJson(rosterOutput);
 
         // post roster
@@ -155,7 +157,6 @@ public class SithClanMemberRoster {
      */
     private HashMap<String, SithClanMember> deserializeRoster(String jsonRoster) {
         // convert roster to JSON
-        Gson gson = new Gson();
         RosterResponse rosterResponse = gson.fromJson(jsonRoster, RosterResponse.class);
         ZonedDateTime utcTime = ZonedDateTime.parse(rosterResponse.getDate());
         this.dateRosterPosted = utcTime.withZoneSameInstant(ZoneId.systemDefault());

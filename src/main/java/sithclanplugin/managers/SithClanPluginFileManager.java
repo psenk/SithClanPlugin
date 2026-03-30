@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import net.runelite.client.RuneLite;
@@ -16,6 +17,9 @@ import sithclanplugin.util.SithClanPluginConstants;
 
 @Singleton
 public class SithClanPluginFileManager {
+
+    @Inject
+    private Gson gson;
 
     private final File localDirectory;
     private final File storedScheduleFile;
@@ -93,7 +97,7 @@ public class SithClanPluginFileManager {
      */
     private void saveSubscriptions(ArrayList<String> subscriptions) {
         try (FileWriter fileWriter = new FileWriter(storedSubscriptionsFile)) {
-            fileWriter.write(new Gson().toJson(subscriptions));
+            fileWriter.write(gson.toJson(subscriptions));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,7 +114,6 @@ public class SithClanPluginFileManager {
             if (input.isBlank()) {
                 return new ArrayList<>();
             }
-            Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<String>>() {
             }.getType();
             ArrayList<String> subscriptions = gson.fromJson(input, listType);

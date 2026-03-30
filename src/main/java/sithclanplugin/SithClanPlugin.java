@@ -6,6 +6,7 @@ import java.net.http.HttpClient;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 
+import com.google.gson.Gson;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -211,7 +212,7 @@ public class SithClanPlugin extends Plugin {
 	}
 
 	/**
-	 * Creates HttpClient object for rest of plugin to utilize
+	 * Creates HttpClient object for rest of plugin to use
 	 * 
 	 * @return HttpClient client object
 	 */
@@ -219,6 +220,17 @@ public class SithClanPlugin extends Plugin {
 	@Singleton
 	HttpClient provideHttpClient() {
 		return HttpClient.newHttpClient();
+	}
+
+	/**
+	 * Creates Gson object for rest of plugin to use
+	 * 
+	 * @return Gson client object
+	 */
+	@Provides
+	@Singleton
+	Gson provideGson() {
+		return new Gson();
 	}
 
 	/**

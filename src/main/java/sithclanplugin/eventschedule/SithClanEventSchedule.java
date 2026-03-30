@@ -39,6 +39,9 @@ public class SithClanEventSchedule {
     @Inject
     private HttpClient httpClient;
 
+    @Inject
+    private Gson gson;
+
     @Setter
     private boolean isSenateMember = false;
 
@@ -125,7 +128,6 @@ public class SithClanEventSchedule {
             return SithClanPluginConstants.STATUS_BAD_INPUT;
         }
         // store schedule as JSON object
-        Gson gson = new Gson();
         String data = gson.toJson(newSchedule);
 
         // post schedule
@@ -266,7 +268,6 @@ public class SithClanEventSchedule {
      */
     private ArrayList<SithClanDaySchedule> deserializeSchedule(String jsonSchedule) {
         // convert schedule to JSON
-        Gson gson = new Gson();
         // java generic type erasure workaround
         Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
         }.getType();

@@ -19,6 +19,9 @@ public class SithClanPluginStartupManager {
     private HttpClient httpClient;
 
     @Inject
+    private Gson gson;
+
+    @Inject
     private SithClanEventSchedule eventSchedule;
 
     @Inject
@@ -51,7 +54,6 @@ public class SithClanPluginStartupManager {
 
     private void deserializeStartupInfo(String jsonStartupInfo) {
         // convert startup info to JSON
-        Gson gson = new Gson();
         StartupResponse startupResponse = gson.fromJson(jsonStartupInfo, StartupResponse.class);
         String scheduleJson = gson.toJson(startupResponse.getStartupSchedule());
         eventSchedule.loadStartupSchedule(startupResponse.getStartupSchedule(), scheduleJson);
