@@ -9,5 +9,6 @@
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "interactive",
     "java.jdt.ls.lombokSupport.enabled": true,
-    "java.debug.settings.onBuildFailureProceed": true
+    "java.debug.settings.onBuildFailureProceed": true,
+    "java.format.settings.url": "F:\\Java\\google-java-formatter.xml"
 }
