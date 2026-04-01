@@ -326,7 +326,7 @@ public class SithClanSchedulePanel extends JPanel
         // event host (optional info)
         if (event.getEventHost() != null && !event.getEventHost().isBlank())
         {
-            JLabel eventHost = new JLabel("Hosted by: " + event.getEventHost());
+            JLabel eventHost = new JLabel("Hosted by: " + SithClanPluginUtil.removeEmojis(event.getEventHost()));
             eventHost.setAlignmentX(Component.LEFT_ALIGNMENT);
             singleEvent.add(eventHost);
         }
