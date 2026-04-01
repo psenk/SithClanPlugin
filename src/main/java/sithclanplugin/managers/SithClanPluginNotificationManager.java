@@ -32,7 +32,6 @@ public class SithClanPluginNotificationManager
 
     private final Notifier notifier;
     private final SithClanPluginConfig config;
-
     private final List<ScheduledFuture<?>> scheduledNotifications = new ArrayList<>();
 
     private static final String EVENT_NOTIFICATION = "Clan event starting soon: ";

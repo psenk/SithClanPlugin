@@ -60,6 +60,9 @@ public class SithClanPlugin extends Plugin
 	private ChatMessageManager chatMessageManager;
 
 	@Inject
+	private OkHttpClient httpClient;
+
+	@Inject
 	private ScheduledExecutorService executor;
 
 	@Inject
@@ -79,9 +82,6 @@ public class SithClanPlugin extends Plugin
 
 	@Inject
 	private SithClanEventSchedule eventSchedule;
-
-	@Inject
-	private OkHttpClient httpClient;
 
 	private NavigationButton uiNavigationButton;
 	private boolean pendingClanCheck = false;

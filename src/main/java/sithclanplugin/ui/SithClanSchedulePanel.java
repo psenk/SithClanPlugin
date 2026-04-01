@@ -67,10 +67,9 @@ public class SithClanSchedulePanel extends JPanel
 
     private final JLabel scheduleExpiredLabel;
     private final JPanel scheduleContainer;
-    private Runnable onRefreshCallback;
-
     private final Icon rightArrowIcon;
     private final Icon downArrowIcon;
+    private Runnable onRefreshCallback;
 
     private static final String EVENT_SCHEDULE = "Event Schedule";
     private static final String SCHEDULE_EXPIRED_WARNING = "Schedule is expired! Please refresh";

@@ -49,7 +49,6 @@ public class SithClanMembersPanel extends JPanel
     @Inject
     private SithClanMemberRoster memberRoster;
 
-    private Icon[] rankIcons;
     private final JScrollPane membersAreaScrollPane;
     private final JTextField membersSearchTextField;
     private final JButton membersSearchButton;
@@ -58,12 +57,12 @@ public class SithClanMembersPanel extends JPanel
     private final JPanel statusPanel;
     private final JLabel rosterDateLabel;
     private final JLabel memberDoesNotExistLabel;
+    private Icon[] rankIcons;
     private ArrayList<SithClanMember> rosterList;
     private int pageIndex;
     private boolean isLoading;
 
     private static final String CURRENT_GOLD_KEY = "Faca";
-
     private static final String MEMBERS_PANEL_TITLE = "Sith Member Info";
     private static final String MEMBERS_SEARCH_BUTTON = "Search Members";
     private static final String MEMBERS_SHOW_ALL_BUTTON = "Show All Members";

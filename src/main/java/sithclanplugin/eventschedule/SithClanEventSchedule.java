@@ -28,6 +28,12 @@ import sithclanplugin.util.SithClanPluginUtil;
 public class SithClanEventSchedule
 {
     @Inject
+    private OkHttpClient httpClient;
+
+    @Inject
+    private Gson gson;
+
+    @Inject
     private SithClanPluginConfig config;
 
     @Inject
@@ -35,12 +41,6 @@ public class SithClanEventSchedule
 
     @Inject
     private SithClanPluginNotificationManager notificationManager;
-
-    @Inject
-    private OkHttpClient httpClient;
-
-    @Inject
-    private Gson gson;
 
     @Setter
     private boolean isSenateMember = false;

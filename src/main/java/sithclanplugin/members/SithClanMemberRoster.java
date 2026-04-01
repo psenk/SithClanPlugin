@@ -25,13 +25,13 @@ import sithclanplugin.util.SithClanPluginUtil;
 public class SithClanMemberRoster
 {
     @Inject
-    private SithClanPluginConfig config;
-
-    @Inject
     private OkHttpClient httpClient;
 
     @Inject
     private Gson gson;
+
+    @Inject
+    private SithClanPluginConfig config;
 
     private HashMap<String, SithClanMember> roster;
     private ZonedDateTime dateRosterPosted;
