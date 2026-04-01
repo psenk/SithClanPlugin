@@ -24,6 +24,7 @@ public class SithClanPluginFileManager
     private final File localDirectory;
     private final File storedScheduleFile;
     private final File storedSubscriptionsFile;
+    private ArrayList<String> cachedSubscriptions = null;
 
     public SithClanPluginFileManager()
     {
@@ -128,6 +129,10 @@ public class SithClanPluginFileManager
      */
     private ArrayList<String> loadSubscriptions()
     {
+        if (cachedSubscriptions != null)
+        {
+            return cachedSubscriptions;
+        }
         try
         {
             String input = new String(Files.readAllBytes(storedSubscriptionsFile.toPath()));
@@ -138,8 +143,8 @@ public class SithClanPluginFileManager
             Type listType = new TypeToken<ArrayList<String>>()
             {
             }.getType();
-            ArrayList<String> subscriptions = gson.fromJson(input, listType);
-            return subscriptions != null ? subscriptions : new ArrayList<>();
+            cachedSubscriptions = gson.fromJson(input, listType);
+            return cachedSubscriptions;
         } catch (Exception e)
         {
             e.printStackTrace();
