@@ -34,7 +34,7 @@ public class SithClanPluginNotificationManager
     private final SithClanPluginConfig config;
     private final List<ScheduledFuture<?>> scheduledNotifications = new ArrayList<>();
 
-    private static final String EVENT_NOTIFICATION = "Clan event starting soon: ";
+    private static final String EVENT_NOTIFICATION = "Clan event starting soon: "; // trailing space intentional
 
     @Inject
     public SithClanPluginNotificationManager(SithClanPluginConfig config, Notifier notifier)

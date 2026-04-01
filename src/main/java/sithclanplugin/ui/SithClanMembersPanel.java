@@ -57,7 +57,7 @@ public class SithClanMembersPanel extends JPanel
     private final JPanel statusPanel;
     private final JLabel rosterDateLabel;
     private final JLabel memberDoesNotExistLabel;
-    private Icon[] rankIcons;
+    private final Icon[] rankIcons;
     private ArrayList<SithClanMember> rosterList;
     private int pageIndex;
     private boolean isLoading;

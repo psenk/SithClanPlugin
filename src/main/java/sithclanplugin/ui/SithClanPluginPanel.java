@@ -48,14 +48,14 @@ public class SithClanPluginPanel extends PluginPanel
     @Getter
     private final JButton senateButton;
 
+    private final CardLayout cardLayout;
+    private final CardLayout outerCardLayout = new CardLayout();
+    private final JPanel outerCardPanel = new JPanel(outerCardLayout);
     private final JPanel cardPanel;
     private final JPanel navPanel;
     private final JPanel buttonPanel;
     private final JPanel notLoggedInPanel;
     private final JPanel notClanMemberPanel;
-    private final CardLayout outerCardLayout = new CardLayout();
-    private final JPanel outerCardPanel = new JPanel(outerCardLayout);
-    private CardLayout cardLayout;
 
     private static final String PLUGIN_LABEL = "Sith Clan Plugin";
     private static final String SCHEDULE_BUTTON = "Event Schedule";
