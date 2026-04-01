@@ -26,11 +26,13 @@ import sithclanplugin.util.SithClanPluginUtil;
 public class SithClanPluginNotificationManager
 {
     @Inject
+    private ScheduledExecutorService executor;
+
+    @Inject
     private SithClanPluginFileManager fileManager;
 
     private final Notifier notifier;
     private final SithClanPluginConfig config;
-    private final ScheduledExecutorService executor;
 
     private final List<ScheduledFuture<?>> scheduledNotifications = new ArrayList<>();
 
@@ -41,7 +43,6 @@ public class SithClanPluginNotificationManager
     {
         this.config = config;
         this.notifier = notifier;
-        this.executor = Executors.newScheduledThreadPool(1);
     }
 
     // for testing
@@ -50,7 +51,6 @@ public class SithClanPluginNotificationManager
     {
         this.config = config;
         this.notifier = notifier;
-        this.executor = executor;
         this.fileManager = fileManager;
     }
 

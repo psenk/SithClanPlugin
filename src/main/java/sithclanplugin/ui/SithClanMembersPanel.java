@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -27,6 +28,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -41,6 +43,9 @@ import sithclanplugin.util.SithClanPluginConstants;
 @Singleton
 public class SithClanMembersPanel extends JPanel
 {
+    @Inject
+    private ScheduledExecutorService executor;
+
     @Inject
     private SithClanMemberRoster memberRoster;
 
@@ -77,6 +82,10 @@ public class SithClanMembersPanel extends JPanel
     private static final String ROSTER_DATE_PREFIX = "Roster last updated on "; // trailing space intentional
     private static final int AVATAR_SIZE = 64;
     private static final int PAGE_SIZE = 6;
+    private static final Font MEMBER_NAME_FONT = new JLabel().getFont().deriveFont(Font.BOLD, 16f);
+    private static final Border MEMBER_CARD_BORDER = BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR),
+            BorderFactory.createEmptyBorder(4, 1, 4, 1));
 
     // rank icons
     private static final String ICON_CHILDREN_OF_THE_WATCH = "/children_of_the_watch.png";
@@ -213,7 +222,7 @@ public class SithClanMembersPanel extends JPanel
         // get individual member
         membersSearchButton.addActionListener(e ->
         {
-            new Thread(() ->
+            executor.submit(() ->
             {
                 // get roster if not already in memory
                 if (memberRoster.getRoster().isEmpty())
@@ -243,13 +252,13 @@ public class SithClanMembersPanel extends JPanel
                         displaySingleMember(member);
                     }
                 });
-            }).start();
+            });
         });
 
         // show all members
         membersShowAllButton.addActionListener(e ->
         {
-            new Thread(() ->
+            executor.submit(() ->
             {
                 // get roster if not already in memory
                 if (memberRoster.getRoster().isEmpty())
@@ -270,7 +279,7 @@ public class SithClanMembersPanel extends JPanel
                     updateRosterDateLabel(memberRoster.getDateRosterPosted());
                     displayAllMembers(memberRoster.getRoster().values());
                 });
-            }).start();
+            });
         });
 
         // pagination for show all members
@@ -313,9 +322,7 @@ public class SithClanMembersPanel extends JPanel
         singleMemberPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 160));
         singleMemberPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 160));
         singleMemberPanel.setLayout(new BoxLayout(singleMemberPanel, BoxLayout.X_AXIS));
-        singleMemberPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR),
-                BorderFactory.createEmptyBorder(4, 1, 4, 1)));
+        singleMemberPanel.setBorder(MEMBER_CARD_BORDER);
         singleMemberPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         singleMemberPanel.setOpaque(true);
         singleMemberPanel.setVisible(true);
@@ -354,8 +361,7 @@ public class SithClanMembersPanel extends JPanel
 
         // member name
         JLabel memberNameLabel = new JLabel(memberName);
-        Font customFont = memberNameLabel.getFont().deriveFont(Font.BOLD, 16);
-        memberNameLabel.setFont(customFont);
+        memberNameLabel.setFont(MEMBER_NAME_FONT);
         rightPanel.add(memberNameLabel);
 
         // member rank
@@ -375,7 +381,7 @@ public class SithClanMembersPanel extends JPanel
         // until next promotion
         if (rankInt <= 10)
         { // sith marauder and below
-            // credits
+          // credits
             int creditsNeeded = SithClanPluginConstants.CREDITS_TO_PROMOTE[rankInt] - creditsInt;
             if (creditsNeeded > 0)
             {

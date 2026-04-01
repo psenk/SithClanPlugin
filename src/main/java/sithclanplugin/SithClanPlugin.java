@@ -1,6 +1,8 @@
 package sithclanplugin;
 
 import java.awt.image.BufferedImage;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
@@ -57,6 +59,9 @@ public class SithClanPlugin extends Plugin
 
 	@Inject
 	private ChatMessageManager chatMessageManager;
+
+	@Inject
+	private ScheduledExecutorService executor;
 
 	@Inject
 	private SithClanPluginConfig config;
@@ -117,7 +122,7 @@ public class SithClanPlugin extends Plugin
 		}
 
 		// startup loading
-		new Thread(() ->
+		executor.submit(() ->
 		{
 			// get startup info and parse
 			int status = startupManager.parseStartupInfoFromGet();
@@ -135,7 +140,7 @@ public class SithClanPlugin extends Plugin
 				// display senate options button if senate
 				uiPanel.get().getSenateButton().setVisible(isSenateMember);
 			});
-		}).start();
+		});
 	}
 
 	/**

@@ -6,6 +6,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -31,6 +32,9 @@ import sithclanplugin.util.SithClanPluginConstants;
 @Singleton
 public class SithClanSenatePanel extends JPanel
 {
+    @Inject
+    private ScheduledExecutorService executor;
+
     @Inject
     private SithClanEventSchedule eventSchedule;
 
@@ -99,7 +103,7 @@ public class SithClanSenatePanel extends JPanel
         // post event schedule action
         senatePostScheduleButton.addActionListener(e ->
         {
-            new Thread(() ->
+            executor.submit(() ->
             {
                 uploadingLabel.setVisible(true);
                 int status = eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
@@ -107,7 +111,7 @@ public class SithClanSenatePanel extends JPanel
                 {
                     handlePostStatus(status, senatePostScheduleTextArea, EVENT_TEXT_AREA_DEFAULT);
                 });
-            }).start();
+            });
         });
 
         this.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -124,7 +128,7 @@ public class SithClanSenatePanel extends JPanel
         // post member roster action
         senatePostRosterButton.addActionListener(e ->
         {
-            new Thread(() ->
+            executor.submit(() ->
             {
                 uploadingLabel.setVisible(true);
                 int status = memberRoster.parseRosterForPost(senatePostRosterTextArea.getText());
@@ -132,7 +136,7 @@ public class SithClanSenatePanel extends JPanel
                 {
                     handlePostStatus(status, senatePostRosterTextArea, ROSTER_TEXT_AREA_DEFAULT);
                 });
-            }).start();
+            });
         });
 
         this.add(Box.createRigidArea(new Dimension(0, 10)));

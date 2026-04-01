@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +47,9 @@ import sithclanplugin.util.SithClanPluginUtil;
 @Singleton
 public class SithClanSchedulePanel extends JPanel
 {
+    @Inject
+    private ScheduledExecutorService executor;
+
     @Inject
     private SithClanPlugin plugin;
 
@@ -125,7 +129,7 @@ public class SithClanSchedulePanel extends JPanel
         // refresh event schedule button action
         scheduleRefreshScheduleButton.addActionListener(e ->
         {
-            new Thread(() ->
+            executor.submit(() ->
             {
                 // get and store schedule
                 int status = eventSchedule.parseScheduleFromGet();
@@ -140,7 +144,7 @@ public class SithClanSchedulePanel extends JPanel
                         onRefreshCallback.run();
                     }
                 });
-            }).start();
+            });
         });
 
         this.setVisible(true);

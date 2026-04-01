@@ -7,6 +7,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -34,6 +35,9 @@ import sithclanplugin.util.SithClanPluginConstants;
 @Singleton
 public class SithClanAnnouncementsPanelSenate extends JPanel
 {
+    @Inject
+    private ScheduledExecutorService executor;
+
     @Inject
     private SithClanAnnouncements announcements;
 
@@ -159,7 +163,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
 
         postAnnouncementButton.addActionListener(e ->
         {
-            new Thread(() ->
+            executor.submit(() ->
             {
                 int status = announcements.parseAnnouncementForPost(newAnnouncementTextArea.getText());
                 SwingUtilities.invokeLater(() ->
@@ -168,7 +172,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                     displayAnnouncements(announcements.getAnnouncementsList());
                     newAnnouncementPanel.setVisible(false);
                 });
-            }).start();
+            });
         });
 
         mainPanel.add(announcementsPanelLabel);
@@ -215,7 +219,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
             } else
             {
                 // save announcement
-                new Thread(() ->
+                executor.submit(() ->
                 {
                     int status = announcements.parseAnnouncementForEdit(announcement.getAnnouncementId(),
                             announcementTextArea.getText());
@@ -229,21 +233,21 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                         }
                         handleStatus(status);
                     });
-                }).start();
+                });
             }
         });
 
         // delete button action
         deleteAnnouncementButton.addActionListener(e ->
         {
-            new Thread(() ->
+            executor.submit(() ->
             {
                 int status = announcements.parseAnnouncementForDelete(announcement.getAnnouncementId());
                 SwingUtilities.invokeLater(() ->
                 {
                     handleStatus(status);
                 });
-            }).start();
+            });
         });
 
         buttonPanel.add(editAnnouncementButton);

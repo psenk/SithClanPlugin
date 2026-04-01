@@ -5,6 +5,7 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
 import javax.swing.Box;
@@ -27,10 +28,13 @@ import sithclanplugin.util.SithClanPluginUtil;
 public class SithClanPluginPanel extends PluginPanel
 {
     @Inject
-    private SithClanPluginConfig config;
+    private OkHttpClient httpClient;
 
     @Inject
-    private OkHttpClient httpClient;
+    private ScheduledExecutorService executor;
+
+    @Inject
+    private SithClanPluginConfig config;
 
     @Getter
     private final SithClanSchedulePanel schedulePanel;
@@ -144,11 +148,11 @@ public class SithClanPluginPanel extends PluginPanel
         // show senate button if API key added LATER
         schedulePanel.setOnRefreshCallback(() ->
         {
-            new Thread(() ->
+            executor.submit(() ->
             {
                 boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
                 SwingUtilities.invokeLater(() -> senateButton.setVisible(isSenateMember));
-            }).start();
+            });
         });
 
         // panel for users not logged in
