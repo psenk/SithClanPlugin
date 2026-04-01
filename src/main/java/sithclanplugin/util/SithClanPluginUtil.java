@@ -1,5 +1,7 @@
 package sithclanplugin.util;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -10,6 +12,8 @@ import sithclanplugin.SithClanPluginConfig;
 
 public class SithClanPluginUtil
 {
+
+    private static final int TIMEOUT_SECONDS = 60;
 
     /**
      * Removes Discord emojis from text
@@ -69,6 +73,13 @@ public class SithClanPluginUtil
      */
     public static String sendPostRequest(OkHttpClient client, String apiKey, String data, String uri)
     {
+        // new client with longer timeout
+        OkHttpClient clientWithTimeout = client.newBuilder()
+                .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .build();
+
         // build HTTP POST request
         Request request = new Request.Builder()
                 .url(uri)
@@ -77,7 +88,7 @@ public class SithClanPluginUtil
                 .post(RequestBody.create(MediaType.parse("application/json"), data))
                 .build();
 
-        try (Response response = client.newCall(request).execute())
+        try (Response response = clientWithTimeout.newCall(request).execute())
         {
             ResponseBody responseBody = response.body();
             if (responseBody == null)
