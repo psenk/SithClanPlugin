@@ -34,25 +34,25 @@ public class SithClanPluginFileManager
     }
 
     /**
-     * Creates plugin specific files and directories
+     * Create plugin specific files and directories
      * 
      * @throws IOException
      */
     public void initializeFiles() throws IOException
     {
-        // create main plugin directory
+        // main plugin directory
         if (!localDirectory.exists())
         {
             localDirectory.mkdirs();
         }
 
-        // create saved schedule file
+        // saved event schedule file
         if (!storedScheduleFile.exists())
         {
             storedScheduleFile.createNewFile();
         }
 
-        // create event subscriptions file
+        // event subscriptions file
         if (!storedSubscriptionsFile.exists())
         {
             storedSubscriptionsFile.createNewFile();
@@ -60,9 +60,9 @@ public class SithClanPluginFileManager
     }
 
     /**
-     * Checks if user has a saved schedule to load
+     * Check if user has a saved event schedule file to load
      * 
-     * @return boolean if schedule is saved
+     * @return boolean has local schedule file
      */
     public boolean hasSavedSchedule()
     {
@@ -70,15 +70,16 @@ public class SithClanPluginFileManager
     }
 
     /**
-     * Saves schedule to local file for cached loading
+     * Save event schedule to local file
      * 
      * @param data
-     *                 String schedule as JSON string
+     *                 String JSON schedule
      */
     public void saveScheduleLocally(String data)
     {
         try (FileWriter fileWriter = new FileWriter(storedScheduleFile))
         {
+            // write data to file
             fileWriter.write(data);
         } catch (Exception e)
         {
@@ -87,14 +88,15 @@ public class SithClanPluginFileManager
     }
 
     /**
-     * Gets event schedule from local file for display
+     * Get event schedule from local file
      * 
-     * @return String JSON schedule as string
+     * @return String JSON schedule
      */
     public String readScheduleFile()
     {
         try
         {
+            // read schedule from file
             String jsonSchedule = new String(Files.readAllBytes(storedScheduleFile.toPath()));
             return jsonSchedule.isBlank() ? null : jsonSchedule;
         } catch (Exception e)
@@ -105,16 +107,17 @@ public class SithClanPluginFileManager
     }
 
     /**
-     * Saves list of event subscriptions
+     * Save list of event subscriptions
      * 
      * @param subscriptions
-     *                          ArrayList<String> list of event subscriptions to
+     *                          ArrayList<String> list of event subscriptions to be
      *                          save
      */
     private void saveSubscriptions(ArrayList<String> subscriptions)
     {
         try (FileWriter fileWriter = new FileWriter(storedSubscriptionsFile))
         {
+            // write subscriptions to file
             fileWriter.write(gson.toJson(subscriptions));
         } catch (Exception e)
         {
@@ -123,22 +126,25 @@ public class SithClanPluginFileManager
     }
 
     /**
-     * Obtains the list of saved event subscriptions
+     * Get list of saved or cached event subscriptions
      * 
      * @return ArrayList<String> list of subscribed events
      */
     private ArrayList<String> loadSubscriptions()
     {
+        // return cached subscriptions
         if (cachedSubscriptions != null)
         {
             return cachedSubscriptions;
         }
         try
         {
+            // load subscriptions from file
             String input = new String(Files.readAllBytes(storedSubscriptionsFile.toPath()));
             if (input.isBlank())
             {
-                return new ArrayList<>();
+                cachedSubscriptions = new ArrayList<>();
+                return cachedSubscriptions;
             }
             Type listType = new TypeToken<ArrayList<String>>()
             {
@@ -156,7 +162,7 @@ public class SithClanPluginFileManager
      * Add new event subscription
      * 
      * @param eventTitle
-     *                       String name of event
+     *                       String title of event
      */
     public void addSubscription(String eventTitle)
     {
@@ -172,7 +178,7 @@ public class SithClanPluginFileManager
      * Remove event subscription
      * 
      * @param eventTitle
-     *                       String name of event
+     *                       String title of event
      */
     public void removeSubscription(String eventTitle)
     {
@@ -182,11 +188,11 @@ public class SithClanPluginFileManager
     }
 
     /**
-     * Finds out if user is subscribed to event or not
+     * Check if user is subscribed to event
      * 
      * @param eventTitle
-     *                       String name of event
-     * @return boolean whether event is subscribed or not
+     *                       String title of event
+     * @return boolean whether event is subscribed
      */
     public boolean isSubscribed(String eventTitle)
     {

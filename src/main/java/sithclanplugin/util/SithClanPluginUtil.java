@@ -143,7 +143,7 @@ public class SithClanPluginUtil
      * Creates and sends HTTP DELETE request
      * 
      * @param client
-     *                   HttpClient object
+     *                   OkHttpClient object
      * @param apiKey
      *                   String auth API key
      * @param uri
