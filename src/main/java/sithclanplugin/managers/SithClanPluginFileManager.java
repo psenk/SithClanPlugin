@@ -16,8 +16,8 @@ import net.runelite.client.RuneLite;
 import sithclanplugin.util.SithClanPluginConstants;
 
 @Singleton
-public class SithClanPluginFileManager {
-
+public class SithClanPluginFileManager
+{
     @Inject
     private Gson gson;
 
@@ -25,7 +25,8 @@ public class SithClanPluginFileManager {
     private final File storedScheduleFile;
     private final File storedSubscriptionsFile;
 
-    public SithClanPluginFileManager() {
+    public SithClanPluginFileManager()
+    {
         this.localDirectory = new File(RuneLite.RUNELITE_DIR, SithClanPluginConstants.LOCAL_DIRECTORY_NAME);
         this.storedScheduleFile = new File(localDirectory, SithClanPluginConstants.STORED_SCHEDULE_NAME);
         this.storedSubscriptionsFile = new File(localDirectory, SithClanPluginConstants.STORED_SUBSCRIPTIONS_NAME);
@@ -36,19 +37,23 @@ public class SithClanPluginFileManager {
      * 
      * @throws IOException
      */
-    public void initializeFiles() throws IOException {
+    public void initializeFiles() throws IOException
+    {
         // create main plugin directory
-        if (!localDirectory.exists()) {
+        if (!localDirectory.exists())
+        {
             localDirectory.mkdirs();
         }
 
         // create saved schedule file
-        if (!storedScheduleFile.exists()) {
+        if (!storedScheduleFile.exists())
+        {
             storedScheduleFile.createNewFile();
         }
 
         // create event subscriptions file
-        if (!storedSubscriptionsFile.exists()) {
+        if (!storedSubscriptionsFile.exists())
+        {
             storedSubscriptionsFile.createNewFile();
         }
     }
@@ -58,19 +63,24 @@ public class SithClanPluginFileManager {
      * 
      * @return boolean if schedule is saved
      */
-    public boolean hasSavedSchedule() {
+    public boolean hasSavedSchedule()
+    {
         return storedScheduleFile.length() > 0;
     }
 
     /**
      * Saves schedule to local file for cached loading
      * 
-     * @param data String schedule as JSON string
+     * @param data
+     *                 String schedule as JSON string
      */
-    public void saveScheduleLocally(String data) {
-        try (FileWriter fileWriter = new FileWriter(storedScheduleFile)) {
+    public void saveScheduleLocally(String data)
+    {
+        try (FileWriter fileWriter = new FileWriter(storedScheduleFile))
+        {
             fileWriter.write(data);
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
@@ -80,11 +90,14 @@ public class SithClanPluginFileManager {
      * 
      * @return String JSON schedule as string
      */
-    public String readScheduleFile() {
-        try {
+    public String readScheduleFile()
+    {
+        try
+        {
             String jsonSchedule = new String(Files.readAllBytes(storedScheduleFile.toPath()));
             return jsonSchedule.isBlank() ? null : jsonSchedule;
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             e.printStackTrace();
             return null;
         }
@@ -93,12 +106,17 @@ public class SithClanPluginFileManager {
     /**
      * Saves list of event subscriptions
      * 
-     * @param subscriptions ArrayList<String> list of event subscriptions to save
+     * @param subscriptions
+     *                          ArrayList<String> list of event subscriptions to
+     *                          save
      */
-    private void saveSubscriptions(ArrayList<String> subscriptions) {
-        try (FileWriter fileWriter = new FileWriter(storedSubscriptionsFile)) {
+    private void saveSubscriptions(ArrayList<String> subscriptions)
+    {
+        try (FileWriter fileWriter = new FileWriter(storedSubscriptionsFile))
+        {
             fileWriter.write(gson.toJson(subscriptions));
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
@@ -108,17 +126,22 @@ public class SithClanPluginFileManager {
      * 
      * @return ArrayList<String> list of subscribed events
      */
-    private ArrayList<String> loadSubscriptions() {
-        try {
+    private ArrayList<String> loadSubscriptions()
+    {
+        try
+        {
             String input = new String(Files.readAllBytes(storedSubscriptionsFile.toPath()));
-            if (input.isBlank()) {
+            if (input.isBlank())
+            {
                 return new ArrayList<>();
             }
-            Type listType = new TypeToken<ArrayList<String>>() {
+            Type listType = new TypeToken<ArrayList<String>>()
+            {
             }.getType();
             ArrayList<String> subscriptions = gson.fromJson(input, listType);
             return subscriptions != null ? subscriptions : new ArrayList<>();
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             e.printStackTrace();
             return new ArrayList<>();
         }
@@ -127,11 +150,14 @@ public class SithClanPluginFileManager {
     /**
      * Add new event subscription
      * 
-     * @param eventTitle String name of event
+     * @param eventTitle
+     *                       String name of event
      */
-    public void addSubscription(String eventTitle) {
+    public void addSubscription(String eventTitle)
+    {
         ArrayList<String> subscriptions = loadSubscriptions();
-        if (!subscriptions.contains(eventTitle)) {
+        if (!subscriptions.contains(eventTitle))
+        {
             subscriptions.add(eventTitle);
             saveSubscriptions(subscriptions);
         }
@@ -140,9 +166,11 @@ public class SithClanPluginFileManager {
     /**
      * Remove event subscription
      * 
-     * @param eventTitle String name of event
+     * @param eventTitle
+     *                       String name of event
      */
-    public void removeSubscription(String eventTitle) {
+    public void removeSubscription(String eventTitle)
+    {
         ArrayList<String> subscriptions = loadSubscriptions();
         subscriptions.remove(eventTitle);
         saveSubscriptions(subscriptions);
@@ -151,10 +179,12 @@ public class SithClanPluginFileManager {
     /**
      * Finds out if user is subscribed to event or not
      * 
-     * @param eventTitle String name of event
+     * @param eventTitle
+     *                       String name of event
      * @return boolean whether event is subscribed or not
      */
-    public boolean isSubscribed(String eventTitle) {
+    public boolean isSubscribed(String eventTitle)
+    {
         ArrayList<String> subscriptions = loadSubscriptions();
         return subscriptions.contains(eventTitle);
     }

@@ -15,8 +15,8 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SithClanEvent {
-
+public class SithClanEvent
+{
     String eventTitle;
     String eventTime;
     String eventHost = "";

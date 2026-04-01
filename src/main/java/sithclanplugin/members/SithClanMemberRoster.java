@@ -1,6 +1,5 @@
 package sithclanplugin.members;
 
-import java.net.http.HttpClient;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -11,6 +10,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import lombok.Getter;
+import okhttp3.OkHttpClient;
 import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.dto.RosterResponse;
 import sithclanplugin.util.SithClanPluginConstants;
@@ -22,13 +22,13 @@ import sithclanplugin.util.SithClanPluginUtil;
 
 @Getter
 @Singleton
-public class SithClanMemberRoster {
-
+public class SithClanMemberRoster
+{
     @Inject
     private SithClanPluginConfig config;
 
     @Inject
-    private HttpClient httpClient;
+    private OkHttpClient httpClient;
 
     @Inject
     private Gson gson;
@@ -36,7 +36,8 @@ public class SithClanMemberRoster {
     private HashMap<String, SithClanMember> roster;
     private ZonedDateTime dateRosterPosted;
 
-    public SithClanMemberRoster() {
+    public SithClanMemberRoster()
+    {
         roster = new HashMap<>();
         dateRosterPosted = null;
     }
@@ -46,17 +47,20 @@ public class SithClanMemberRoster {
      * 
      * @return String member roster in an HTTP response body
      */
-    private String getMemberRoster() {
+    private String getMemberRoster()
+    {
         return SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.MEMBER_ROSTER_URI);
     }
 
     /**
      * Creates and sends HTTP POST request to post new member roster
      * 
-     * @param jsonData String JSON member roster in string format
+     * @param jsonData
+     *                     String JSON member roster in string format
      * @return String HTTP Response body with status code
      */
-    private String postMemberRoster(String jsonData) {
+    private String postMemberRoster(String jsonData)
+    {
         return SithClanPluginUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
                 SithClanPluginConstants.MEMBER_ROSTER_URI);
     }
@@ -68,10 +72,12 @@ public class SithClanMemberRoster {
      * 
      * @return int SithClanPluginConstants status code value
      */
-    public int parseRosterFromGet() {
+    public int parseRosterFromGet()
+    {
         // get fresh member roster
         String jsonRoster = getMemberRoster();
-        if (jsonRoster == null) {
+        if (jsonRoster == null)
+        {
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
         // convert roster to JSON
@@ -82,11 +88,14 @@ public class SithClanMemberRoster {
     /**
      * Takes String input and converts to JSON format for posting
      * 
-     * @param rosterInput String member roster from plugin text box
+     * @param rosterInput
+     *                        String member roster from plugin text box
      * @return int SithClanPluginConstants status code value
      */
-    public int parseRosterForPost(String rosterInput) {
-        if (rosterInput.isBlank()) {
+    public int parseRosterForPost(String rosterInput)
+    {
+        if (rosterInput.isBlank())
+        {
             return SithClanPluginConstants.STATUS_BAD_INPUT;
         }
 
@@ -94,7 +103,8 @@ public class SithClanMemberRoster {
         String[] rosterInputList = rosterInput.split("\\r?\\n");
         // turn list into member roster
         HashMap<String, SithClanMember> newRoster = convertRoster(rosterInputList);
-        if (newRoster == null || newRoster.isEmpty()) {
+        if (newRoster == null || newRoster.isEmpty())
+        {
             return SithClanPluginConstants.STATUS_BAD_INPUT;
         }
 
@@ -106,7 +116,8 @@ public class SithClanMemberRoster {
 
         // post roster
         String response = postMemberRoster(data);
-        if (response == null) {
+        if (response == null)
+        {
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
         // save roster
@@ -117,17 +128,21 @@ public class SithClanMemberRoster {
     /**
      * Converts member roster String list into custom object list
      * 
-     * @param rosterInput member roster in String[] list
+     * @param rosterInput
+     *                        member roster in String[] list
      * @return HashMap<String, SithClanMember> converted member roster
      */
-    private HashMap<String, SithClanMember> convertRoster(String[] rosterInput) {
+    private HashMap<String, SithClanMember> convertRoster(String[] rosterInput)
+    {
 
         HashMap<String, SithClanMember> newRoster = new HashMap<>();
 
         // iterate through roster list
-        for (String member : rosterInput) {
+        for (String member : rosterInput)
+        {
             member = member.trim();
-            if (member.isBlank() || member.startsWith("name,")) {
+            if (member.isBlank() || member.startsWith("name,"))
+            {
                 continue;
             }
             // parse member info
@@ -152,16 +167,19 @@ public class SithClanMemberRoster {
     /**
      * Deserializes JSON string to HashMap roster
      * 
-     * @param jsonRoster JSON String of member roster
+     * @param jsonRoster
+     *                       JSON String of member roster
      * @return HashMap<String, SithClanMember> deserialized member roster
      */
-    private HashMap<String, SithClanMember> deserializeRoster(String jsonRoster) {
+    private HashMap<String, SithClanMember> deserializeRoster(String jsonRoster)
+    {
         // convert roster to JSON
         RosterResponse rosterResponse = gson.fromJson(jsonRoster, RosterResponse.class);
         ZonedDateTime utcTime = ZonedDateTime.parse(rosterResponse.getDate());
         this.dateRosterPosted = utcTime.withZoneSameInstant(ZoneId.systemDefault());
         HashMap<String, SithClanMember> roster = new HashMap<>();
-        for (SithClanMember member : rosterResponse.getRoster()) {
+        for (SithClanMember member : rosterResponse.getRoster())
+        {
             roster.put(member.getMemberName().toLowerCase(), member);
         }
         return roster;
@@ -170,10 +188,12 @@ public class SithClanMemberRoster {
     /**
      * Searches for member in roster by name
      * 
-     * @param name String name of member to search for
+     * @param name
+     *                 String name of member to search for
      * @return SithClanMember member searched for
      */
-    public SithClanMember getMemberByName(String memberName) {
+    public SithClanMember getMemberByName(String memberName)
+    {
         return roster.get(memberName.toLowerCase());
     }
 
@@ -182,7 +202,8 @@ public class SithClanMemberRoster {
      * 
      * @return int size of member roster
      */
-    public int getClanSize() {
+    public int getClanSize()
+    {
         return roster.size();
     }
 }

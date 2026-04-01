@@ -13,8 +13,8 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SithClanMember {
-
+public class SithClanMember
+{
     private String memberName;
     private int memberRank;
     private int memberCredits;

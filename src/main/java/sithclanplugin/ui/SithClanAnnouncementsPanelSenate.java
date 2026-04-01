@@ -32,8 +32,8 @@ import sithclanplugin.announcements.SithClanAnnouncements;
 import sithclanplugin.util.SithClanPluginConstants;
 
 @Singleton
-public class SithClanAnnouncementsPanelSenate extends JPanel {
-
+public class SithClanAnnouncementsPanelSenate extends JPanel
+{
     @Inject
     private SithClanAnnouncements announcements;
 
@@ -53,7 +53,8 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
     private static final String BAD_INPUT_WARNING = "There is a problem with your input.";
     private static final String NOT_FOUND_WARNING = "Unable to post.";
 
-    SithClanAnnouncementsPanelSenate() {
+    SithClanAnnouncementsPanelSenate()
+    {
         final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
         final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
 
@@ -101,9 +102,11 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
         newAnnouncementTextArea.setWrapStyleWord(true);
 
         // highlights all text when box focused
-        newAnnouncementTextArea.addFocusListener(new FocusAdapter() {
+        newAnnouncementTextArea.addFocusListener(new FocusAdapter()
+        {
             @Override
-            public void focusGained(FocusEvent e) {
+            public void focusGained(FocusEvent e)
+            {
                 newAnnouncementTextArea.selectAll();
             }
         });
@@ -128,13 +131,16 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
         announcementsCollapsiblePanel.setVisible(false);
 
         // expand/collapse panel
-        announcementsPanelLabel.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+        announcementsPanelLabel.addMouseListener(new MouseAdapter()
+        {
+            public void mouseClicked(MouseEvent e)
+            {
                 boolean isVisible = !announcementsCollapsiblePanel.isVisible();
                 announcementsCollapsiblePanel.setVisible(isVisible);
                 // change arrow icon
                 announcementsPanelLabel.setIcon(isVisible ? downArrowIcon : rightArrowIcon);
-                if (isVisible) {
+                if (isVisible)
+                {
                     displayAnnouncements(announcements.getAnnouncementsList());
                 }
                 revalidate();
@@ -143,17 +149,21 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
         });
 
         // add new announcement
-        addNewButton.addActionListener(e -> {
+        addNewButton.addActionListener(e ->
+        {
             newAnnouncementPanel.setVisible(true);
             announcementsListPanel.revalidate();
             announcementsListPanel.repaint();
 
         });
 
-        postAnnouncementButton.addActionListener(e -> {
-            new Thread(() -> {
+        postAnnouncementButton.addActionListener(e ->
+        {
+            new Thread(() ->
+            {
                 int status = announcements.parseAnnouncementForPost(newAnnouncementTextArea.getText());
-                SwingUtilities.invokeLater(() -> {
+                SwingUtilities.invokeLater(() ->
+                {
                     handleStatus(status);
                     displayAnnouncements(announcements.getAnnouncementsList());
                     newAnnouncementPanel.setVisible(false);
@@ -170,10 +180,12 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
      * Creates single announcement panel for display
      * Allows to edit and delete announcements
      * 
-     * @param announcement SithClanAnnouncement announcement to display
+     * @param announcement
+     *                         SithClanAnnouncement announcement to display
      * @return JPanel single announcement panel
      */
-    private JPanel createSingleAnnouncement(SithClanAnnouncement announcement) {
+    private JPanel createSingleAnnouncement(SithClanAnnouncement announcement)
+    {
 
         // create announcement panel
         JPanel singleAnnouncementPanel = new JPanel();
@@ -192,19 +204,25 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
         JButton deleteAnnouncementButton = new JButton(DELETE_ANNOUNCEMENT_BUTTON);
 
         // edit button action
-        editAnnouncementButton.addActionListener(e -> {
+        editAnnouncementButton.addActionListener(e ->
+        {
             // edit announcement
-            if (!announcementTextArea.isEditable()) {
+            if (!announcementTextArea.isEditable())
+            {
                 announcementTextArea.setEditable(true);
                 announcementTextArea.requestFocus();
                 editAnnouncementButton.setText(SAVE_ANNOUNCEMENT_BUTTON);
-            } else {
+            } else
+            {
                 // save announcement
-                new Thread(() -> {
+                new Thread(() ->
+                {
                     int status = announcements.parseAnnouncementForEdit(announcement.getAnnouncementId(),
                             announcementTextArea.getText());
-                    SwingUtilities.invokeLater(() -> {
-                        if (status == SithClanPluginConstants.STATUS_OK) {
+                    SwingUtilities.invokeLater(() ->
+                    {
+                        if (status == SithClanPluginConstants.STATUS_OK)
+                        {
                             // reset button state, lock text area
                             announcementTextArea.setEditable(false);
                             editAnnouncementButton.setText(EDIT_ANNOUNCEMENT_BUTTON);
@@ -216,10 +234,13 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
         });
 
         // delete button action
-        deleteAnnouncementButton.addActionListener(e -> {
-            new Thread(() -> {
+        deleteAnnouncementButton.addActionListener(e ->
+        {
+            new Thread(() ->
+            {
                 int status = announcements.parseAnnouncementForDelete(announcement.getAnnouncementId());
-                SwingUtilities.invokeLater(() -> {
+                SwingUtilities.invokeLater(() ->
+                {
                     handleStatus(status);
                 });
             }).start();
@@ -238,15 +259,19 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
     /**
      * Creates and posts all announcements to display
      * 
-     * @param announcements ArrayList<SithClanAnnouncement> list of announcements to
-     *                      display
+     * @param announcements
+     *                          ArrayList<SithClanAnnouncement> list of
+     *                          announcements to
+     *                          display
      */
-    private void displayAnnouncements(ArrayList<SithClanAnnouncement> announcements) {
+    private void displayAnnouncements(ArrayList<SithClanAnnouncement> announcements)
+    {
         // start fresh
         announcementsListPanel.removeAll();
 
         // iterate through announcements and create/post each
-        for (SithClanAnnouncement announcement : announcements) {
+        for (SithClanAnnouncement announcement : announcements)
+        {
             JPanel announcementPanel = createSingleAnnouncement(announcement);
             announcementsListPanel.add(announcementPanel);
             announcementsListPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -258,10 +283,13 @@ public class SithClanAnnouncementsPanelSenate extends JPanel {
     /**
      * Handles response status of announcement event
      * 
-     * @param statusCode int returned status code
+     * @param statusCode
+     *                       int returned status code
      */
-    private void handleStatus(int statusCode) {
-        switch (statusCode) {
+    private void handleStatus(int statusCode)
+    {
+        switch (statusCode)
+        {
             case SithClanPluginConstants.STATUS_OK:
                 JOptionPane.showMessageDialog(null,
                         SUCCESSFUL_POST);

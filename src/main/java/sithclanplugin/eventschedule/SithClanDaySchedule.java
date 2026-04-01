@@ -13,8 +13,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SithClanDaySchedule {
-
+public class SithClanDaySchedule
+{
     String date;
     ArrayList<SithClanEvent> events;
 }

@@ -29,8 +29,8 @@ import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.util.SithClanPluginConstants;
 
 @Singleton
-public class SithClanSenatePanel extends JPanel {
-
+public class SithClanSenatePanel extends JPanel
+{
     @Inject
     private SithClanEventSchedule eventSchedule;
 
@@ -57,7 +57,8 @@ public class SithClanSenatePanel extends JPanel {
     private static final String UPLOADING = "Uploading...";
 
     @Inject
-    SithClanSenatePanel(SithClanAnnouncementsPanelSenate announcementsPanelSenate) {
+    SithClanSenatePanel(SithClanAnnouncementsPanelSenate announcementsPanelSenate)
+    {
 
         this.announcementsPanelSenate = announcementsPanelSenate;
 
@@ -96,11 +97,14 @@ public class SithClanSenatePanel extends JPanel {
                 senatePostScheduleButton, rightArrowIcon, downArrowIcon));
 
         // post event schedule action
-        senatePostScheduleButton.addActionListener(e -> {
-            new Thread(() -> {
+        senatePostScheduleButton.addActionListener(e ->
+        {
+            new Thread(() ->
+            {
                 uploadingLabel.setVisible(true);
                 int status = eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
-                SwingUtilities.invokeLater(() -> {
+                SwingUtilities.invokeLater(() ->
+                {
                     handlePostStatus(status, senatePostScheduleTextArea, EVENT_TEXT_AREA_DEFAULT);
                 });
             }).start();
@@ -118,11 +122,14 @@ public class SithClanSenatePanel extends JPanel {
                 senatePostRosterButton, rightArrowIcon, downArrowIcon));
 
         // post member roster action
-        senatePostRosterButton.addActionListener(e -> {
-            new Thread(() -> {
+        senatePostRosterButton.addActionListener(e ->
+        {
+            new Thread(() ->
+            {
                 uploadingLabel.setVisible(true);
                 int status = memberRoster.parseRosterForPost(senatePostRosterTextArea.getText());
-                SwingUtilities.invokeLater(() -> {
+                SwingUtilities.invokeLater(() ->
+                {
                     handlePostStatus(status, senatePostRosterTextArea, ROSTER_TEXT_AREA_DEFAULT);
                 });
             }).start();
@@ -137,16 +144,23 @@ public class SithClanSenatePanel extends JPanel {
     /**
      * Creates collapsible text area panel
      * 
-     * @param labelText   String text of collapsible panel label
-     * @param defaultText String default text of text area
-     * @param textArea    JTextArea text area to put text for posting
-     * @param button      JButton button to post text
-     * @param rightIcon   Icon right arrow to display collapsed state
-     * @param downIcon    Icon down arrow to display expanded state
+     * @param labelText
+     *                        String text of collapsible panel label
+     * @param defaultText
+     *                        String default text of text area
+     * @param textArea
+     *                        JTextArea text area to put text for posting
+     * @param button
+     *                        JButton button to post text
+     * @param rightIcon
+     *                        Icon right arrow to display collapsed state
+     * @param downIcon
+     *                        Icon down arrow to display expanded state
      * @return JPanel created collapsible panel
      */
     private JPanel createCollapsiblePanel(String labelText, String defaultText, JTextArea textArea,
-            JButton button, Icon rightIcon, Icon downIcon) {
+            JButton button, Icon rightIcon, Icon downIcon)
+    {
 
         // main panel container
         JPanel container = new JPanel();
@@ -158,9 +172,11 @@ public class SithClanSenatePanel extends JPanel {
         textArea.setLineWrap(false);
 
         // highlights all text when box focused
-        textArea.addFocusListener(new FocusAdapter() {
+        textArea.addFocusListener(new FocusAdapter()
+        {
             @Override
-            public void focusGained(FocusEvent e) {
+            public void focusGained(FocusEvent e)
+            {
                 textArea.selectAll();
             }
         });
@@ -186,8 +202,10 @@ public class SithClanSenatePanel extends JPanel {
         collapsiblePanel.setVisible(false);
 
         // expand/collapse panel
-        panelLabel.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+        panelLabel.addMouseListener(new MouseAdapter()
+        {
+            public void mouseClicked(MouseEvent e)
+            {
                 boolean isVisible = !collapsiblePanel.isVisible();
                 collapsiblePanel.setVisible(isVisible);
                 // change arrow icon
@@ -206,13 +224,18 @@ public class SithClanSenatePanel extends JPanel {
     /**
      * Handles response status of post event
      * 
-     * @param statusCode  int returned status code of post
-     * @param textArea    JTextArea text area where post came from to reset to
-     *                    default
-     * @param defaultText String default text for text area
+     * @param statusCode
+     *                        int returned status code of post
+     * @param textArea
+     *                        JTextArea text area where post came from to reset to
+     *                        default
+     * @param defaultText
+     *                        String default text for text area
      */
-    private void handlePostStatus(int statusCode, JTextArea textArea, String defaultText) {
-        switch (statusCode) {
+    private void handlePostStatus(int statusCode, JTextArea textArea, String defaultText)
+    {
+        switch (statusCode)
+        {
             case SithClanPluginConstants.STATUS_OK:
                 JOptionPane.showMessageDialog(null,
                         SUCCESSFUL_POST);

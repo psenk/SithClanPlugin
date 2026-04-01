@@ -39,8 +39,8 @@ import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.util.SithClanPluginConstants;
 
 @Singleton
-public class SithClanMembersPanel extends JPanel {
-
+public class SithClanMembersPanel extends JPanel
+{
     @Inject
     private SithClanMemberRoster memberRoster;
 
@@ -96,8 +96,10 @@ public class SithClanMembersPanel extends JPanel {
     private static final String ICON_SILVER_KEY = "/silver_key.png";
     private static final String ICON_GOLD_KEY = "/gold_key.png";
 
-    SithClanMembersPanel() {
-        rankIcons = new Icon[] {
+    SithClanMembersPanel()
+    {
+        rankIcons = new Icon[]
+        {
                 new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_CHILDREN_OF_THE_WATCH)),
                 new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_SITH_LOYALIST)),
                 new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_TIE_PILOT)),
@@ -147,9 +149,11 @@ public class SithClanMembersPanel extends JPanel {
 
         membersSearchTextField = new JTextField();
         // highlights all text when box focused
-        membersSearchTextField.addFocusListener(new FocusAdapter() {
+        membersSearchTextField.addFocusListener(new FocusAdapter()
+        {
             @Override
-            public void focusGained(FocusEvent e) {
+            public void focusGained(FocusEvent e)
+            {
                 membersSearchTextField.selectAll();
             }
         });
@@ -207,14 +211,19 @@ public class SithClanMembersPanel extends JPanel {
         this.add(bottomPanel, BorderLayout.CENTER);
 
         // get individual member
-        membersSearchButton.addActionListener(e -> {
-            new Thread(() -> {
+        membersSearchButton.addActionListener(e ->
+        {
+            new Thread(() ->
+            {
                 // get roster if not already in memory
-                if (memberRoster.getRoster().isEmpty()) {
+                if (memberRoster.getRoster().isEmpty())
+                {
                     int status = memberRoster.parseRosterFromGet();
 
-                    if (status == SithClanPluginConstants.STATUS_NOT_FOUND) {
-                        SwingUtilities.invokeLater(() -> {
+                    if (status == SithClanPluginConstants.STATUS_NOT_FOUND)
+                    {
+                        SwingUtilities.invokeLater(() ->
+                        {
                             JOptionPane.showMessageDialog(null, ROSTER_UNOBTAINABLE_WARNING);
                         });
                         return;
@@ -222,10 +231,13 @@ public class SithClanMembersPanel extends JPanel {
                 }
                 // get specific member
                 SithClanMember member = memberRoster.getMemberByName(membersSearchTextField.getText());
-                SwingUtilities.invokeLater(() -> {
-                    if (member == null) {
+                SwingUtilities.invokeLater(() ->
+                {
+                    if (member == null)
+                    {
                         memberDoesNotExistLabel.setVisible(true);
-                    } else {
+                    } else
+                    {
                         memberDoesNotExistLabel.setVisible(false);
                         updateRosterDateLabel(memberRoster.getDateRosterPosted());
                         displaySingleMember(member);
@@ -235,20 +247,26 @@ public class SithClanMembersPanel extends JPanel {
         });
 
         // show all members
-        membersShowAllButton.addActionListener(e -> {
-            new Thread(() -> {
+        membersShowAllButton.addActionListener(e ->
+        {
+            new Thread(() ->
+            {
                 // get roster if not already in memory
-                if (memberRoster.getRoster().isEmpty()) {
+                if (memberRoster.getRoster().isEmpty())
+                {
                     int status = memberRoster.parseRosterFromGet();
-                    if (status == SithClanPluginConstants.STATUS_NOT_FOUND) {
-                        SwingUtilities.invokeLater(() -> {
+                    if (status == SithClanPluginConstants.STATUS_NOT_FOUND)
+                    {
+                        SwingUtilities.invokeLater(() ->
+                        {
                             JOptionPane.showMessageDialog(null, ROSTER_UNOBTAINABLE_WARNING);
                         });
                         return;
                     }
                 }
                 // get all members
-                SwingUtilities.invokeLater(() -> {
+                SwingUtilities.invokeLater(() ->
+                {
                     updateRosterDateLabel(memberRoster.getDateRosterPosted());
                     displayAllMembers(memberRoster.getRoster().values());
                 });
@@ -257,18 +275,22 @@ public class SithClanMembersPanel extends JPanel {
 
         // pagination for show all members
         JScrollBar membersAreaScrollBar = membersAreaScrollPane.getVerticalScrollBar();
-        membersAreaScrollBar.addAdjustmentListener(e -> {
+        membersAreaScrollBar.addAdjustmentListener(e ->
+        {
             // if already loading stop
-            if (isLoading) {
+            if (isLoading)
+            {
                 return;
             }
             // if no list or everything loaded
-            if (rosterList == null || pageIndex >= rosterList.size()) {
+            if (rosterList == null || pageIndex >= rosterList.size())
+            {
                 return;
             }
             // load next page if at the bottom
             if (membersAreaScrollBar.getValue() + membersAreaScrollBar.getVisibleAmount() >= membersAreaScrollBar
-                    .getMaximum()) {
+                    .getMaximum())
+            {
                 loadNextPage();
             }
         });
@@ -279,10 +301,12 @@ public class SithClanMembersPanel extends JPanel {
     /**
      * Creates a single member card panel for display
      * 
-     * @param member SithClanMember member to place on card
+     * @param member
+     *                   SithClanMember member to place on card
      * @return JPanel built member card panel
      */
-    private JPanel buildMemberCard(SithClanMember member) {
+    private JPanel buildMemberCard(SithClanMember member)
+    {
         // container for all info
         JPanel singleMemberPanel = new JPanel();
         singleMemberPanel.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 160));
@@ -311,9 +335,11 @@ public class SithClanMembersPanel extends JPanel {
         memberAvatar.setMinimumSize(new Dimension(AVATAR_SIZE - 5, 130));
 
         memberAvatar.setOpaque(false);
-        if (rankInt == 15 && memberName.equalsIgnoreCase(CURRENT_GOLD_KEY)) {
+        if (rankInt == 15 && memberName.equalsIgnoreCase(CURRENT_GOLD_KEY))
+        {
             avatar = new JLabel(rankIcons[15]);
-        } else {
+        } else
+        {
             avatar = new JLabel(rankIcons[rankInt - 1]);
         }
         avatar.setPreferredSize(new Dimension(AVATAR_SIZE, AVATAR_SIZE));
@@ -347,30 +373,39 @@ public class SithClanMembersPanel extends JPanel {
         rightPanel.add(memberPromoted);
 
         // until next promotion
-        if (rankInt <= 10) { // sith marauder and below
+        if (rankInt <= 10)
+        { // sith marauder and below
             // credits
             int creditsNeeded = SithClanPluginConstants.CREDITS_TO_PROMOTE[rankInt] - creditsInt;
-            if (creditsNeeded > 0) {
+            if (creditsNeeded > 0)
+            {
                 JLabel creditsUntilPromotion = new JLabel(MEMBER_CREDITS_NEEDED + creditsNeeded);
                 rightPanel.add(creditsUntilPromotion);
-            } else {
-                if (rankInt >= 5 && rankInt <= 10) {// between death trooper and sith marauder
+            } else
+            {
+                if (rankInt >= 5 && rankInt <= 10)
+                {// between death trooper and sith marauder
                     JLabel daysUntilPromotion = null;
-                    if (promotionDate == null) {
+                    if (promotionDate == null)
+                    {
                         daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + MEMBER_UNKNOWN_DATA);
-                    } else {
+                    } else
+                    {
                         long daysInRank = ChronoUnit.DAYS.between(
                                 LocalDate.parse(promotionDate, SithClanPluginConstants.SHORT_DATE_FORMATTER),
                                 LocalDate.now());
                         long daysNeeded = SithClanPluginConstants.DAYS_TO_PROMOTE[rankInt - 1] - daysInRank;
-                        if (daysNeeded <= 0) {
+                        if (daysNeeded <= 0)
+                        {
                             daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + MEMBER_NONE_NEEDED);
-                        } else {
+                        } else
+                        {
                             daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + daysNeeded);
                         }
                     }
                     rightPanel.add(daysUntilPromotion);
-                } else {
+                } else
+                {
                     JLabel noneNeeded = new JLabel(MEMBER_CREDITS_NEEDED + MEMBER_NONE_NEEDED);
                     rightPanel.add(noneNeeded);
                 }
@@ -383,7 +418,8 @@ public class SithClanMembersPanel extends JPanel {
 
         // member alt accounts
         String altName = member.getMemberAltName();
-        if (altName != null && !altName.isBlank()) {
+        if (altName != null && !altName.isBlank())
+        {
             JLabel memberAlt = new JLabel(MEMBER_ALT + altName);
             rightPanel.add(memberAlt);
         }
@@ -395,9 +431,11 @@ public class SithClanMembersPanel extends JPanel {
     /**
      * Adds single member card to display
      * 
-     * @param member SithClanMember member to display
+     * @param member
+     *                   SithClanMember member to display
      */
-    private void displaySingleMember(SithClanMember member) {
+    private void displaySingleMember(SithClanMember member)
+    {
         // fresh panel
         membersAreaPanel.removeAll();
 
@@ -412,9 +450,11 @@ public class SithClanMembersPanel extends JPanel {
     /**
      * Lazily displays a list of all members in clan
      * 
-     * @param rosterCollection collection of clan members
+     * @param rosterCollection
+     *                             collection of clan members
      */
-    private void displayAllMembers(Collection<SithClanMember> rosterCollection) {
+    private void displayAllMembers(Collection<SithClanMember> rosterCollection)
+    {
         // fresh panel
         membersAreaPanel.removeAll();
 
@@ -432,12 +472,14 @@ public class SithClanMembersPanel extends JPanel {
     /**
      * Loads the next page of member cards
      */
-    private void loadNextPage() {
+    private void loadNextPage()
+    {
         int pageEnd = Math.min(pageIndex + PAGE_SIZE, rosterList.size());
 
         isLoading = true;
         // create member card and display page
-        for (int i = pageIndex; i < pageEnd; i++) {
+        for (int i = pageIndex; i < pageEnd; i++)
+        {
             membersAreaPanel.add(buildMemberCard(rosterList.get(i)));
         }
         pageIndex = pageEnd;
@@ -449,9 +491,11 @@ public class SithClanMembersPanel extends JPanel {
     /**
      * Converts roster date into user local time
      * 
-     * @param time ZonedDateTime roster date
+     * @param time
+     *                 ZonedDateTime roster date
      */
-    private void updateRosterDateLabel(ZonedDateTime time) {
+    private void updateRosterDateLabel(ZonedDateTime time)
+    {
         ZonedDateTime timeStamp = time
                 .withZoneSameInstant(ZoneId.systemDefault());
         rosterDateLabel

@@ -3,8 +3,8 @@ package sithclanplugin.util;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-public class SithClanPluginConstants {
-
+public class SithClanPluginConstants
+{
         // testing
         // TODO: set false before release
         public static final boolean BYPASS_CLAN_CHECK = true;
@@ -19,7 +19,8 @@ public class SithClanPluginConstants {
         public static final String CLAN_NAME = "Sith";
 
         // ranks
-        public static final String[] CLAN_RANKS = {
+        public static final String[] CLAN_RANKS =
+        {
                         "Children of the Watch",
                         "Sith Loyalist",
                         "TIE Pilot",
@@ -38,7 +39,8 @@ public class SithClanPluginConstants {
         };
 
         // credits to promote
-        public static final int[] CREDITS_TO_PROMOTE = {
+        public static final int[] CREDITS_TO_PROMOTE =
+        {
                         0, // children of the watch, start as this rank
                         10, // loyalist
                         30, // tie pilot
@@ -53,7 +55,8 @@ public class SithClanPluginConstants {
         };
 
         // time to promote in days
-        public static final int[] DAYS_TO_PROMOTE = {
+        public static final int[] DAYS_TO_PROMOTE =
+        {
                         0, // children of the watch, start as this rank
                         0, // loyalist
                         0, // tie pilot

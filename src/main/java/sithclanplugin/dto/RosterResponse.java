@@ -16,8 +16,8 @@ import sithclanplugin.members.SithClanMember;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RosterResponse {
-
+public class RosterResponse
+{
     private ArrayList<SithClanMember> roster;
     private String date;
 }

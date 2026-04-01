@@ -17,8 +17,8 @@ import sithclanplugin.eventschedule.SithClanDaySchedule;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StartupResponse {
-
+public class StartupResponse
+{
     private ArrayList<SithClanDaySchedule> startupSchedule;
     private ArrayList<SithClanAnnouncement> startupAnnouncements;
 }

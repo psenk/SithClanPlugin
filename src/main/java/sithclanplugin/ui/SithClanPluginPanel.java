@@ -5,7 +5,6 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.net.http.HttpClient;
 
 import javax.inject.Inject;
 import javax.swing.Box;
@@ -20,17 +19,18 @@ import com.google.inject.Singleton;
 
 import lombok.Getter;
 import net.runelite.client.ui.PluginPanel;
+import okhttp3.OkHttpClient;
 import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.util.SithClanPluginUtil;
 
 @Singleton
-public class SithClanPluginPanel extends PluginPanel {
-
+public class SithClanPluginPanel extends PluginPanel
+{
     @Inject
     private SithClanPluginConfig config;
 
     @Inject
-    private HttpClient httpClient;
+    private OkHttpClient httpClient;
 
     @Getter
     private final SithClanSchedulePanel schedulePanel;
@@ -68,7 +68,8 @@ public class SithClanPluginPanel extends PluginPanel {
 
     @Inject
     SithClanPluginPanel(SithClanSchedulePanel schedulePanel,
-            SithClanSenatePanel senatePanel, SithClanMembersPanel membersPanel) {
+            SithClanSenatePanel senatePanel, SithClanMembersPanel membersPanel)
+    {
         this.schedulePanel = schedulePanel;
         this.membersPanel = membersPanel;
         this.senatePanel = senatePanel;
@@ -125,21 +126,26 @@ public class SithClanPluginPanel extends PluginPanel {
         this.add(navPanel, BorderLayout.NORTH);
 
         // action listeners
-        scheduleButton.addActionListener(e -> {
+        scheduleButton.addActionListener(e ->
+        {
             cardLayout.show(cardPanel, SCHEDULE_CARD);
         });
 
-        membersButton.addActionListener(e -> {
+        membersButton.addActionListener(e ->
+        {
             cardLayout.show(cardPanel, MEMBERS_CARD);
         });
 
-        senateButton.addActionListener(e -> {
+        senateButton.addActionListener(e ->
+        {
             cardLayout.show(cardPanel, SENATE_CARD);
         });
 
         // show senate button if API key added LATER
-        schedulePanel.setOnRefreshCallback(() -> {
-            new Thread(() -> {
+        schedulePanel.setOnRefreshCallback(() ->
+        {
+            new Thread(() ->
+            {
                 boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
                 SwingUtilities.invokeLater(() -> senateButton.setVisible(isSenateMember));
             }).start();
@@ -175,7 +181,8 @@ public class SithClanPluginPanel extends PluginPanel {
     /**
      * Shows main panel after successful clan verification
      */
-    public void showMainPanel() {
+    public void showMainPanel()
+    {
         navPanel.setVisible(true);
         buttonPanel.setVisible(true);
         outerCardLayout.show(outerCardPanel, MAIN_CARD);
@@ -186,7 +193,8 @@ public class SithClanPluginPanel extends PluginPanel {
     /**
      * Hide all if user is not in clan
      */
-    public void userNotInClan() {
+    public void userNotInClan()
+    {
         navPanel.setVisible(false);
         buttonPanel.setVisible(false);
         outerCardLayout.show(outerCardPanel, NOT_CLAN_MEMBER_CARD);

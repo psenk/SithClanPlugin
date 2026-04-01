@@ -1,7 +1,6 @@
 package sithclanplugin.eventschedule;
 
 import java.lang.reflect.Type;
-import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -13,6 +12,7 @@ import com.google.inject.Singleton;
 
 import lombok.Getter;
 import lombok.Setter;
+import okhttp3.OkHttpClient;
 import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.managers.SithClanPluginFileManager;
 import sithclanplugin.managers.SithClanPluginNotificationManager;
@@ -25,8 +25,8 @@ import sithclanplugin.util.SithClanPluginUtil;
 
 @Getter
 @Singleton
-public class SithClanEventSchedule {
-
+public class SithClanEventSchedule
+{
     @Inject
     private SithClanPluginConfig config;
 
@@ -37,7 +37,7 @@ public class SithClanEventSchedule {
     private SithClanPluginNotificationManager notificationManager;
 
     @Inject
-    private HttpClient httpClient;
+    private OkHttpClient httpClient;
 
     @Inject
     private Gson gson;
@@ -50,7 +50,8 @@ public class SithClanEventSchedule {
 
     private static final int SCHEDULE_FETCH_COOLDOWN_MINUTES = 5;
 
-    public SithClanEventSchedule() {
+    public SithClanEventSchedule()
+    {
         schedule = new ArrayList<>();
         lastTimeScheduleFetched = null;
     }
@@ -60,17 +61,20 @@ public class SithClanEventSchedule {
      * 
      * @return String event schedule string in HTTP response body
      */
-    private String getEventSchedule() {
+    private String getEventSchedule()
+    {
         return SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.EVENT_SCHEDULE_URI);
     }
 
     /**
      * Creates and sends HTTP POST request to post new event schedule
      * 
-     * @param jsonData String JSON event schedule in string format
+     * @param jsonData
+     *                     String JSON event schedule in string format
      * @return String HTTP Response body with status code
      */
-    private String postEventSchedule(String jsonData) {
+    private String postEventSchedule(String jsonData)
+    {
         return SithClanPluginUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
                 SithClanPluginConstants.EVENT_SCHEDULE_URI);
     }
@@ -83,18 +87,21 @@ public class SithClanEventSchedule {
      * 
      * @return int SithClanPluginConstants status code value
      */
-    public int parseScheduleFromGet() {
+    public int parseScheduleFromGet()
+    {
         // rate limiting, 5 minutes
         boolean rateLimited = lastTimeScheduleFetched != null
                 && LocalDateTime.now().isBefore(lastTimeScheduleFetched.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES));
 
         // allows senate members to bypass rate limiting
-        if (rateLimited && !isSenateMember) {
+        if (rateLimited && !isSenateMember)
+        {
             return SithClanPluginConstants.STATUS_RATE_LIMITED;
         }
         // get fresh event schedule
         String jsonSchedule = getEventSchedule();
-        if (jsonSchedule == null) {
+        if (jsonSchedule == null)
+        {
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
         // convert schedule to JSON
@@ -113,18 +120,22 @@ public class SithClanEventSchedule {
      * Saves schedule locally
      * Schedules notifications
      * 
-     * @param scheduleInput String event schedule from plugin text box
+     * @param scheduleInput
+     *                          String event schedule from plugin text box
      * @return int SithClanPluginConstants status code value
      */
-    public int parseScheduleForPost(String scheduleInput) {
-        if (scheduleInput.isBlank()) {
+    public int parseScheduleForPost(String scheduleInput)
+    {
+        if (scheduleInput.isBlank())
+        {
             return SithClanPluginConstants.STATUS_BAD_INPUT;
         }
         // split input into list of strings
         String[] scheduleInputList = scheduleInput.split("\\r?\\n");
         // turn list into event schedule
         ArrayList<SithClanDaySchedule> newSchedule = convertSchedule(scheduleInputList);
-        if (newSchedule == null || newSchedule.isEmpty()) {
+        if (newSchedule == null || newSchedule.isEmpty())
+        {
             return SithClanPluginConstants.STATUS_BAD_INPUT;
         }
         // store schedule as JSON object
@@ -132,7 +143,8 @@ public class SithClanEventSchedule {
 
         // post schedule
         String response = postEventSchedule(data);
-        if (response == null) {
+        if (response == null)
+        {
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
         this.schedule = newSchedule;
@@ -148,11 +160,14 @@ public class SithClanEventSchedule {
      * 
      * @return int SithClanPluginConstants status code value
      */
-    public int parseScheduleFromFile() {
-        try {
+    public int parseScheduleFromFile()
+    {
+        try
+        {
             // load schedule from local file
             String jsonSchedule = fileManager.readScheduleFile();
-            if (jsonSchedule == null || jsonSchedule.isBlank()) {
+            if (jsonSchedule == null || jsonSchedule.isBlank())
+            {
                 return SithClanPluginConstants.STATUS_BAD_INPUT;
             }
             // convert schedule to JSON
@@ -160,7 +175,8 @@ public class SithClanEventSchedule {
             // schedule event notifications
             notificationManager.scheduleNotifications(schedule);
             return SithClanPluginConstants.STATUS_OK;
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             e.printStackTrace();
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
@@ -169,10 +185,12 @@ public class SithClanEventSchedule {
     /**
      * Converts event schedule String list into custom object list
      * 
-     * @param scheduleInput event schedule in String[] list
+     * @param scheduleInput
+     *                          event schedule in String[] list
      * @return ArrayList<SithClanDaySchedule> converted event schedule
      */
-    private ArrayList<SithClanDaySchedule> convertSchedule(String[] scheduleInput) {
+    private ArrayList<SithClanDaySchedule> convertSchedule(String[] scheduleInput)
+    {
         // tracking states
         SithClanDaySchedule currentDay = null;
         SithClanEvent currentEvent = null;
@@ -180,16 +198,21 @@ public class SithClanEventSchedule {
         ArrayList<SithClanDaySchedule> newSchedule = new ArrayList<>();
 
         // iterate through schedule list
-        for (String line : scheduleInput) {
-            if (line.isBlank()) {
+        for (String line : scheduleInput)
+        {
+            if (line.isBlank())
+            {
                 continue;
             }
             line = line.trim();
             // parse event date
-            if (line.startsWith("--")) {
+            if (line.startsWith("--"))
+            {
                 // add previous day created
-                if (currentDay != null) {
-                    if (currentEvent != null) {
+                if (currentDay != null)
+                {
+                    if (currentEvent != null)
+                    {
                         currentDay.getEvents().add(currentEvent);
                         currentEvent = null;
                     }
@@ -202,12 +225,15 @@ public class SithClanEventSchedule {
                 currentDay.setEvents(new ArrayList<>());
             }
             // parse event title
-            else if (line.startsWith("-")) {
-                if (currentDay == null) {
+            else if (line.startsWith("-"))
+            {
+                if (currentDay == null)
+                {
                     return null;
                 }
                 // add previous event created to day
-                if (currentEvent != null) {
+                if (currentEvent != null)
+                {
                     currentDay.getEvents().add(currentEvent);
                 }
                 // create and setup event
@@ -216,28 +242,34 @@ public class SithClanEventSchedule {
                 currentEvent.setEventMiscInfo(new ArrayList<>());
             }
             // parse event time
-            else if (currentEvent != null && currentEvent.getEventTime() == null) {
+            else if (currentEvent != null && currentEvent.getEventTime() == null)
+            {
                 currentEvent.setEventTime(line);
             }
 
             // parse event host (optional info)
-            else if (currentEvent != null && line.startsWith("Hosted by:")) {
+            else if (currentEvent != null && line.startsWith("Hosted by:"))
+            {
                 currentEvent.setEventHost(line.substring(11));
             }
 
             // parse event location
-            else if (currentEvent != null && line.startsWith("🌎")) {
+            else if (currentEvent != null && line.startsWith("🌎"))
+            {
                 currentEvent.setEventLocation(line);
             }
 
             // parse event repetition (optional info)
-            else if (currentEvent != null && line.startsWith("**")) {
+            else if (currentEvent != null && line.startsWith("**"))
+            {
                 currentEvent.setEventRepeated(true);
             }
 
             // parse misc event info (optional info)
-            else {
-                if (currentEvent == null) {
+            else
+            {
+                if (currentEvent == null)
+                {
                     continue;
                 }
                 currentEvent.getEventMiscInfo().add(line);
@@ -245,15 +277,18 @@ public class SithClanEventSchedule {
         }
 
         // add final event
-        if (currentEvent != null) {
-            if (currentDay == null) {
+        if (currentEvent != null)
+        {
+            if (currentDay == null)
+            {
                 return null;
             }
             currentDay.getEvents().add(currentEvent);
         }
 
         // add final day
-        if (currentDay != null) {
+        if (currentDay != null)
+        {
             newSchedule.add(currentDay);
         }
 
@@ -263,13 +298,16 @@ public class SithClanEventSchedule {
     /**
      * Deserializes JSON string to ArrayList of SithClanDaySchedule objects
      * 
-     * @param jsonSchedule JSON String of event schedule
+     * @param jsonSchedule
+     *                         JSON String of event schedule
      * @return ArrayList<SithClanDaySchedule> deserialized event schedule
      */
-    private ArrayList<SithClanDaySchedule> deserializeSchedule(String jsonSchedule) {
+    private ArrayList<SithClanDaySchedule> deserializeSchedule(String jsonSchedule)
+    {
         // convert schedule to JSON
         // java generic type erasure workaround
-        Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>() {
+        Type scheduleType = new TypeToken<ArrayList<SithClanDaySchedule>>()
+        {
         }.getType();
         return gson.fromJson(jsonSchedule, scheduleType);
     }
@@ -277,10 +315,13 @@ public class SithClanEventSchedule {
     /**
      * Loads schedule received during plugin startup
      * 
-     * @param startupSchedule ArrayList<SithClanDaySchedule> event schedule
-     * @param startupJson     String json string for saving
+     * @param startupSchedule
+     *                            ArrayList<SithClanDaySchedule> event schedule
+     * @param startupJson
+     *                            String json string for saving
      */
-    public void loadStartupSchedule(ArrayList<SithClanDaySchedule> startupSchedule, String startupJson) {
+    public void loadStartupSchedule(ArrayList<SithClanDaySchedule> startupSchedule, String startupJson)
+    {
         // save schedule
         this.schedule = startupSchedule;
         // save schedule locally
