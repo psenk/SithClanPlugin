@@ -501,6 +501,11 @@ public class SithClanMembersPanel extends JPanel
      */
     private void updateRosterDateLabel(ZonedDateTime time)
     {
+        if (time == null)
+        {
+            rosterDateLabel.setVisible(false);
+            return;
+        }
         ZonedDateTime timeStamp = time
                 .withZoneSameInstant(ZoneId.systemDefault());
         rosterDateLabel

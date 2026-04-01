@@ -122,6 +122,7 @@ public class SithClanMemberRoster
         }
         // save roster
         this.roster = newRoster;
+        this.dateRosterPosted = ZonedDateTime.now();
         return SithClanPluginConstants.STATUS_OK;
     }
 
