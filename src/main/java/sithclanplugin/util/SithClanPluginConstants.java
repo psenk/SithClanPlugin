@@ -8,11 +8,14 @@ public class SithClanPluginConstants
         // testing
         // TODO: set false before release
         public static final boolean BYPASS_CLAN_CHECK = true;
-        public static final String TEST_PREFIX = "http://127.0.0.1:8787";
-        public static final String EVENT_SCHEDULE_GET_URI = TEST_PREFIX + "/api/eventschedule";
-        public static final String EVENT_SCHEDULE_POST_URI = TEST_PREFIX + "/api/eventschedule/post";
-        public static final String MEMBER_ROSTER_GET_URI = TEST_PREFIX + "/api/memberroster";
-        public static final String MEMBER_ROSTER_POST_URI = TEST_PREFIX + "/api/memberroster/post";
+        //public static final String TEST_PREFIX = "http://127.0.0.1:8787";
+        //public static final String EVENT_SCHEDULE_URI = TEST_PREFIX + "/api/eventschedule";
+        //public static final String MEMBER_ROSTER_URI = TEST_PREFIX + "/api/memberroster";
+        //public static final String ANNOUNCEMENTS_URI = TEST_PREFIX + "/api/announcements";
+        //public static final String ANNOUNCEMENTS_EDIT_URI = TEST_PREFIX + "/api/announcements/edit/";
+        //public static final String ANNOUNCEMENTS_DELETE_URI = TEST_PREFIX + "/api/announcements/delete/";
+        //public static final String VALIDATE_URI = TEST_PREFIX + "/api/validate";
+        
 
         // clan info
         // name
