@@ -1,42 +1,54 @@
 package sithclanplugin.util;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import sithclanplugin.SithClanPluginConfig;
 
-public class SithClanPluginUtil {
+public class SithClanPluginUtil
+{
 
     /**
      * Removes Discord emojis from text
      * 
-     * @param input String text to search for emojis using regex
+     * @param input
+     *                  String text to search for emojis using regex
      * @return String text without emojis
      */
-    public static String removeEmojis(String input) {
+    public static String removeEmojis(String input)
+    {
         return input.replaceAll(":[a-zA-Z0-9_]+:", "").trim();
     }
 
     /**
      * Creates and sends an HTTP GET request
      * 
-     * @param client HttpClient object
-     * @param uri    String GET URI
+     * @param client
+     *                   OkHttpClient object
+     * @param uri
+     *                   String GET URI
      * @return String HTTP response body
      */
-    public static String sendGetRequest(HttpClient client, String uri) {
+    public static String sendGetRequest(OkHttpClient client, String uri)
+    {
         // build HTTP GET request
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uri))
-                .GET()
+        Request request = new Request.Builder()
+                .url(uri)
+                .get()
                 .build();
-        try {
-            // send request and process response
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body();
-        } catch (Exception e) {
+        try (Response response = client.newCall(request).execute())
+        {
+            ResponseBody responseBody = response.body();
+            if (responseBody == null)
+            {
+                return null;
+            }
+            return responseBody.string();
+        } catch (Exception e)
+        {
             e.printStackTrace();
             return null;
         }
@@ -45,29 +57,40 @@ public class SithClanPluginUtil {
     /**
      * Creates and sends HTTP POST request
      * 
-     * @param client HttpClient object
-     * @param apiKey String auth API key
-     * @param data   String data to post
-     * @param uri    String POST URI
+     * @param client
+     *                   OkHttpClient object
+     * @param apiKey
+     *                   String auth API key
+     * @param data
+     *                   String data to post
+     * @param uri
+     *                   String POST URI
      * @return String HTTP Response body with status code
      */
-    public static String sendPostRequest(HttpClient client, String apiKey, String data, String uri) {
+    public static String sendPostRequest(OkHttpClient client, String apiKey, String data, String uri)
+    {
         // build HTTP POST request
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uri))
+        Request request = new Request.Builder()
+                .url(uri)
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + apiKey)
-                .POST(HttpRequest.BodyPublishers.ofString(data))
+                .post(RequestBody.create(MediaType.parse("application/json"), data))
                 .build();
 
-        try {
-            // send request and process response
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200 && response.statusCode() != 201) {
+        try (Response response = client.newCall(request).execute())
+        {
+            ResponseBody responseBody = response.body();
+            if (responseBody == null)
+            {
                 return null;
             }
-            return response.body();
-        } catch (Exception e) {
+            if (response.code() != 200 && response.code() != 201)
+            {
+                return null;
+            }
+            return responseBody.string();
+        } catch (Exception e)
+        {
             e.printStackTrace();
             return null;
         }
@@ -76,29 +99,41 @@ public class SithClanPluginUtil {
     /**
      * Creates and sends HTTP PUT request
      * 
-     * @param client HttpClient object
-     * @param apiKey String auth API key
-     * @param data   String data to put
-     * @param uri    String PUT URI
+     * @param client
+     *                   OkHttpClient object
+     * @param apiKey
+     *                   String auth API key
+     * @param data
+     *                   String data to put
+     * @param uri
+     *                   String PUT URI
      * @return String HTTP Response body with status code
      */
-    public static String sendPutRequest(HttpClient client, String apiKey, String data, String uri) {
+    public static String sendPutRequest(OkHttpClient client, String apiKey, String data, String uri)
+    {
+
         // build HTTP PUT request
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uri))
+        Request request = new Request.Builder()
+                .url(uri)
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + apiKey)
-                .PUT(HttpRequest.BodyPublishers.ofString(data))
+                .put(RequestBody.create(MediaType.parse("application/json"), data))
                 .build();
 
-        try {
-            // send request and process response
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
+        try (Response response = client.newCall(request).execute())
+        {
+            ResponseBody responseBody = response.body();
+            if (responseBody == null)
+            {
                 return null;
             }
-            return response.body();
-        } catch (Exception e) {
+            if (response.code() != 200)
+            {
+                return null;
+            }
+            return responseBody.string();
+        } catch (Exception e)
+        {
             e.printStackTrace();
             return null;
         }
@@ -107,27 +142,38 @@ public class SithClanPluginUtil {
     /**
      * Creates and sends HTTP DELETE request
      * 
-     * @param client HttpClient object
-     * @param apiKey String auth API key
-     * @param uri    String DELETE URI
+     * @param client
+     *                   HttpClient object
+     * @param apiKey
+     *                   String auth API key
+     * @param uri
+     *                   String DELETE URI
      * @return String HTTP Response body with status code
      */
-    public static String sendDeleteRequest(HttpClient client, String apiKey, String uri) {
+    public static String sendDeleteRequest(OkHttpClient client, String apiKey, String uri)
+    {
+
         // build HTTP DELETE request
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uri))
+        Request request = new Request.Builder()
+                .url(uri)
                 .header("Authorization", "Bearer " + apiKey)
-                .DELETE()
+                .delete()
                 .build();
 
-        try {
-            // send request and process response
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
+        try (Response response = client.newCall(request).execute())
+        {
+            ResponseBody responseBody = response.body();
+            if (responseBody == null)
+            {
                 return null;
             }
-            return response.body();
-        } catch (Exception e) {
+            if (response.code() != 200)
+            {
+                return null;
+            }
+            return responseBody.string();
+        } catch (Exception e)
+        {
             e.printStackTrace();
             return null;
         }
@@ -139,22 +185,28 @@ public class SithClanPluginUtil {
      * 
      * @return boolean is API key valid
      */
-    public static boolean validateApiKey(HttpClient client, SithClanPluginConfig config) {
+    public static boolean validateApiKey(OkHttpClient client, SithClanPluginConfig config)
+    {
         // create HTTP GET request
-        HttpRequest validationRequest = HttpRequest.newBuilder()
-                .uri(URI.create(SithClanPluginConstants.VALIDATE_URI))
+        Request request = new Request.Builder()
+                .url(SithClanPluginConstants.VALIDATE_URI)
                 .header("Authorization", "Bearer " + config.apiKey())
-                .GET()
+                .get()
                 .build();
 
-        try {
-            // send request
-            HttpResponse<String> validationResponse = client.send(validationRequest,
-                    HttpResponse.BodyHandlers.ofString());
+        try (Response response = client.newCall(request).execute())
+        {
+            ResponseBody responseBody = response.body();
+            if (responseBody == null)
+            {
+                return false;
+            }
             // validate response
-            boolean isSenateMember = validationResponse.statusCode() == 200;
+            boolean isSenateMember = response.code() == 200;
             return isSenateMember;
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
+            e.printStackTrace();
             return false;
         }
     }
