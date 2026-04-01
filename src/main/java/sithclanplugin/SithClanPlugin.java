@@ -1,7 +1,6 @@
 package sithclanplugin;
 
 import java.awt.image.BufferedImage;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
