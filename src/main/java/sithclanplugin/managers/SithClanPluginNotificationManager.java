@@ -30,7 +30,7 @@ public class SithClanPluginNotificationManager
 
     private final Notifier notifier;
     private final SithClanPluginConfig config;
-    private final ScheduledExecutorService scheduler;
+    private final ScheduledExecutorService executor;
 
     private final List<ScheduledFuture<?>> scheduledNotifications = new ArrayList<>();
 
@@ -41,16 +41,16 @@ public class SithClanPluginNotificationManager
     {
         this.config = config;
         this.notifier = notifier;
-        this.scheduler = Executors.newScheduledThreadPool(1);
+        this.executor = Executors.newScheduledThreadPool(1);
     }
 
     // for testing
     public SithClanPluginNotificationManager(SithClanPluginConfig config, Notifier notifier,
-            ScheduledExecutorService scheduler, SithClanPluginFileManager fileManager)
+            ScheduledExecutorService executor, SithClanPluginFileManager fileManager)
     {
         this.config = config;
         this.notifier = notifier;
-        this.scheduler = scheduler;
+        this.executor = executor;
         this.fileManager = fileManager;
     }
 
@@ -100,7 +100,7 @@ public class SithClanPluginNotificationManager
                     // schedule event
                     if (delay >= 0)
                     {
-                        ScheduledFuture<?> future = scheduler.schedule(() ->
+                        ScheduledFuture<?> future = executor.schedule(() ->
                         {
                             notifier.notify(EVENT_NOTIFICATION + eventTitle);
                         }, delay, TimeUnit.MINUTES);
@@ -127,11 +127,11 @@ public class SithClanPluginNotificationManager
     }
 
     /**
-     * Shuts the scheduler down
+     * Shuts the executor down
      */
     public void shutDown()
     {
         cancelAllNotifications();
-        scheduler.shutdown();
+        executor.shutdown();
     }
 }
