@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -42,7 +43,7 @@ public class SithClanAnnouncements
     }
 
     /**
-     * Creates and sends an HTTP GET request to obtain announcements
+     * Create and send an HTTP GET request to obtain announcements
      * 
      * @return String announcements in an HTTP response body
      */
@@ -52,7 +53,7 @@ public class SithClanAnnouncements
     }
 
     /**
-     * Creates and sends HTTP POST request to post new announcement
+     * Create and send HTTP POST request to post new announcement
      * 
      * @param jsonData
      *                     String JSON announcement in string format
@@ -65,7 +66,7 @@ public class SithClanAnnouncements
     }
 
     /**
-     * Creates and sends HTTP PUT request to edit announcement
+     * Create and send HTTP PUT request to edit announcement
      * 
      * @param jsonData
      *                           String JSON announcement in string format
@@ -81,7 +82,7 @@ public class SithClanAnnouncements
     }
 
     /**
-     * Creates and sends HTTP DELETE request to delete announcement
+     * Create and send HTTP DELETE request to delete announcement
      * 
      * @param announcementId
      *                           int id of announcement
@@ -94,7 +95,7 @@ public class SithClanAnnouncements
     }
 
     /**
-     * Gets clan announcements
+     * Get clan announcements
      * 
      * @return int SithClanPluginConstants status code value
      */
@@ -112,7 +113,7 @@ public class SithClanAnnouncements
     }
 
     /**
-     * Takes String input and converts to JSON for posting
+     * Take String input and convert to JSON for posting
      * 
      * @param announcementInput
      *                              String announcement from plugin text box
@@ -141,11 +142,13 @@ public class SithClanAnnouncements
         {
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
+        // save to cache
+        announcementsList.add(announcement);
         return SithClanPluginConstants.STATUS_OK;
     }
 
     /**
-     * Takes a string input and converts to JSON for editing
+     * Take a string input and convert to JSON for editing
      * 
      * @param id
      *                              int id number of announcement
@@ -176,6 +179,9 @@ public class SithClanAnnouncements
         {
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
+        // replace announcement in cache
+        announcementsList.remove(getAnnouncementById(id));
+        announcementsList.add(announcement);
         return SithClanPluginConstants.STATUS_OK;
     }
 
@@ -198,11 +204,13 @@ public class SithClanAnnouncements
         {
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
+        // remove from cache
+        announcementsList.remove(getAnnouncementById(id));
         return SithClanPluginConstants.STATUS_OK;
     }
 
     /**
-     * Loads announcements received during plugin startup
+     * Load announcements received during plugin startup
      * 
      * @param announcements
      *                          ArrayList<SithClanAnnouncements> announcements
@@ -248,7 +256,7 @@ public class SithClanAnnouncements
     }
 
     /**
-     * Deserializes JSON string to announcement object
+     * Deserialize JSON string to announcement object
      * 
      * @param jsonAnnouncements
      *                              JSON string of announcements
@@ -262,5 +270,20 @@ public class SithClanAnnouncements
         }.getType();
         return gson.fromJson(jsonAnnouncements,
                 announcementType);
+    }
+
+    /**
+     * Return specific announcement by id
+     * 
+     * @param id
+     *               int announcement id number
+     * @return SithClanAnnouncement specific announcement
+     */
+    private SithClanAnnouncement getAnnouncementById(int id)
+    {
+        return announcementsList.stream()
+                .filter(announcement -> announcement.getAnnouncementId() == id)
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Announcement not found with ID: " + id));
     }
 }
