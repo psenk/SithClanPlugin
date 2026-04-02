@@ -317,9 +317,9 @@ public class SithClanMembersPanel extends JPanel
     {
         // container for all info
         JPanel singleMemberPanel = new JPanel();
-        singleMemberPanel.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 160));
-        singleMemberPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 160));
-        singleMemberPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 160));
+        singleMemberPanel.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 160));
+        singleMemberPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 160));
+        singleMemberPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 160));
         singleMemberPanel.setLayout(new BoxLayout(singleMemberPanel, BoxLayout.X_AXIS));
         singleMemberPanel.setBorder(MEMBER_CARD_BORDER);
         singleMemberPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
