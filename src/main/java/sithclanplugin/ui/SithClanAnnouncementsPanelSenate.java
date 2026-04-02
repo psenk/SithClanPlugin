@@ -44,6 +44,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
 
     private final JPanel announcementsListPanel;
     private final JTextArea newAnnouncementTextArea;
+    private final JScrollPane announcementsScrollPane;
 
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
@@ -95,11 +96,15 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         // panel displaying all announcements
         announcementsListPanel = new JPanel();
         announcementsListPanel.setLayout(new BoxLayout(announcementsListPanel, BoxLayout.Y_AXIS));
+        announcementsListPanel.setPreferredSize(
+                new Dimension(PluginPanel.PANEL_WIDTH - 10, announcementsListPanel.getPreferredSize().height));
 
         // scroll pane for announcements
-        JScrollPane announcementsScrollPane = new JScrollPane(announcementsListPanel);
+        announcementsScrollPane = new JScrollPane(announcementsListPanel);
         announcementsScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 300));
-        announcementsScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
+        announcementsScrollPane.setBorder(ANNOUNCEMENT_BORDER);
+        announcementsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        announcementsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         // panel for new announcements
         JPanel newAnnouncementPanel = new JPanel();
@@ -200,9 +205,9 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         singleAnnouncementPanel.setLayout(new BoxLayout(singleAnnouncementPanel, BoxLayout.Y_AXIS));
         singleAnnouncementPanel
                 .setPreferredSize(
-                        new Dimension(PluginPanel.PANEL_WIDTH - 10, singleAnnouncementPanel.getPreferredSize().height));
-        singleAnnouncementPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 80));
-        singleAnnouncementPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 200));
+                        new Dimension(PluginPanel.PANEL_WIDTH, 90));
+        singleAnnouncementPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 90));
+        singleAnnouncementPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 90));
         singleAnnouncementPanel.setBorder(ANNOUNCEMENT_BORDER);
 
         // create text area to type announcement
@@ -210,6 +215,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         announcementTextArea.setEditable(false);
         announcementTextArea.setLineWrap(true);
         announcementTextArea.setWrapStyleWord(true);
+        announcementTextArea.setRows(3);
 
         // row of buttons, edit and delete announcements
         JPanel buttonPanel = new JPanel();
@@ -256,13 +262,20 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                 int status = announcements.parseAnnouncementForDelete(announcement.getAnnouncementId());
                 SwingUtilities.invokeLater(() ->
                 {
-                    handleStatus(status);
+                    if (status == SithClanPluginConstants.STATUS_OK)
+                    {
+                        JOptionPane.showMessageDialog(null, "Announcement Deleted");
+                    } else
+                    {
+                        handleStatus(status);
+                    }
                     displayAnnouncements(announcements.getAnnouncementsList());
                 });
             });
         });
 
         buttonPanel.add(editAnnouncementButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         buttonPanel.add(deleteAnnouncementButton);
 
         singleAnnouncementPanel.add(announcementTextArea);
@@ -294,6 +307,12 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         }
         announcementsListPanel.revalidate();
         announcementsListPanel.repaint();
+
+        // scroll back up
+        SwingUtilities.invokeLater(() ->
+        {
+            announcementsScrollPane.getVerticalScrollBar().setValue(0);
+        });
     }
 
     /**
