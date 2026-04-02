@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -53,9 +54,12 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     private static final String EDIT_ANNOUNCEMENT_BUTTON = "Edit";
     private static final String SAVE_ANNOUNCEMENT_BUTTON = "Save";
     private static final String DELETE_ANNOUNCEMENT_BUTTON = "Delete";
-    private static final String SUCCESSFUL_POST = "Posted successfully.";
+    private static final String SUCCESSFUL_POST = "Announcement Updated";
+    private static final String RESOURCE_CREATED = "Announcement Created";
     private static final String BAD_INPUT_WARNING = "There is a problem with your input.";
     private static final String NOT_FOUND_WARNING = "Unable to post.";
+    private static final Border ANNOUNCEMENT_BORDER = BorderFactory.createMatteBorder(1, 1, 1, 1,
+            ColorScheme.BORDER_COLOR);
 
     SithClanAnnouncementsPanelSenate()
     {
@@ -181,8 +185,8 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     }
 
     /**
-     * Creates single announcement panel for display
-     * Allows to edit and delete announcements
+     * Create single announcement panel for display
+     * Allow edit and delete of announcements
      * 
      * @param announcement
      *                         SithClanAnnouncement announcement to display
@@ -194,6 +198,12 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         // create announcement panel
         JPanel singleAnnouncementPanel = new JPanel();
         singleAnnouncementPanel.setLayout(new BoxLayout(singleAnnouncementPanel, BoxLayout.Y_AXIS));
+        singleAnnouncementPanel
+                .setPreferredSize(
+                        new Dimension(PluginPanel.PANEL_WIDTH - 10, singleAnnouncementPanel.getPreferredSize().height));
+        singleAnnouncementPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 80));
+        singleAnnouncementPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 200));
+        singleAnnouncementPanel.setBorder(ANNOUNCEMENT_BORDER);
 
         // create text area to type announcement
         JTextArea announcementTextArea = new JTextArea(announcement.getAnnouncementText());
@@ -230,6 +240,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                             // reset button state, lock text area
                             announcementTextArea.setEditable(false);
                             editAnnouncementButton.setText(EDIT_ANNOUNCEMENT_BUTTON);
+                            displayAnnouncements(announcements.getAnnouncementsList());
                         }
                         handleStatus(status);
                     });
@@ -246,6 +257,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                 SwingUtilities.invokeLater(() ->
                 {
                     handleStatus(status);
+                    displayAnnouncements(announcements.getAnnouncementsList());
                 });
             });
         });
@@ -261,7 +273,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     }
 
     /**
-     * Creates and posts all announcements to display
+     * Create and post all announcements to display
      * 
      * @param announcements
      *                          ArrayList<SithClanAnnouncement> list of
@@ -285,7 +297,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     }
 
     /**
-     * Handles response status of announcement event
+     * Handle response status of announcement event
      * 
      * @param statusCode
      *                       int returned status code
@@ -297,6 +309,9 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
             case SithClanPluginConstants.STATUS_OK:
                 JOptionPane.showMessageDialog(null,
                         SUCCESSFUL_POST);
+                break;
+            case SithClanPluginConstants.STATUS_RESOURCE_CREATED:
+                JOptionPane.showMessageDialog(null, RESOURCE_CREATED);
                 break;
             case SithClanPluginConstants.STATUS_BAD_INPUT:
                 JOptionPane.showMessageDialog(null,
