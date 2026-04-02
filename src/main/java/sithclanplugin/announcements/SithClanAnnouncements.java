@@ -143,8 +143,12 @@ public class SithClanAnnouncements
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
         // save to cache
-        announcementsList.add(announcement);
-        return SithClanPluginConstants.STATUS_OK;
+        String newAnnouncements = getAnnouncements();
+        if (newAnnouncements != null)
+        {
+            this.announcementsList = deserializeAnnouncements(newAnnouncements);
+        }
+        return SithClanPluginConstants.STATUS_RESOURCE_CREATED;
     }
 
     /**
@@ -205,7 +209,13 @@ public class SithClanAnnouncements
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
         // remove from cache
-        announcementsList.remove(getAnnouncementById(id));
+        try
+        {
+            announcementsList.remove(getAnnouncementById(id));
+        } catch (NoSuchElementException e)
+        {
+            e.printStackTrace();
+        }
         return SithClanPluginConstants.STATUS_OK;
     }
 
