@@ -43,7 +43,7 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Creates and sends an HTTP GET request to obtain the event roster
+     * Create and send an HTTP GET request to obtain the event roster
      * 
      * @return String member roster in an HTTP response body
      */
@@ -53,7 +53,7 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Creates and sends HTTP POST request to post new member roster
+     * Create and send HTTP POST request to post new member roster
      * 
      * @param jsonData
      *                     String JSON member roster in string format
@@ -66,7 +66,7 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Gets member roster
+     * Get member roster
      * 
      * TODO: rate limiting?
      * 
@@ -86,7 +86,7 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Takes String input and converts to JSON format for posting
+     * Take String input and converts to JSON format for posting
      * 
      * @param rosterInput
      *                        String member roster from plugin text box
@@ -127,7 +127,7 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Converts member roster String list into custom object list
+     * Convert member roster String list into custom object list
      * 
      * @param rosterInput
      *                        member roster in String[] list
@@ -166,7 +166,7 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Deserializes JSON string to HashMap roster
+     * Deserialize JSON string to HashMap roster
      * 
      * @param jsonRoster
      *                       JSON String of member roster
@@ -187,7 +187,7 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Searches for member in roster by name
+     * Searche for member in roster by name
      * 
      * @param name
      *                 String name of member to search for
@@ -199,7 +199,7 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Returns size of member roster
+     * Return size of member roster
      * 
      * @return int size of member roster
      */

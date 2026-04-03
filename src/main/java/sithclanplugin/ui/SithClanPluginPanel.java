@@ -183,7 +183,7 @@ public class SithClanPluginPanel extends PluginPanel
     }
 
     /**
-     * Shows main panel after successful clan verification
+     * Show main panel after successful clan verification
      */
     public void showMainPanel()
     {

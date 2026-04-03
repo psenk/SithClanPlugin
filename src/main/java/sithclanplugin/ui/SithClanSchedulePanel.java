@@ -150,7 +150,7 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
-     * Displays event schedule to panel
+     * Display event schedule to panel
      */
     public void displaySchedule()
     {
@@ -204,7 +204,7 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
-     * Creates panel to hold each days events
+     * Create panel to hold each days events
      * 
      * @return JPanel panel that holds events
      */
@@ -219,7 +219,7 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
-     * Creates interactive date label for each day on schedule
+     * Create interactive date label for each day on schedule
      * 
      * @param date
      *                        String date of events for label
@@ -262,7 +262,7 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
-     * Creates panel for single event
+     * Create panel for single event
      * 
      * @param event
      *                  SithClanEvent object with all event data
@@ -365,7 +365,7 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
-     * Converts Discord channel IDs into links
+     * Convert Discord channel IDs into links
      * 
      * @param text
      *                 String text to search for Discord channel IDs
@@ -404,7 +404,7 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
-     * Turns world location into quick world hop link
+     * Turn world location into quick world hop link
      * 
      * @param location
      *                     event location
@@ -440,7 +440,7 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
-     * Checks if event schedule is expired
+     * Check if event schedule is expired
      * 
      * @param inputDay
      *                     String last day of the current event schedule
@@ -462,7 +462,7 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
-     * Handles the returned status of the schedule
+     * Handle the returned status of the schedule
      * 
      * @param status
      *                   int status code

@@ -146,7 +146,7 @@ public class SithClanSenatePanel extends JPanel
     }
 
     /**
-     * Creates collapsible text area panel
+     * Create collapsible text area panel
      * 
      * @param labelText
      *                        String text of collapsible panel label
@@ -226,7 +226,7 @@ public class SithClanSenatePanel extends JPanel
     }
 
     /**
-     * Handles response status of post event
+     * Handle response status of post event
      * 
      * @param statusCode
      *                        int returned status code of post

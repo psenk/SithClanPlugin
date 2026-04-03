@@ -307,7 +307,7 @@ public class SithClanMembersPanel extends JPanel
     }
 
     /**
-     * Creates a single member card panel for display
+     * Create a single member card panel for display
      * 
      * @param member
      *                   SithClanMember member to place on card
@@ -434,7 +434,7 @@ public class SithClanMembersPanel extends JPanel
     }
 
     /**
-     * Adds single member card to display
+     * Add single member card to display
      * 
      * @param member
      *                   SithClanMember member to display
@@ -453,7 +453,7 @@ public class SithClanMembersPanel extends JPanel
     }
 
     /**
-     * Lazily displays a list of all members in clan
+     * Lazily display a list of all members in clan
      * 
      * @param rosterCollection
      *                             collection of clan members
@@ -475,7 +475,7 @@ public class SithClanMembersPanel extends JPanel
     }
 
     /**
-     * Loads the next page of member cards
+     * Load next page of member cards
      */
     private void loadNextPage()
     {
@@ -494,7 +494,7 @@ public class SithClanMembersPanel extends JPanel
     }
 
     /**
-     * Converts roster date into user local time
+     * Convert roster date into user local time
      * 
      * @param time
      *                 ZonedDateTime roster date

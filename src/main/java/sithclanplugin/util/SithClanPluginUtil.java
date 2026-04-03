@@ -16,7 +16,7 @@ public class SithClanPluginUtil
     private static final int TIMEOUT_SECONDS = 60;
 
     /**
-     * Removes Discord emojis from text
+     * Remove Discord emojis from text
      * 
      * @param input
      *                  String text to search for emojis using regex
@@ -28,7 +28,7 @@ public class SithClanPluginUtil
     }
 
     /**
-     * Creates and sends an HTTP GET request
+     * Create and send an HTTP GET request
      * 
      * @param client
      *                   OkHttpClient object
@@ -59,7 +59,7 @@ public class SithClanPluginUtil
     }
 
     /**
-     * Creates and sends HTTP POST request
+     * Create and send HTTP POST request
      * 
      * @param client
      *                   OkHttpClient object
@@ -108,7 +108,7 @@ public class SithClanPluginUtil
     }
 
     /**
-     * Creates and sends HTTP PUT request
+     * Create and send HTTP PUT request
      * 
      * @param client
      *                   OkHttpClient object
@@ -151,7 +151,7 @@ public class SithClanPluginUtil
     }
 
     /**
-     * Creates and sends HTTP DELETE request
+     * Create and send HTTP DELETE request
      * 
      * @param client
      *                   OkHttpClient object
@@ -191,8 +191,8 @@ public class SithClanPluginUtil
     }
 
     /**
-     * Validates API key in plugin config via HTTP GET request
-     * Saves senate member state
+     * Validate API key in plugin config via HTTP GET request
+     * Save senate member state
      * 
      * @return boolean is API key valid
      */
