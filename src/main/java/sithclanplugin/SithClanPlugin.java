@@ -222,7 +222,7 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Allows config to be accessible from RL settings panel
+	 * Allow config to be accessible from RL settings panel
 	 * 
 	 * @param configManager
 	 *                          ConfigManager configuration manager object
@@ -246,7 +246,7 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Finds World from list and passes forward to hop
+	 * Find World from list and passes forward to hop
 	 * 
 	 * @param worldId
 	 *                    int id of world to hop to
@@ -267,7 +267,7 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Hops to provided world on next gametick
+	 * Hop to provided world on next gametick
 	 * 
 	 * @param world
 	 *                  World world to hop to in game

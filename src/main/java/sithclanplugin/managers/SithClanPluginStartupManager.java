@@ -27,7 +27,7 @@ public class SithClanPluginStartupManager
     private SithClanAnnouncements announcements;
 
     /**
-     * Creates and sends an HTTP GET request to obtain the plugin startup info
+     * Create and send an HTTP GET request to obtain the plugin startup info
      * 
      * @return String startup info in an HTTP response body
      */
@@ -37,7 +37,7 @@ public class SithClanPluginStartupManager
     }
 
     /**
-     * Gets startup info
+     * Get startup info
      * 
      * @return int SithClanPluginConstants status code value
      */
@@ -54,6 +54,12 @@ public class SithClanPluginStartupManager
         return SithClanPluginConstants.STATUS_OK;
     }
 
+    /**
+     * Deserialize startup info from JSON string
+     * 
+     * @param jsonStartupInfo
+     *                            String JSON startup data
+     */
     private void deserializeStartupInfo(String jsonStartupInfo)
     {
         // convert startup info to JSON
