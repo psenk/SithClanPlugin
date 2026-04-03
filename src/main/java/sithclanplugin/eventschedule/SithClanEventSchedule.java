@@ -57,7 +57,7 @@ public class SithClanEventSchedule
     }
 
     /**
-     * Creates and sends an HTTP GET request to obtain the event schedule
+     * Create and send an HTTP GET request to obtain the event schedule
      * 
      * @return String event schedule string in HTTP response body
      */
@@ -67,7 +67,7 @@ public class SithClanEventSchedule
     }
 
     /**
-     * Creates and sends HTTP POST request to post new event schedule
+     * Create and send HTTP POST request to post new event schedule
      * 
      * @param jsonData
      *                     String JSON event schedule in string format
@@ -80,10 +80,10 @@ public class SithClanEventSchedule
     }
 
     /**
-     * Gets event schedule
+     * Get event schedule
      * Includes 5 min rate limiting
-     * Saves schedule locally
-     * Schedules event notifications
+     * Save schedule locally
+     * Schedule event notifications
      * 
      * @return int SithClanPluginConstants status code value
      */
@@ -116,9 +116,9 @@ public class SithClanEventSchedule
     }
 
     /**
-     * Takes String input and converts to JSON format for posting
-     * Saves schedule locally
-     * Schedules notifications
+     * Take String input and converts to JSON format for posting
+     * Save schedule locally
+     * Schedule notifications
      * 
      * @param scheduleInput
      *                          String event schedule from plugin text box
@@ -156,7 +156,7 @@ public class SithClanEventSchedule
     }
 
     /**
-     * Gets event schedule from local file
+     * Get event schedule from local file
      * 
      * @return int SithClanPluginConstants status code value
      */
@@ -183,7 +183,7 @@ public class SithClanEventSchedule
     }
 
     /**
-     * Converts event schedule String list into custom object list
+     * Convert event schedule String list into custom object list
      * 
      * @param scheduleInput
      *                          event schedule in String[] list
@@ -296,7 +296,7 @@ public class SithClanEventSchedule
     }
 
     /**
-     * Deserializes JSON string to ArrayList of SithClanDaySchedule objects
+     * Deserialize JSON string to ArrayList of SithClanDaySchedule objects
      * 
      * @param jsonSchedule
      *                         JSON String of event schedule
@@ -313,7 +313,7 @@ public class SithClanEventSchedule
     }
 
     /**
-     * Loads schedule received during plugin startup
+     * Load schedule received during plugin startup
      * 
      * @param startupSchedule
      *                            ArrayList<SithClanDaySchedule> event schedule

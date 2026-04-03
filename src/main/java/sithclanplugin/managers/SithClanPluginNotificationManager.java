@@ -53,7 +53,7 @@ public class SithClanPluginNotificationManager
     }
 
     /**
-     * Schedules event notifications
+     * Schedule event notifications
      * 
      * @param schedule
      *                     ArrayList<SithClanDaySchedule> clan event schedule
@@ -113,7 +113,7 @@ public class SithClanPluginNotificationManager
     }
 
     /**
-     * Cancels all active notifications and clears scheduled notifications
+     * Cancel all active notifications and clears scheduled notifications
      */
     private void cancelAllNotifications()
     {
@@ -125,7 +125,7 @@ public class SithClanPluginNotificationManager
     }
 
     /**
-     * Shuts the executor down
+     * Shut executor down
      */
     public void shutDown()
     {
