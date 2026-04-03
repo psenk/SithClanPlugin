@@ -8,18 +8,27 @@ public class SithClanPluginConstants
         // testing
         // TODO: set false before release
         public static final boolean BYPASS_CLAN_CHECK = true;
-        //public static final String TEST_PREFIX = "http://127.0.0.1:8787";
-        //public static final String EVENT_SCHEDULE_URI = TEST_PREFIX + "/api/eventschedule";
-        //public static final String MEMBER_ROSTER_URI = TEST_PREFIX + "/api/memberroster";
-        //public static final String ANNOUNCEMENTS_URI = TEST_PREFIX + "/api/announcements";
-        //public static final String ANNOUNCEMENTS_EDIT_URI = TEST_PREFIX + "/api/announcements/edit/";
-        //public static final String ANNOUNCEMENTS_DELETE_URI = TEST_PREFIX + "/api/announcements/delete/";
-        //public static final String VALIDATE_URI = TEST_PREFIX + "/api/validate";
-        
+        // public static final String TEST_PREFIX = "http://127.0.0.1:8787";
+        // public static final String EVENT_SCHEDULE_URI = TEST_PREFIX +
+        // "/api/eventschedule";
+        // public static final String MEMBER_ROSTER_URI = TEST_PREFIX +
+        // "/api/memberroster";
+        // public static final String ANNOUNCEMENTS_URI = TEST_PREFIX +
+        // "/api/announcements";
+        // public static final String ANNOUNCEMENTS_EDIT_URI = TEST_PREFIX +
+        // "/api/announcements/edit/";
+        // public static final String ANNOUNCEMENTS_DELETE_URI = TEST_PREFIX +
+        // "/api/announcements/delete/";
+        // public static final String VALIDATE_URI = TEST_PREFIX + "/api/validate";
 
         // clan info
         // name
         public static final String CLAN_NAME = "Sith";
+
+        // discord
+        public static final String SITH_DISCORD_SERVER_ID = "741153043776667658";
+        public static final String DISCORD_CHANNEL_URI = "https://discord.com/channels/" + SITH_DISCORD_SERVER_ID + "/";
+        public static final String EVENT_LOG_WEBHOOK_URI = "";
 
         // ranks
         public static final String[] CLAN_RANKS =
@@ -85,7 +94,7 @@ public class SithClanPluginConstants
         public static final String STORED_SCHEDULE_NAME = "sithclaneventschedule.txt";
         public static final String STORED_SUBSCRIPTIONS_NAME = "sithclannotifiedevents.txt";
 
-        // uris
+        // endpoints
         public static final String URI_PREFIX = "https://sithclanplugin.psenk168.workers.dev";
         public static final String STARTUP_URI = URI_PREFIX + "/api/startup";
         public static final String EVENT_SCHEDULE_URI = URI_PREFIX + "/api/eventschedule";
@@ -94,10 +103,6 @@ public class SithClanPluginConstants
         public static final String ANNOUNCEMENTS_EDIT_URI = URI_PREFIX + "/api/announcements/edit/";
         public static final String ANNOUNCEMENTS_DELETE_URI = URI_PREFIX + "/api/announcements/delete/";
         public static final String VALIDATE_URI = URI_PREFIX + "/api/validate";
-
-        // discord
-        public static final String SITH_DISCORD_SERVER_ID = "741153043776667658";
-        public static final String DISCORD_CHANNEL_URI = "https://discord.com/channels/" + SITH_DISCORD_SERVER_ID + "/";
 
         // timing
         private static final String DATE_FORMAT = "M/d/yyyy";
