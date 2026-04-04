@@ -1,6 +1,7 @@
 package sithclanplugin.announcements;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -31,10 +32,16 @@ public class SithClanAnnouncements
     @Inject
     private Gson gson;
 
-    private ArrayList<SithClanAnnouncement> announcementsList;
-
     @Setter
     private ZonedDateTime announcementsUpdated;
+
+    @Setter
+    private boolean isSenateMember = false;
+
+    private ArrayList<SithClanAnnouncement> announcementsList;
+    private LocalDateTime lastTimeAnnouncementsFetched;
+
+    private static final int ANNOUNCEMENTS_FETCH_COOLDOWN_MINUTES = 5;
 
     public SithClanAnnouncements()
     {
@@ -96,11 +103,21 @@ public class SithClanAnnouncements
 
     /**
      * Get clan announcements
+     * Include 5 min rate limiting
      * 
      * @return int SithClanPluginConstants status code value
      */
     public int parseAnnouncementsFromGet()
     {
+        // rate limiting, 5 minutes
+        boolean rateLimited = lastTimeAnnouncementsFetched != null && LocalDateTime.now()
+                .isBefore(lastTimeAnnouncementsFetched.plusMinutes(ANNOUNCEMENTS_FETCH_COOLDOWN_MINUTES));
+
+        if (rateLimited && !isSenateMember)
+        {
+            return SithClanPluginConstants.STATUS_RATE_LIMITED;
+        }
+
         // get announcements
         String jsonAnnouncements = getAnnouncements();
         if (jsonAnnouncements == null)
@@ -109,6 +126,8 @@ public class SithClanAnnouncements
         }
         // convert announcements to JSON
         this.announcementsList = deserializeAnnouncements(jsonAnnouncements);
+        // refresh rate limiting timestamp
+        this.lastTimeAnnouncementsFetched = LocalDateTime.now();
         return SithClanPluginConstants.STATUS_OK;
     }
 
@@ -229,6 +248,7 @@ public class SithClanAnnouncements
     {
         this.announcementsList = announcements;
         setAnnouncementsUpdated(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
+        this.lastTimeAnnouncementsFetched = LocalDateTime.now();
     }
 
     /**
