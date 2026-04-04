@@ -48,8 +48,8 @@ public class SithClanSenatePanel extends JPanel
     private final JLabel uploadingLabel;
 
     private static final String SENATE_OPTIONS_LABEL = "Senate Options";
-    private static final String UPDATE_SCHEDULE_LABEL = "Event Schedule";
-    private static final String UPDATE_ROSTER_LABEL = "Member Roster";
+    private static final String UPDATE_SCHEDULE_LABEL = "Post Event Schedule";
+    private static final String UPDATE_ROSTER_LABEL = "Post Member Roster";
     private static final String UPDATE_BUTTON = "Update";
     private static final String EVENT_TEXT_AREA_DEFAULT = "Post Event Schedule Here";
     private static final String ROSTER_TEXT_AREA_DEFAULT = "Post Member Roster Here";

@@ -48,7 +48,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
 
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
-    private static final String ANNOUNCEMENTS_LABEL = "Announcements";
+    private static final String ANNOUNCEMENTS_LABEL = "Update Announcements";
     private static final String ADD_NEW_ANNOUNCEMENT = "Add New";
     private static final String NEW_ANNOUNCEMENT_DEFAULT_TEXT = "Type Announcement Here";
     private static final String POST_ANNOUNCEMENT_BUTTON = "Post";
