@@ -66,6 +66,7 @@ public class SithClanSchedulePanel extends JPanel
     private SithClanEventSchedule eventSchedule;
 
     private final JLabel scheduleExpiredLabel;
+    private final Component scheduleExpiredSpace;
     private final JPanel scheduleContainer;
     private final Icon rightArrowIcon;
     private final Icon downArrowIcon;
@@ -98,7 +99,9 @@ public class SithClanSchedulePanel extends JPanel
         scheduleExpiredLabel.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
         scheduleExpiredLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         scheduleExpiredLabel.setVisible(false);
-        this.add(Box.createRigidArea(new Dimension(0, 5)));
+        scheduleExpiredSpace = Box.createRigidArea(new Dimension(0, 5));
+        scheduleExpiredSpace.setVisible(false);
+        this.add(scheduleExpiredSpace);
 
         // organization, contains panel title and expiration warning
         JPanel topPanel = new JPanel();
@@ -455,9 +458,11 @@ public class SithClanSchedulePanel extends JPanel
         if (finalDate.isBefore(LocalDate.now()))
         {
             scheduleExpiredLabel.setVisible(true);
+            scheduleExpiredSpace.setVisible(true);
         } else
         {
             scheduleExpiredLabel.setVisible(false);
+            scheduleExpiredSpace.setVisible(false);
         }
     }
 
