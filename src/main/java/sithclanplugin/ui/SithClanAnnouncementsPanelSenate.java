@@ -52,6 +52,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     private static final String ADD_NEW_ANNOUNCEMENT = "Add New";
     private static final String NEW_ANNOUNCEMENT_DEFAULT_TEXT = "Type Announcement Here";
     private static final String POST_ANNOUNCEMENT_BUTTON = "Post";
+    private static final String CANCEL_ANNOUNCEMENT_BUTTON = "Cancel";
     private static final String EDIT_ANNOUNCEMENT_BUTTON = "Edit";
     private static final String SAVE_ANNOUNCEMENT_BUTTON = "Save";
     private static final String DELETE_ANNOUNCEMENT_BUTTON = "Delete";
@@ -124,12 +125,23 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
             }
         });
 
+        // panel for new announcement buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+
         JButton postAnnouncementButton = new JButton(POST_ANNOUNCEMENT_BUTTON);
         postAnnouncementButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        JButton cancelAnnouncementButton = new JButton(CANCEL_ANNOUNCEMENT_BUTTON);
+        cancelAnnouncementButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        buttonPanel.add(postAnnouncementButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        buttonPanel.add(cancelAnnouncementButton);
+
         newAnnouncementPanel.add(newAnnouncementTextArea);
         newAnnouncementPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        newAnnouncementPanel.add(postAnnouncementButton);
+        newAnnouncementPanel.add(buttonPanel);
         newAnnouncementPanel.setVisible(false);
 
         // setup collapsible panel
@@ -182,6 +194,14 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                     newAnnouncementPanel.setVisible(false);
                 });
             });
+        });
+
+        cancelAnnouncementButton.addActionListener(e ->
+        {
+            newAnnouncementTextArea.setText(NEW_ANNOUNCEMENT_DEFAULT_TEXT);
+            newAnnouncementPanel.setVisible(false);
+            announcementsListPanel.revalidate();
+            announcementsListPanel.repaint();
         });
 
         mainPanel.add(announcementsPanelLabel);
