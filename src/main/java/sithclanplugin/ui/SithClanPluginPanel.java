@@ -46,6 +46,9 @@ public class SithClanPluginPanel extends PluginPanel
     private final SithClanSenatePanel senatePanel;
 
     @Getter
+    private final SithClanAnnouncementsPanel announcementsPanel;
+
+    @Getter
     private final JButton senateButton;
 
     private final CardLayout cardLayout;
@@ -72,11 +75,13 @@ public class SithClanPluginPanel extends PluginPanel
 
     @Inject
     SithClanPluginPanel(SithClanSchedulePanel schedulePanel,
-            SithClanSenatePanel senatePanel, SithClanMembersPanel membersPanel)
+            SithClanSenatePanel senatePanel, SithClanMembersPanel membersPanel,
+            SithClanAnnouncementsPanel announcementsPanel)
     {
         this.schedulePanel = schedulePanel;
         this.membersPanel = membersPanel;
         this.senatePanel = senatePanel;
+        this.announcementsPanel = announcementsPanel;
 
         // main panel
         cardLayout = new CardLayout();
@@ -124,6 +129,8 @@ public class SithClanPluginPanel extends PluginPanel
 
         // top panel
         navPanel.add(pluginLabel);
+        navPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        navPanel.add(announcementsPanel);
         navPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         navPanel.add(buttonContainer);
 
