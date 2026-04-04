@@ -177,7 +177,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                 int status = announcements.parseAnnouncementForPost(newAnnouncementTextArea.getText());
                 SwingUtilities.invokeLater(() ->
                 {
-                    handleStatus(status);
+                    handleAnnouncementStatus(status);
                     displayAnnouncements(announcements.getAnnouncementsList());
                     newAnnouncementPanel.setVisible(false);
                 });
@@ -248,7 +248,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                             editAnnouncementButton.setText(EDIT_ANNOUNCEMENT_BUTTON);
                             displayAnnouncements(announcements.getAnnouncementsList());
                         }
-                        handleStatus(status);
+                        handleAnnouncementStatus(status);
                     });
                 });
             }
@@ -267,7 +267,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                         JOptionPane.showMessageDialog(null, "Announcement Deleted");
                     } else
                     {
-                        handleStatus(status);
+                        handleAnnouncementStatus(status);
                     }
                     displayAnnouncements(announcements.getAnnouncementsList());
                 });
@@ -321,7 +321,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
      * @param statusCode
      *                       int returned status code
      */
-    private void handleStatus(int statusCode)
+    private void handleAnnouncementStatus(int statusCode)
     {
         switch (statusCode)
         {
