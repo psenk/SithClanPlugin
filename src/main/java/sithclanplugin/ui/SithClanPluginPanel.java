@@ -61,6 +61,7 @@ public class SithClanPluginPanel extends PluginPanel
     private final JPanel notClanMemberPanel;
 
     private static final String PLUGIN_LABEL = "Sith Clan Plugin";
+    private static final String PLUGIN_NAVIGATION_LABEL = "Plugin Navigation";
     private static final String SCHEDULE_BUTTON = "Event Schedule";
     private static final String MEMBERS_BUTTON = "Member Info";
     private static final String SENATE_BUTTON = "Senate Options";
@@ -127,11 +128,17 @@ public class SithClanPluginPanel extends PluginPanel
         JPanel buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonContainer.add(buttonPanel);
 
+        // navigation area label
+        JLabel navLabel = new JLabel(PLUGIN_NAVIGATION_LABEL);
+        navLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         // top panel
         navPanel.add(pluginLabel);
         navPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         navPanel.add(announcementsPanel);
         navPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        navPanel.add(navLabel);
+        navPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         navPanel.add(buttonContainer);
 
         this.add(navPanel, BorderLayout.NORTH);
