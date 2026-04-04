@@ -125,6 +125,7 @@ public class SithClanAnnouncementsPanel extends JPanel
         this.add(announcementsPanelLabel);
         this.add(collapsiblePanel);
         this.add(Box.createRigidArea(new Dimension(0, 10)));
+        this.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.BORDER_COLOR));
     }
 
     /**
