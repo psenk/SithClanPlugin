@@ -33,6 +33,7 @@ import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
 import okhttp3.OkHttpClient;
+import sithclanplugin.announcements.SithClanAnnouncements;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
 import sithclanplugin.managers.SithClanPluginFileManager;
 import sithclanplugin.managers.SithClanPluginNotificationManager;
@@ -78,10 +79,13 @@ public class SithClanPlugin extends Plugin
 	private SithClanPluginNotificationManager notificationManager;
 
 	@Inject
-	private Provider<SithClanPluginPanel> uiPanel;
+	private SithClanEventSchedule eventSchedule;
 
 	@Inject
-	private SithClanEventSchedule eventSchedule;
+	private SithClanAnnouncements announcements;
+
+	@Inject
+	private Provider<SithClanPluginPanel> uiPanel;
 
 	private NavigationButton uiNavigationButton;
 	private boolean pendingClanCheck = false;
@@ -133,9 +137,13 @@ public class SithClanPlugin extends Plugin
 			// validate API key of Senate members
 			boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
 			eventSchedule.setSenateMember(isSenateMember);
+			announcements.setSenateMember(isSenateMember);
 			SwingUtilities.invokeLater(() ->
 			{
+				// display event schedule
 				uiPanel.get().getSchedulePanel().displaySchedule();
+				// display clan announcements
+				uiPanel.get().getAnnouncementsPanel().displayAnnouncements();
 				// display senate options button if senate
 				uiPanel.get().getSenateButton().setVisible(isSenateMember);
 			});
