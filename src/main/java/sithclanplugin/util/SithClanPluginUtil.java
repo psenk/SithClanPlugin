@@ -43,19 +43,7 @@ public class SithClanPluginUtil
                 .url(uri)
                 .get()
                 .build();
-        try (Response response = client.newCall(request).execute())
-        {
-            ResponseBody responseBody = response.body();
-            if (responseBody == null)
-            {
-                return null;
-            }
-            return responseBody.string();
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return null;
-        }
+        return executeRequest(client, request);
     }
 
     /**
@@ -88,23 +76,7 @@ public class SithClanPluginUtil
                 .post(RequestBody.create(MediaType.parse("application/json"), data))
                 .build();
 
-        try (Response response = clientWithTimeout.newCall(request).execute())
-        {
-            ResponseBody responseBody = response.body();
-            if (responseBody == null)
-            {
-                return null;
-            }
-            if (response.code() != 200 && response.code() != 201)
-            {
-                return null;
-            }
-            return responseBody.string();
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return null;
-        }
+        return executeRequest(clientWithTimeout, request);
     }
 
     /**
@@ -131,23 +103,7 @@ public class SithClanPluginUtil
                 .put(RequestBody.create(MediaType.parse("application/json"), data))
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            ResponseBody responseBody = response.body();
-            if (responseBody == null)
-            {
-                return null;
-            }
-            if (response.code() != 200)
-            {
-                return null;
-            }
-            return responseBody.string();
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return null;
-        }
+        return executeRequest(client, request);
     }
 
     /**
@@ -171,23 +127,7 @@ public class SithClanPluginUtil
                 .delete()
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            ResponseBody responseBody = response.body();
-            if (responseBody == null)
-            {
-                return null;
-            }
-            if (response.code() != 200)
-            {
-                return null;
-            }
-            return responseBody.string();
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return null;
-        }
+        return executeRequest(client, request);
     }
 
     /**
@@ -219,6 +159,32 @@ public class SithClanPluginUtil
         {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    /**
+     * Executes HTTP request
+     * 
+     * @param client
+     *                    OkHttpClient client to send requests
+     * @param request
+     *                    Request HTTP request object
+     * @return String response body
+     */
+    private static String executeRequest(OkHttpClient client, Request request)
+    {
+        try (Response response = client.newCall(request).execute())
+        {
+            ResponseBody responseBody = response.body();
+            if (responseBody == null || !response.isSuccessful())
+            {
+                return null;
+            }
+            return responseBody.string();
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
         }
     }
 }
