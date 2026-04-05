@@ -89,15 +89,13 @@ public class SithClanEventSchedule
      */
     public int parseScheduleFromGet()
     {
-        // rate limiting, 5 minutes
-        boolean rateLimited = lastTimeScheduleFetched != null
-                && LocalDateTime.now().isBefore(lastTimeScheduleFetched.plusMinutes(SCHEDULE_FETCH_COOLDOWN_MINUTES));
-
-        // allows senate members to bypass rate limiting
-        if (rateLimited && !isSenateMember)
+        // rate limiting
+        if (SithClanPluginUtil.isRateLimited(lastTimeScheduleFetched, SCHEDULE_FETCH_COOLDOWN_MINUTES,
+                isSenateMember))
         {
             return SithClanPluginConstants.STATUS_RATE_LIMITED;
         }
+
         // get fresh event schedule
         String jsonSchedule = getEventSchedule();
         if (jsonSchedule == null)

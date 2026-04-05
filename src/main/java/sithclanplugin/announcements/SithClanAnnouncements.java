@@ -109,11 +109,9 @@ public class SithClanAnnouncements
      */
     public int parseAnnouncementsFromGet()
     {
-        // rate limiting, 5 minutes
-        boolean rateLimited = lastTimeAnnouncementsFetched != null && LocalDateTime.now()
-                .isBefore(lastTimeAnnouncementsFetched.plusMinutes(ANNOUNCEMENTS_FETCH_COOLDOWN_MINUTES));
-
-        if (rateLimited && !isSenateMember)
+        // rate limiting
+        if (SithClanPluginUtil.isRateLimited(lastTimeAnnouncementsFetched, ANNOUNCEMENTS_FETCH_COOLDOWN_MINUTES,
+                isSenateMember))
         {
             return SithClanPluginConstants.STATUS_RATE_LIMITED;
         }
