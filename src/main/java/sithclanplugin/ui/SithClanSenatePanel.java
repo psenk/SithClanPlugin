@@ -41,7 +41,9 @@ public class SithClanSenatePanel extends JPanel
     @Inject
     private SithClanMemberRoster memberRoster;
 
-    private final SithClanAnnouncementsPanelSenate announcementsPanelSenate;
+    @Inject
+    private SithClanAnnouncementsPanelSenate announcementsPanelSenate;
+
     private final JTextArea senatePostScheduleTextArea;
     private final JTextArea senatePostRosterTextArea;
     private final JPanel statusPanel;
@@ -61,11 +63,8 @@ public class SithClanSenatePanel extends JPanel
     private static final String UPLOADING = "Uploading...";
 
     @Inject
-    SithClanSenatePanel(SithClanAnnouncementsPanelSenate announcementsPanelSenate)
+    SithClanSenatePanel()
     {
-
-        this.announcementsPanelSenate = announcementsPanelSenate;
-
         final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
         final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
 
