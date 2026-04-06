@@ -160,6 +160,10 @@ public class SithClanMemberRoster
 
             // add member to roster
             newRoster.put(newMember.getMemberName().toLowerCase(), newMember);
+            if (newMember.getMemberAltName() != null && !newMember.getMemberAltName().isBlank())
+            {
+                newRoster.put(newMember.getMemberAltName().toLowerCase(), newMember);
+            }
 
         }
         return newRoster;
@@ -179,9 +183,14 @@ public class SithClanMemberRoster
         ZonedDateTime utcTime = ZonedDateTime.parse(rosterResponse.getDate());
         this.dateRosterPosted = utcTime.withZoneSameInstant(ZoneId.systemDefault());
         HashMap<String, SithClanMember> roster = new HashMap<>();
+        // create member map
         for (SithClanMember member : rosterResponse.getRoster())
         {
             roster.put(member.getMemberName().toLowerCase(), member);
+            if (member.getMemberAltName() != null && !member.getMemberAltName().isBlank())
+            {
+                roster.put(member.getMemberAltName().toLowerCase(), member);
+            }
         }
         return roster;
     }
@@ -196,29 +205,5 @@ public class SithClanMemberRoster
     public SithClanMember getMemberByName(String memberName)
     {
         return roster.get(memberName.toLowerCase());
-    }
-
-    /**
-     * Search for member in roster by alt name
-     * 
-     * @param altMemberName String alt name of member to search for
-     * @return SithClanMember member searched for or null
-     */
-    public SithClanMember getMemberByAltName(String altMemberName)
-    {
-        return roster.values().stream()
-                .filter(member -> member.getMemberAltName() != null
-                        && member.getMemberAltName().equalsIgnoreCase(altMemberName))
-                .findFirst().orElse(null);
-    }
-
-    /**
-     * Return size of member roster
-     * 
-     * @return int size of member roster
-     */
-    public int getClanSize()
-    {
-        return roster.size();
     }
 }
