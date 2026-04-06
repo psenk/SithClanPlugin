@@ -21,7 +21,7 @@ public interface SithClanPluginConfig extends Config
 		return 15;
 	}
 
-	@ConfigItem(keyName = "eventLogWebhook", name = "Alert Time Buffer", description = "Discord webhook URL to post event logs from plugin", position = 3)
+	@ConfigItem(keyName = "eventLogWebhook", name = "Discord Event Log Webhook URL", description = "Discord webhook URL to post event logs", position = 3)
 	default String eventLogWebhook()
 	{
 		return "".trim();
