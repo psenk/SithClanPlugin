@@ -37,16 +37,19 @@ public class SithClanPluginPanel extends PluginPanel
     private SithClanPluginConfig config;
 
     @Getter
+    private final SithClanAnnouncementsPanel announcementsPanel;
+
+    @Getter
     private final SithClanSchedulePanel schedulePanel;
 
     @Getter
     private final SithClanMembersPanel membersPanel;
 
     @Getter
-    private final SithClanSenatePanel senatePanel;
+    private final SithClanEventLogPanel eventLogPanel;
 
     @Getter
-    private final SithClanAnnouncementsPanel announcementsPanel;
+    private final SithClanSenatePanel senatePanel;
 
     @Getter
     private final JButton senateButton;
@@ -64,12 +67,14 @@ public class SithClanPluginPanel extends PluginPanel
     private static final String PLUGIN_NAVIGATION_LABEL = "Plugin Navigation";
     private static final String SCHEDULE_BUTTON = "Event Schedule";
     private static final String MEMBERS_BUTTON = "Member Info";
+    private static final String EVENT_LOG_BUTTON = "Post Event Log";
     private static final String SENATE_BUTTON = "Senate Options";
     private static final String MAIN_CARD = "main";
     private static final String NOT_LOGGED_IN_CARD = "notLoggedIn";
     private static final String NOT_CLAN_MEMBER_CARD = "notClanMember";
     private static final String SCHEDULE_CARD = "schedule";
     private static final String MEMBERS_CARD = "members";
+    private static final String EVENT_LOG_CARD = "log";
     private static final String SENATE_CARD = "senate";
     private static final String NOT_LOGGED_IN_MESSAGE = "<html><center>Please log in and turn on clan chat to use this plugin.</center></html>";
     private static final String NON_MEMBER_MESSAGE = "<html><center>Sorry, this plugin is for members of the Sith clan only.  Message Kyanize in-game or kyanize. in Discord for joining info!</center></html>";
@@ -77,12 +82,13 @@ public class SithClanPluginPanel extends PluginPanel
     @Inject
     SithClanPluginPanel(SithClanSchedulePanel schedulePanel,
             SithClanSenatePanel senatePanel, SithClanMembersPanel membersPanel,
-            SithClanAnnouncementsPanel announcementsPanel)
+            SithClanAnnouncementsPanel announcementsPanel, SithClanEventLogPanel eventLogPanel)
     {
         this.schedulePanel = schedulePanel;
         this.membersPanel = membersPanel;
         this.senatePanel = senatePanel;
         this.announcementsPanel = announcementsPanel;
+        this.eventLogPanel = eventLogPanel;
 
         // main panel
         cardLayout = new CardLayout();
@@ -95,6 +101,7 @@ public class SithClanPluginPanel extends PluginPanel
         cardPanel.setLayout(cardLayout);
         cardPanel.add(schedulePanel, SCHEDULE_CARD);
         cardPanel.add(membersPanel, MEMBERS_CARD);
+        cardPanel.add(eventLogPanel, EVENT_LOG_CARD);
         cardPanel.add(senatePanel, SENATE_CARD);
 
         // button container
@@ -114,12 +121,17 @@ public class SithClanPluginPanel extends PluginPanel
         scheduleButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
         JButton membersButton = new JButton(MEMBERS_BUTTON);
         membersButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        JButton eventLogButton = new JButton(EVENT_LOG_BUTTON);
+        eventLogButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
         senateButton = new JButton(SENATE_BUTTON);
         senateButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
         senateButton.setVisible(false);
+
         buttonPanel.add(scheduleButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(membersButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        buttonPanel.add(eventLogButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         buttonPanel.add(senateButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 15)));
@@ -152,6 +164,11 @@ public class SithClanPluginPanel extends PluginPanel
         membersButton.addActionListener(e ->
         {
             cardLayout.show(cardPanel, MEMBERS_CARD);
+        });
+
+        eventLogButton.addActionListener(e ->
+        {
+            cardLayout.show(cardPanel, EVENT_LOG_CARD);
         });
 
         senateButton.addActionListener(e ->
