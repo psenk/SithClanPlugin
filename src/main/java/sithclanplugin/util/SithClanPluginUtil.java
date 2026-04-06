@@ -220,8 +220,14 @@ public class SithClanPluginUtil
      */
     public static String sendEventLogToDiscord(OkHttpClient client, String webhookUrl, String message)
     {
+        // replace escape characters
+        String newMessage = message.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r");
+                
         // create JSON string
-        String jsonBody = "{\"content\": " + "\"" + message.replace("\"", "\\\"") + "\"}";
+        String jsonBody = "{\"content\": " + "\"" + newMessage + "\"}";
 
         // build HTTP POST request
         Request request = new Request.Builder()
@@ -229,6 +235,8 @@ public class SithClanPluginUtil
                 .post(RequestBody.create(MediaType.parse("application/json"), jsonBody))
                 .build();
 
+        System.out.println(request);
+        System.out.println("url " + webhookUrl);
         return executeRequest(client, request);
     }
 }
