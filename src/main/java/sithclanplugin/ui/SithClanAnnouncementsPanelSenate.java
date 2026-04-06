@@ -1,5 +1,6 @@
 package sithclanplugin.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
@@ -92,7 +93,6 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         JButton addNewButton = new JButton(ADD_NEW_ANNOUNCEMENT);
 
         topButtonPanel.add(addNewButton);
-        topButtonPanel.add(Box.createRigidArea(new Dimension(5, 0)));
 
         // panel displaying all announcements
         announcementsListPanel = new JPanel();
@@ -147,7 +147,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         // setup collapsible panel
         JPanel announcementsCollapsiblePanel = new JPanel();
         announcementsCollapsiblePanel.setLayout((new BoxLayout(announcementsCollapsiblePanel, BoxLayout.Y_AXIS)));
-        announcementsCollapsiblePanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        announcementsCollapsiblePanel.add(Box.createRigidArea(new Dimension(0, 10)));
         announcementsCollapsiblePanel.add(topButtonPanel);
         announcementsCollapsiblePanel.add(Box.createRigidArea(new Dimension(0, 10)));
         announcementsCollapsiblePanel.add(newAnnouncementPanel);
