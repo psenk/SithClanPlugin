@@ -206,4 +206,29 @@ public class SithClanPluginUtil
             return false;
         return lastFetched != null && LocalDateTime.now().isBefore(lastFetched.plusMinutes((cooldownMinutes)));
     }
+
+    /**
+     * Create and send HTTP POST request to Discord webhook
+     * 
+     * @param client
+     *                       OkHttpClient client to send request
+     * @param webhookUrl
+     *                       String Discord webhook URL
+     * @param message
+     *                       String content to post
+     * @return String HTTP Response body
+     */
+    public static String sendEventLogToDiscord(OkHttpClient client, String webhookUrl, String message)
+    {
+        // create JSON string
+        String jsonBody = "{\"content\": " + "\"" + message.replace("\"", "\\\"") + "\"}";
+
+        // build HTTP POST request
+        Request request = new Request.Builder()
+                .url(webhookUrl)
+                .post(RequestBody.create(MediaType.parse("application/json"), jsonBody))
+                .build();
+
+        return executeRequest(client, request);
+    }
 }
