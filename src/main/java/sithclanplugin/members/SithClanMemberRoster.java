@@ -187,15 +187,29 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Searche for member in roster by name
+     * Search for member in roster by name
      * 
      * @param name
      *                 String name of member to search for
-     * @return SithClanMember member searched for
+     * @return SithClanMember member searched for or null
      */
     public SithClanMember getMemberByName(String memberName)
     {
         return roster.get(memberName.toLowerCase());
+    }
+
+    /**
+     * Search for member in roster by alt name
+     * 
+     * @param altMemberName String alt name of member to search for
+     * @return SithClanMember member searched for or null
+     */
+    public SithClanMember getMemberByAltName(String altMemberName)
+    {
+        return roster.values().stream()
+                .filter(member -> member.getMemberAltName() != null
+                        && member.getMemberAltName().equalsIgnoreCase(altMemberName))
+                .findFirst().orElse(null);
     }
 
     /**
