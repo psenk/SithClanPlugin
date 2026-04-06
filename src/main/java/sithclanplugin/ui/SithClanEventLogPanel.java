@@ -57,6 +57,8 @@ public class SithClanEventLogPanel extends JPanel
     private static final String POST_SUCCESS = "Event log posted to Discord";
     private static final String POST_FAILURE = "Failed to post event log to Discord";
 
+    private static final int DISCORD_MAX_LENGTH = 2000;
+
     SithClanEventLogPanel()
     {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -130,13 +132,16 @@ public class SithClanEventLogPanel extends JPanel
             return;
         }
 
-        // post to Discord
-        String response = SithClanPluginUtil.sendEventLogToDiscord(httpClient, webhookUrl, eventLog);
-        System.out.println(response);
-        if (response == null)
+        ArrayList<String> messages = buildDiscordMessages(eventLog);
+        for (String message : messages)
         {
-            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, POST_FAILURE));
-            return;
+            // post to Discord
+            String response = SithClanPluginUtil.sendEventLogToDiscord(httpClient, webhookUrl, message);
+            if (response == null)
+            {
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, POST_FAILURE));
+                return;
+            }
         }
         SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, POST_SUCCESS));
     }
@@ -243,5 +248,118 @@ public class SithClanEventLogPanel extends JPanel
             return false;
         }
         return true;
+    }
+
+    /**
+     * Builds Discord messages
+     * Splits message if required
+     * 
+     * @param eventLog
+     *                     String raw event log
+     * @return ArrayList<String> list of messages to send
+     */
+    private ArrayList<String> buildDiscordMessages(String eventLog)
+    {
+        // only one post needed
+        if (eventLog.length() <= DISCORD_MAX_LENGTH)
+        {
+            ArrayList<String> singleMessage = new ArrayList<>();
+            singleMessage.add(eventLog + "\n*Sent from Sith Clan Plugin, message 1 of 1*");
+            return singleMessage;
+        }
+
+        // split event log
+        String[] lines = eventLog.split("\\r?\\n");
+
+        // separate header, members, and footer
+        StringBuilder header = new StringBuilder();
+        StringBuilder tableHeader = new StringBuilder();
+        ArrayList<String> memberLines = new ArrayList<>();
+        StringBuilder footer = new StringBuilder();
+        boolean inTable = false;
+        boolean tableEnded = false;
+
+        // build header and messages
+        for (String line : lines)
+        {
+            if (!inTable && line.trim().equals("```"))
+            {
+                inTable = true;
+                continue;
+            }
+            if (!inTable)
+            {
+                header.append(line).append("\n");
+                continue;
+            }
+
+            if (inTable && !tableEnded)
+            {
+                if (line.trim().equals("```"))
+                {
+                    tableEnded = true;
+                    continue;
+                }
+                if (line.trim().startsWith(TABLE_HEADER.trim()) || line.trim().startsWith("---"))
+                {
+                    tableHeader.append(line).append("\n");
+                    continue;
+                }
+                if (!line.isBlank())
+                {
+                    memberLines.add(line);
+                }
+            }
+            if (tableEnded)
+            {
+                footer.append(line).append("\n");
+            }
+        }
+
+        // split members in half
+        int mid = memberLines.size() / 2;
+        ArrayList<String> firstHalf = new ArrayList<>(memberLines.subList(0, mid));
+        ArrayList<String> secondHalf = new ArrayList<>(memberLines.subList(mid, memberLines.size()));
+
+        // reconstruct two messages
+        ArrayList<String> messages = new ArrayList<>();
+        messages.add(buildMessage(header.toString(), tableHeader.toString(), firstHalf, footer.toString(), 1, 2));
+        messages.add(buildMessage(header.toString(), tableHeader.toString(), secondHalf, footer.toString(), 2, 2));
+        return messages;
+    }
+
+    /**
+     * Reconstruct event log from header and member list
+     * 
+     * @param header
+     *                          String raw event log header
+     * @param tableHeader
+     *                          String column header and separator
+     * @param memberLines
+     *                          ArrayList<String> list of members in message
+     * @param footer
+     *                          String footer of message
+     * @param messageNumber
+     *                          int index of message
+     * @param totalMessages
+     *                          int total number of messages being sent
+     * @return String raw message output
+     */
+    private String buildMessage(String header, String tableHeader, ArrayList<String> memberLines, String footer,
+            int messageNumber, int totalMessages)
+    {
+        StringBuilder message = new StringBuilder();
+        message.append(header);
+        message.append("```\n");
+        message.append(tableHeader);
+        for (String line : memberLines)
+        {
+            message.append(line).append("\n");
+        }
+        message.append("```\n");
+        message.append(footer);
+        message.append("*Sent from Sith Clan Plugin, message ").append(messageNumber).append(" of ")
+                .append(totalMessages).append("*");
+        return message.toString();
     }
 }
