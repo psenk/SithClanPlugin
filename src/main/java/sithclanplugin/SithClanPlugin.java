@@ -13,6 +13,7 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.clan.ClanChannel;
+import net.runelite.api.events.ClanChannelChanged;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.gameval.InterfaceID;
@@ -231,6 +232,32 @@ public class SithClanPlugin extends Plugin
 			client.hopToWorld(quickHopTargetWorld);
 			quickHopTargetWorld = null;
 			displaySwitcherAttempts = 0;
+		}
+	}
+
+	/**
+	 * Run whenever players clan channel changes (joined, leaves, kicked)
+	 * 
+	 * @param event
+	 *                  ClanChannelChanged event object
+	 */
+	@Subscribe
+	public void onClanChannelChanged(ClanChannelChanged event)
+	{
+		ClanChannel clanChannel = client.getClanChannel();
+
+		if (clanChannel == null)
+		{
+			// player left or was kicked
+			SwingUtilities.invokeLater(() -> uiPanel.get().userNotInClan());
+		} else if (clanChannel.getName().equalsIgnoreCase(SithClanPluginConstants.CLAN_NAME))
+		{
+			// player in correct clan or rejoined
+			SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
+		} else
+		{
+			// player in different clan
+			SwingUtilities.invokeLater(() -> uiPanel.get().userNotInClan());
 		}
 	}
 
