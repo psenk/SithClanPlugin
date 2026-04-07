@@ -6,7 +6,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -28,29 +31,17 @@ public class SithClanPluginNotificationManager
     private ScheduledExecutorService executor;
 
     @Inject
-    private SithClanPluginFileManager fileManager;
-
-    private final Notifier notifier;
-    private final SithClanPluginConfig config;
-    private final List<ScheduledFuture<?>> scheduledNotifications = new ArrayList<>();
-
-    private static final String EVENT_NOTIFICATION = "Clan event starting soon: "; // trailing space intentional
+    private Notifier notifier;
 
     @Inject
-    public SithClanPluginNotificationManager(SithClanPluginConfig config, Notifier notifier)
-    {
-        this.config = config;
-        this.notifier = notifier;
-    }
+    private SithClanPluginFileManager fileManager;
 
-    // for testing
-    public SithClanPluginNotificationManager(SithClanPluginConfig config, Notifier notifier,
-            ScheduledExecutorService executor, SithClanPluginFileManager fileManager)
-    {
-        this.config = config;
-        this.notifier = notifier;
-        this.fileManager = fileManager;
-    }
+    @Inject
+    private SithClanPluginConfig config;
+
+    private final Map<String, ScheduledFuture<?>> scheduledNotifications = new HashMap<>();
+
+    private static final String EVENT_NOTIFICATION = "Clan event starting soon: "; // trailing space intentional
 
     /**
      * Schedule event notifications
@@ -60,14 +51,31 @@ public class SithClanPluginNotificationManager
      */
     public void scheduleNotifications(ArrayList<SithClanDaySchedule> schedule)
     {
-        // dont continue if setting off in configs
+        // check if enabled in config
         if (!config.eventNotifications())
         {
             return;
         }
-        // fresh start
-        cancelAllNotifications();
 
+        // cancel notifications if no longer in schedule
+        Set<String> incomingEvents = new HashSet<>();
+        for (SithClanDaySchedule day : schedule)
+        {
+            for (SithClanEvent event : day.getEvents())
+            {
+                incomingEvents.add(SithClanPluginUtil.removeEmojis(event.getEventTitle()));
+            }
+        }
+
+        scheduledNotifications.entrySet().removeIf(entry ->
+        {
+            if (!incomingEvents.contains(entry.getKey()))
+            {
+                entry.getValue().cancel(false);
+                return true;
+            }
+            return false;
+        });
         // iterate thru schedule
         for (SithClanDaySchedule day : schedule)
         {
@@ -75,13 +83,20 @@ public class SithClanPluginNotificationManager
             for (SithClanEvent event : day.getEvents())
             {
                 String eventTitle = SithClanPluginUtil.removeEmojis(event.getEventTitle());
+
+                // skip if already scheduled
+                if (scheduledNotifications.containsKey(eventTitle))
+                {
+                    continue;
+                }
+
                 // checks if event subscribed to in config file
                 if (!fileManager.isSubscribed(eventTitle))
                 {
                     continue;
                 }
-                String currentTime = event.getEventTime();
 
+                String currentTime = event.getEventTime();
                 try
                 {
                     // convert to users local time
@@ -101,8 +116,9 @@ public class SithClanPluginNotificationManager
                         ScheduledFuture<?> future = executor.schedule(() ->
                         {
                             notifier.notify(EVENT_NOTIFICATION + eventTitle);
+                            scheduledNotifications.remove(eventTitle);
                         }, delay, TimeUnit.MINUTES);
-                        scheduledNotifications.add(future);
+                        scheduledNotifications.put(eventTitle, future);
                     }
                 } catch (Exception e)
                 {
@@ -117,7 +133,7 @@ public class SithClanPluginNotificationManager
      */
     private void cancelAllNotifications()
     {
-        for (ScheduledFuture<?> future : scheduledNotifications)
+        for (ScheduledFuture<?> future : scheduledNotifications.values())
         {
             future.cancel(false);
         }
