@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
@@ -97,7 +98,7 @@ public class SithClanPluginFileManager
         try
         {
             // read schedule from file
-            String jsonSchedule = new String(Files.readAllBytes(storedScheduleFile.toPath()));
+            String jsonSchedule = Files.readString(storedScheduleFile.toPath(), StandardCharsets.UTF_8);
             return jsonSchedule.isBlank() ? null : jsonSchedule;
         } catch (Exception e)
         {
@@ -140,7 +141,8 @@ public class SithClanPluginFileManager
         try
         {
             // load subscriptions from file
-            String input = new String(Files.readAllBytes(storedSubscriptionsFile.toPath()));
+            String input = Files.readString(storedSubscriptionsFile.toPath(), StandardCharsets.UTF_8);
+
             if (input.isBlank())
             {
                 cachedSubscriptions = new ArrayList<>();
