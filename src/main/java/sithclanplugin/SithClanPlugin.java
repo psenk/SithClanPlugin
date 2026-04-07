@@ -12,7 +12,7 @@ import com.google.inject.Provides;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.clan.ClanChannel;
+import net.runelite.api.clan.ClanSettings;
 import net.runelite.api.events.ClanChannelChanged;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -193,15 +193,13 @@ public class SithClanPlugin extends Plugin
 		// clan check logic
 		if (pendingClanCheck)
 		{
-			ClanChannel clanChannel = client.getClanChannel();
-			if (clanChannel != null)
+			if (client.getClanSettings() != null)
 			{
 				pendingClanCheck = false;
-				boolean isMember = clanChannel.getName().equalsIgnoreCase(SithClanPluginConstants.CLAN_NAME);
 				// if not in clan hide panels
 				SwingUtilities.invokeLater(() ->
 				{
-					if (isMember)
+					if (isInClan())
 					{
 						uiPanel.get().showMainPanel();
 					} else
@@ -244,21 +242,16 @@ public class SithClanPlugin extends Plugin
 	@Subscribe
 	public void onClanChannelChanged(ClanChannelChanged event)
 	{
-		ClanChannel clanChannel = client.getClanChannel();
-
-		if (clanChannel == null)
+		SwingUtilities.invokeLater(() ->
 		{
-			// player left or was kicked
-			SwingUtilities.invokeLater(() -> uiPanel.get().userNotInClan());
-		} else if (clanChannel.getName().equalsIgnoreCase(SithClanPluginConstants.CLAN_NAME))
-		{
-			// player in correct clan or rejoined
-			SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
-		} else
-		{
-			// player in different clan
-			SwingUtilities.invokeLater(() -> uiPanel.get().userNotInClan());
-		}
+			if (isInClan())
+			{
+				uiPanel.get().showMainPanel();
+			} else
+			{
+				uiPanel.get().userNotInClan();
+			}
+		});
 	}
 
 	/**
@@ -348,5 +341,23 @@ public class SithClanPlugin extends Plugin
 				.build());
 		quickHopTargetWorld = rsWorld;
 		displaySwitcherAttempts = 0;
+	}
+
+	/**
+	 * Check is player in clan
+	 * 
+	 * @return boolean if member in clan
+	 */
+	private boolean isInClan()
+	{
+		ClanSettings clanSettings = client.getClanSettings();
+
+		// not in a clan
+		if (clanSettings == null)
+		{
+			return false;
+		}
+
+		return clanSettings.getName().equalsIgnoreCase(SithClanPluginConstants.CLAN_NAME);
 	}
 }
