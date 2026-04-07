@@ -358,8 +358,8 @@ public class SithClanEventLogPanel extends JPanel
         }
         message.append("```\n");
         message.append(footer);
-        message.append("*Sent from Sith Clan Plugin, message ").append(messageNumber).append(" of ")
-                .append(totalMessages).append("*");
+        message.append("\n**Sent from Sith Clan Plugin, message ").append(messageNumber).append(" of ")
+                .append(totalMessages).append("**");
         return message.toString();
     }
 }
