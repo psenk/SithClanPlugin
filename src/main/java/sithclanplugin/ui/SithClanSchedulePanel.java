@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.regex.Matcher;
@@ -66,6 +67,7 @@ public class SithClanSchedulePanel extends JPanel
     private SithClanEventSchedule eventSchedule;
 
     private final JLabel scheduleExpiredLabel;
+    private final JLabel nextEventLabel;
     private final Component scheduleExpiredSpace;
     private final JPanel scheduleContainer;
     private final Icon rightArrowIcon;
@@ -81,6 +83,10 @@ public class SithClanSchedulePanel extends JPanel
     private static final String SCHEDULE_UNOBTAINABLE_WARNING = "Unable to obtain schedule.";
     private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
+    private static final String NO_NEXT_EVENT = "Next Event: None";
+    private static final String NEXT_EVENT = "Next Event";
+
+    private static final String NO_UPCOMING_EVENTS = "No upcoming events";
 
     SithClanSchedulePanel()
     {
@@ -111,6 +117,22 @@ public class SithClanSchedulePanel extends JPanel
         topPanel.add(scheduleExpiredLabel);
 
         this.add(topPanel);
+
+        // next event panel
+        nextEventLabel = new JLabel(NO_NEXT_EVENT);
+        nextEventLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        nextEventLabel.setForeground(ColorScheme.BRAND_ORANGE);
+        nextEventLabel.setVisible(false);
+
+        JPanel nextEventPanel = new JPanel();
+        nextEventPanel.setLayout(new BoxLayout(nextEventPanel, BoxLayout.Y_AXIS));
+        nextEventPanel.setBorder(
+                BorderFactory.createTitledBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR), NEXT_EVENT));
+        nextEventPanel.add(nextEventLabel);
+        nextEventPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        this.add(nextEventPanel);
+        this.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // contains event schedule
         scheduleContainer = new JPanel();
@@ -201,6 +223,9 @@ public class SithClanSchedulePanel extends JPanel
         }
         // check if schedule is expired
         checkScheduleExpired(currentDay);
+
+        // display next event
+        updateNextEventDisplay();
 
         scheduleContainer.revalidate();
         scheduleContainer.repaint();
@@ -440,6 +465,79 @@ public class SithClanSchedulePanel extends JPanel
             }
         });
         return worldLink;
+    }
+
+    /**
+     * Find and display next event
+     */
+    private void updateNextEventDisplay()
+    {
+        if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty())
+        {
+            nextEventLabel.setVisible(false);
+            return;
+        }
+
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime nextEventTime = null;
+        String nextEventName = null;
+
+        // loop through schedule
+        for (SithClanDaySchedule day : eventSchedule.getSchedule())
+        {
+            for (SithClanEvent event : day.getEvents())
+            {
+                try
+                {
+                    ZonedDateTime estTime = ZonedDateTime.of(
+                            LocalDate.parse(day.getDate(), SithClanPluginConstants.DATE_FORMATTER),
+                            LocalTime.parse(event.getEventTime(), SithClanPluginConstants.TIME_FORMATTER),
+                            SithClanPluginConstants.EST_ZONE);
+                    ZonedDateTime localTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
+
+                    // check event hasn't happened yet
+                    if (localTime.isAfter(now))
+                    {
+                        if (nextEventTime == null || localTime.isBefore(nextEventTime))
+                        {
+                            nextEventTime = localTime;
+                            nextEventName = SithClanPluginUtil.removeEmojis(event.getEventTitle());
+                        }
+                    }
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // no future events found
+        if (nextEventTime == null)
+        {
+            nextEventLabel.setText(NO_UPCOMING_EVENTS);
+            nextEventLabel.setVisible(true);
+            return;
+        }
+
+        // calculate how long until event
+        long minutesUntil = ChronoUnit.MINUTES.between(now, nextEventTime);
+        long hours = minutesUntil / 60;
+        long minutes = minutesUntil % 60;
+
+        // display time
+        String countdown;
+        if (hours > 0)
+        {
+            countdown = "in " + hours + "h " + minutes + "m";
+        } else
+        {
+            countdown = "in " + minutes + "m";
+        }
+
+        String timeString = nextEventTime.format(SithClanPluginConstants.TIME_FORMATTER);
+
+        nextEventLabel.setText("<html><b>" + nextEventName + "</b><br />" + timeString + " (" + countdown + ")</html>");
+        nextEventLabel.setVisible(true);
     }
 
     /**
