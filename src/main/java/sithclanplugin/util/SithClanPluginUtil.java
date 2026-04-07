@@ -225,7 +225,7 @@ public class SithClanPluginUtil
                 .replace("\"", "\\\"")
                 .replace("\n", "\\n")
                 .replace("\r", "\\r");
-                
+
         // create JSON string
         String jsonBody = "{\"content\": " + "\"" + newMessage + "\"}";
 
@@ -235,8 +235,6 @@ public class SithClanPluginUtil
                 .post(RequestBody.create(MediaType.parse("application/json"), jsonBody))
                 .build();
 
-        System.out.println(request);
-        System.out.println("url " + webhookUrl);
         return executeRequest(client, request);
     }
 }

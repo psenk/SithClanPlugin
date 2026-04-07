@@ -28,7 +28,6 @@ public class SithClanPluginConstants
         // discord
         public static final String SITH_DISCORD_SERVER_ID = "741153043776667658";
         public static final String DISCORD_CHANNEL_URI = "https://discord.com/channels/" + SITH_DISCORD_SERVER_ID + "/";
-        public static final String EVENT_LOG_WEBHOOK_URI = "";
 
         // ranks
         public static final String[] CLAN_RANKS =
