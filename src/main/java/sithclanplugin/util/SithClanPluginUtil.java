@@ -3,6 +3,8 @@ package sithclanplugin.util;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
+import com.google.gson.JsonObject;
+
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -220,14 +222,10 @@ public class SithClanPluginUtil
      */
     public static String sendEventLogToDiscord(OkHttpClient client, String webhookUrl, String message)
     {
-        // replace escape characters
-        String newMessage = message.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r");
-
         // create JSON string
-        String jsonBody = "{\"content\": " + "\"" + newMessage + "\"}";
+        JsonObject body = new JsonObject();
+        body.addProperty("content", message);
+        String jsonBody = body.toString();
 
         // build HTTP POST request
         Request request = new Request.Builder()
