@@ -38,6 +38,7 @@ import sithclanplugin.eventschedule.SithClanEventSchedule;
 import sithclanplugin.managers.SithClanPluginFileManager;
 import sithclanplugin.managers.SithClanPluginNotificationManager;
 import sithclanplugin.managers.SithClanPluginStartupManager;
+import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.ui.SithClanPluginPanel;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
@@ -83,6 +84,9 @@ public class SithClanPlugin extends Plugin
 
 	@Inject
 	private SithClanAnnouncements announcements;
+
+	@Inject
+	private SithClanMemberRoster memberRoster;
 
 	@Inject
 	private Provider<SithClanPluginPanel> uiPanel;
@@ -138,6 +142,7 @@ public class SithClanPlugin extends Plugin
 			boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
 			eventSchedule.setSenateMember(isSenateMember);
 			announcements.setSenateMember(isSenateMember);
+			memberRoster.setSenateMember(isSenateMember);
 			SwingUtilities.invokeLater(() ->
 			{
 				// display event schedule
