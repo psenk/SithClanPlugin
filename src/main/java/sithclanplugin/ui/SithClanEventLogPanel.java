@@ -201,7 +201,7 @@ public class SithClanEventLogPanel extends JPanel
     private boolean validateMembers(String[] eventLog)
     {
         // load roster if not cached
-        if (memberRoster.getRoster() == null || memberRoster.getRoster().isEmpty())
+        if (memberRoster.getRoster().isEmpty())
         {
             int status = memberRoster.parseRosterFromGet();
             if (status != SithClanPluginConstants.STATUS_OK)
