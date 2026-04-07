@@ -1,5 +1,6 @@
 package sithclanplugin.members;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -10,6 +11,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import lombok.Getter;
+import lombok.Setter;
 import okhttp3.OkHttpClient;
 import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.dto.RosterResponse;
@@ -32,9 +34,15 @@ public class SithClanMemberRoster
 
     @Inject
     private SithClanPluginConfig config;
+    
+    @Setter
+    private boolean isSenateMember;
 
     private HashMap<String, SithClanMember> roster;
     private ZonedDateTime dateRosterPosted;
+    private LocalDateTime lastTimeRosterFetched;
+
+    private static final int ROSTER_FETCH_COOLDOWN_MINUTES = 30;
 
     public SithClanMemberRoster()
     {
@@ -67,13 +75,18 @@ public class SithClanMemberRoster
 
     /**
      * Get member roster
-     * 
-     * TODO: rate limiting?
+     * Includes rate limiting of 30 mins
      * 
      * @return int SithClanPluginConstants status code value
      */
     public int parseRosterFromGet()
     {
+        // rate limiting
+        if (SithClanPluginUtil.isRateLimited(lastTimeRosterFetched, ROSTER_FETCH_COOLDOWN_MINUTES, isSenateMember))
+        {
+            return SithClanPluginConstants.STATUS_RATE_LIMITED;
+        }
+
         // get fresh member roster
         String jsonRoster = getMemberRoster();
         if (jsonRoster == null)
