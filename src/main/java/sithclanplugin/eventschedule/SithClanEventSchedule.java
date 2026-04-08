@@ -57,6 +57,10 @@ public class SithClanEventSchedule
     }
 
     /**
+     * HTTP FUNCTIONS
+     */
+
+    /**
      * Create and send an HTTP GET request to obtain the event schedule
      * 
      * @return String event schedule string in HTTP response body
@@ -78,6 +82,10 @@ public class SithClanEventSchedule
         return SithClanPluginUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
                 SithClanPluginConstants.EVENT_SCHEDULE_URI);
     }
+
+    /**
+     * PARSING FUNCTIONS
+     */
 
     /**
      * Get event schedule
@@ -179,6 +187,10 @@ public class SithClanEventSchedule
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
     }
+
+    /**
+     * MISC FUNCTIONS
+     */
 
     /**
      * Convert event schedule String list into custom object list

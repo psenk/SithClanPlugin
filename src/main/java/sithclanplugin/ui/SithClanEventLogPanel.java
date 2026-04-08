@@ -102,6 +102,10 @@ public class SithClanEventLogPanel extends JPanel
     }
 
     /**
+     * VALIDATION FUNCTIONS
+     */
+
+    /**
      * Validate event log, check for event name, host, clan membership
      * 
      * @param eventLog
@@ -249,6 +253,10 @@ public class SithClanEventLogPanel extends JPanel
         }
         return true;
     }
+
+    /**
+     * CREATE FUNCTIONS
+     */
 
     /**
      * Builds Discord messages

@@ -209,6 +209,10 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     }
 
     /**
+     * CREATE FUNCTIONS
+     */
+
+    /**
      * Create single announcement panel for display
      * Allow edit and delete of announcements
      * 
@@ -305,6 +309,10 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     }
 
     /**
+     * DISPLAY FUNCTIONS
+     */
+
+    /**
      * Create and post all announcements to display
      * 
      * @param announcements
@@ -333,6 +341,10 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
             announcementsScrollPane.getVerticalScrollBar().setValue(0);
         });
     }
+
+    /**
+     * MISC FUNCTIONS
+     */
 
     /**
      * Handle response status of announcement event

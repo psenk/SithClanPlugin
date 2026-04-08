@@ -103,6 +103,10 @@ public class SithClanPlugin extends Plugin
 	private static final String QUICK_HOP_MESSAGE = "Quick hopping to World "; // trailing space intentional
 
 	/**
+	 * RUNELITE FUNCTIONS
+	 */
+
+	/**
 	 * Runs when plugin starts up
 	 */
 	@Override
@@ -266,6 +270,10 @@ public class SithClanPlugin extends Plugin
 	{
 		return configManager.getConfig(SithClanPluginConfig.class);
 	}
+
+	/**
+	 * CUSTOM FUNCTIONS
+	 */
 
 	/**
 	 * Entry point to transfer from EDT to client thread

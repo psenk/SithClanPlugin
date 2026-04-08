@@ -307,6 +307,74 @@ public class SithClanMembersPanel extends JPanel
     }
 
     /**
+     * DISPLAY FUNCTIONS
+     */
+
+    /**
+     * Add single member card to display
+     * 
+     * @param member
+     *                   SithClanMember member to display
+     */
+    private void displaySingleMember(SithClanMember member)
+    {
+        // fresh panel
+        membersAreaPanel.removeAll();
+
+        JPanel singleMemberPanel = buildMemberCard(member);
+
+        // add for display
+        membersAreaPanel.add(singleMemberPanel);
+        membersAreaPanel.revalidate();
+        membersAreaPanel.repaint();
+    }
+
+    /**
+     * Lazily display a list of all members in clan
+     * 
+     * @param rosterCollection
+     *                             collection of clan members
+     */
+    private void displayAllMembers(Collection<SithClanMember> rosterCollection)
+    {
+        // fresh panel
+        membersAreaPanel.removeAll();
+
+        // sort roster by clan rank descending
+        rosterList = new ArrayList<>(rosterCollection);
+        rosterList.sort(Comparator.comparingInt(SithClanMember::getMemberRank).reversed()
+                .thenComparing(SithClanMember::getMemberName));
+
+        // reset pagination and load first page
+        pageIndex = 0;
+        loadNextPage();
+
+    }
+
+    /**
+     * Load next page of member cards
+     */
+    private void loadNextPage()
+    {
+        int pageEnd = Math.min(pageIndex + PAGE_SIZE, rosterList.size());
+
+        isLoading = true;
+        // create member card and display page
+        for (int i = pageIndex; i < pageEnd; i++)
+        {
+            membersAreaPanel.add(buildMemberCard(rosterList.get(i)));
+        }
+        pageIndex = pageEnd;
+        membersAreaPanel.revalidate();
+        membersAreaPanel.repaint();
+        isLoading = false;
+    }
+
+    /**
+     * CREATE FUNCTIONS
+     */
+
+    /**
      * Create a single member card panel for display
      * 
      * @param member
@@ -434,64 +502,8 @@ public class SithClanMembersPanel extends JPanel
     }
 
     /**
-     * Add single member card to display
-     * 
-     * @param member
-     *                   SithClanMember member to display
+     * MISC FUNCTIONS
      */
-    private void displaySingleMember(SithClanMember member)
-    {
-        // fresh panel
-        membersAreaPanel.removeAll();
-
-        JPanel singleMemberPanel = buildMemberCard(member);
-
-        // add for display
-        membersAreaPanel.add(singleMemberPanel);
-        membersAreaPanel.revalidate();
-        membersAreaPanel.repaint();
-    }
-
-    /**
-     * Lazily display a list of all members in clan
-     * 
-     * @param rosterCollection
-     *                             collection of clan members
-     */
-    private void displayAllMembers(Collection<SithClanMember> rosterCollection)
-    {
-        // fresh panel
-        membersAreaPanel.removeAll();
-
-        // sort roster by clan rank descending
-        rosterList = new ArrayList<>(rosterCollection);
-        rosterList.sort(Comparator.comparingInt(SithClanMember::getMemberRank).reversed()
-                .thenComparing(SithClanMember::getMemberName));
-
-        // reset pagination and load first page
-        pageIndex = 0;
-        loadNextPage();
-
-    }
-
-    /**
-     * Load next page of member cards
-     */
-    private void loadNextPage()
-    {
-        int pageEnd = Math.min(pageIndex + PAGE_SIZE, rosterList.size());
-
-        isLoading = true;
-        // create member card and display page
-        for (int i = pageIndex; i < pageEnd; i++)
-        {
-            membersAreaPanel.add(buildMemberCard(rosterList.get(i)));
-        }
-        pageIndex = pageEnd;
-        membersAreaPanel.revalidate();
-        membersAreaPanel.repaint();
-        isLoading = false;
-    }
 
     /**
      * Convert roster date into user local time

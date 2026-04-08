@@ -19,16 +19,8 @@ public class SithClanPluginUtil
     private static final int TIMEOUT_SECONDS = 60;
 
     /**
-     * Remove Discord emojis from text
-     * 
-     * @param input
-     *                  String text to search for emojis using regex
-     * @return String text without emojis
+     * HTTP FUNCTIONS
      */
-    public static String removeEmojis(String input)
-    {
-        return input.replaceAll(":[a-zA-Z0-9_]+:", "").trim();
-    }
 
     /**
      * Create and send an HTTP GET request
@@ -134,6 +126,59 @@ public class SithClanPluginUtil
     }
 
     /**
+     * Executes HTTP request
+     * 
+     * @param client
+     *                    OkHttpClient client to send requests
+     * @param request
+     *                    Request HTTP request object
+     * @return String response body
+     */
+    private static String executeRequest(OkHttpClient client, Request request)
+    {
+        try (Response response = client.newCall(request).execute())
+        {
+            ResponseBody responseBody = response.body();
+            if (responseBody == null || !response.isSuccessful())
+            {
+                return null;
+            }
+            return responseBody.string();
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Create and send HTTP POST request to Discord webhook
+     * 
+     * @param client
+     *                       OkHttpClient client to send request
+     * @param webhookUrl
+     *                       String Discord webhook URL
+     * @param message
+     *                       String content to post
+     * @return String HTTP Response body
+     */
+    public static String sendEventLogToDiscord(OkHttpClient client, String webhookUrl, String message)
+    {
+        // create JSON string
+        JsonObject body = new JsonObject();
+        body.addProperty("content", message);
+        String jsonBody = body.toString();
+
+        // build HTTP POST request
+        Request request = new Request.Builder()
+                .url(webhookUrl)
+                .post(RequestBody.create(MediaType.parse("application/json"), jsonBody))
+                .build();
+
+        return executeRequest(client, request);
+    }
+
+    /**
      * Validate API key in plugin config via HTTP GET request
      * Save senate member state
      * 
@@ -166,32 +211,6 @@ public class SithClanPluginUtil
     }
 
     /**
-     * Executes HTTP request
-     * 
-     * @param client
-     *                    OkHttpClient client to send requests
-     * @param request
-     *                    Request HTTP request object
-     * @return String response body
-     */
-    private static String executeRequest(OkHttpClient client, Request request)
-    {
-        try (Response response = client.newCall(request).execute())
-        {
-            ResponseBody responseBody = response.body();
-            if (responseBody == null || !response.isSuccessful())
-            {
-                return null;
-            }
-            return responseBody.string();
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
      * Checks if a request is rate limited
      * 
      * @param lastFetched
@@ -210,29 +229,18 @@ public class SithClanPluginUtil
     }
 
     /**
-     * Create and send HTTP POST request to Discord webhook
-     * 
-     * @param client
-     *                       OkHttpClient client to send request
-     * @param webhookUrl
-     *                       String Discord webhook URL
-     * @param message
-     *                       String content to post
-     * @return String HTTP Response body
+     * MISC FUNCTIONS
      */
-    public static String sendEventLogToDiscord(OkHttpClient client, String webhookUrl, String message)
+
+    /**
+     * Remove Discord emojis from text
+     * 
+     * @param input
+     *                  String text to search for emojis using regex
+     * @return String text without emojis
+     */
+    public static String removeEmojis(String input)
     {
-        // create JSON string
-        JsonObject body = new JsonObject();
-        body.addProperty("content", message);
-        String jsonBody = body.toString();
-
-        // build HTTP POST request
-        Request request = new Request.Builder()
-                .url(webhookUrl)
-                .post(RequestBody.create(MediaType.parse("application/json"), jsonBody))
-                .build();
-
-        return executeRequest(client, request);
+        return input.replaceAll(":[a-zA-Z0-9_]+:", "").trim();
     }
 }

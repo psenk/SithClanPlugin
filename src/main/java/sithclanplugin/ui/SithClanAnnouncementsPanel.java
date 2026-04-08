@@ -129,6 +129,10 @@ public class SithClanAnnouncementsPanel extends JPanel
     }
 
     /**
+     * DISPLAY FUNCTIONS
+     */
+
+    /**
      * Create announcements and display
      */
     public void displayAnnouncements()
@@ -171,6 +175,10 @@ public class SithClanAnnouncementsPanel extends JPanel
             announcementsListPanel.repaint();
         });
     }
+
+    /**
+     * MISC FUNCTIONS
+     */
 
     /**
      * Handle response status of event

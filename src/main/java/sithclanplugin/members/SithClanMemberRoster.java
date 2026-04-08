@@ -34,7 +34,7 @@ public class SithClanMemberRoster
 
     @Inject
     private SithClanPluginConfig config;
-    
+
     @Setter
     private boolean isSenateMember;
 
@@ -49,6 +49,10 @@ public class SithClanMemberRoster
         roster = new HashMap<>();
         dateRosterPosted = null;
     }
+
+    /**
+     * HTTP FUNCTIONS
+     */
 
     /**
      * Create and send an HTTP GET request to obtain the event roster
@@ -72,6 +76,10 @@ public class SithClanMemberRoster
         return SithClanPluginUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
                 SithClanPluginConstants.MEMBER_ROSTER_URI);
     }
+
+    /**
+     * PARSING FUNCTIONS
+     */
 
     /**
      * Get member roster
@@ -138,6 +146,10 @@ public class SithClanMemberRoster
         this.dateRosterPosted = ZonedDateTime.now();
         return SithClanPluginConstants.STATUS_OK;
     }
+
+    /**
+     * MISC FUNCTIONS
+     */
 
     /**
      * Convert member roster String list into custom object list

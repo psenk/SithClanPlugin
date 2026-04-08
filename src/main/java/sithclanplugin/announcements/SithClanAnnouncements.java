@@ -50,6 +50,10 @@ public class SithClanAnnouncements
     }
 
     /**
+     * HTTP FUNCTIONS
+     */
+
+    /**
      * Create and send an HTTP GET request to obtain announcements
      * 
      * @return String announcements in an HTTP response body
@@ -100,6 +104,10 @@ public class SithClanAnnouncements
         String uri = SithClanPluginConstants.ANNOUNCEMENTS_URI + "/" + announcementId;
         return SithClanPluginUtil.sendDeleteRequest(httpClient, config.apiKey(), uri);
     }
+
+    /**
+     * PARSING FUNCTIONS
+     */
 
     /**
      * Get clan announcements
@@ -237,17 +245,8 @@ public class SithClanAnnouncements
     }
 
     /**
-     * Load announcements received during plugin startup
-     * 
-     * @param announcements
-     *                          ArrayList<SithClanAnnouncements> announcements
+     * MISC FUNCTIONS
      */
-    public void loadStartupAnnouncements(ArrayList<SithClanAnnouncement> announcements)
-    {
-        this.announcementsList = announcements;
-        setAnnouncementsUpdated(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
-        this.lastTimeAnnouncementsFetched = LocalDateTime.now();
-    }
 
     /**
      * Convert string into custom object
@@ -298,6 +297,19 @@ public class SithClanAnnouncements
         }.getType();
         return gson.fromJson(jsonAnnouncements,
                 announcementType);
+    }
+
+    /**
+     * Load announcements received during plugin startup
+     * 
+     * @param announcements
+     *                          ArrayList<SithClanAnnouncements> announcements
+     */
+    public void loadStartupAnnouncements(ArrayList<SithClanAnnouncement> announcements)
+    {
+        this.announcementsList = announcements;
+        setAnnouncementsUpdated(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
+        this.lastTimeAnnouncementsFetched = LocalDateTime.now();
     }
 
     /**

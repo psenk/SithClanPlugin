@@ -175,6 +175,10 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
+     * DISPLAY FUNCTIONS
+     */
+
+    /**
      * Display event schedule to panel
      */
     public void displaySchedule()
@@ -230,6 +234,83 @@ public class SithClanSchedulePanel extends JPanel
         scheduleContainer.revalidate();
         scheduleContainer.repaint();
     }
+
+    /**
+     * Find and display next event
+     */
+    private void updateNextEventDisplay()
+    {
+        if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty())
+        {
+            nextEventLabel.setVisible(false);
+            return;
+        }
+
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime nextEventTime = null;
+        String nextEventName = null;
+
+        // loop through schedule
+        for (SithClanDaySchedule day : eventSchedule.getSchedule())
+        {
+            for (SithClanEvent event : day.getEvents())
+            {
+                try
+                {
+                    ZonedDateTime estTime = ZonedDateTime.of(
+                            LocalDate.parse(day.getDate(), SithClanPluginConstants.DATE_FORMATTER),
+                            LocalTime.parse(event.getEventTime(), SithClanPluginConstants.TIME_FORMATTER),
+                            SithClanPluginConstants.EST_ZONE);
+                    ZonedDateTime localTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
+
+                    // check event hasn't happened yet
+                    if (localTime.isAfter(now))
+                    {
+                        if (nextEventTime == null || localTime.isBefore(nextEventTime))
+                        {
+                            nextEventTime = localTime;
+                            nextEventName = SithClanPluginUtil.removeEmojis(event.getEventTitle());
+                        }
+                    }
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // no future events found
+        if (nextEventTime == null)
+        {
+            nextEventLabel.setText(NO_UPCOMING_EVENTS);
+            nextEventLabel.setVisible(true);
+            return;
+        }
+
+        // calculate how long until event
+        long minutesUntil = ChronoUnit.MINUTES.between(now, nextEventTime);
+        long hours = minutesUntil / 60;
+        long minutes = minutesUntil % 60;
+
+        // display time
+        String countdown;
+        if (hours > 0)
+        {
+            countdown = "in " + hours + "h " + minutes + "m";
+        } else
+        {
+            countdown = "in " + minutes + "m";
+        }
+
+        String timeString = nextEventTime.format(SithClanPluginConstants.TIME_FORMATTER);
+
+        nextEventLabel.setText("<html><b>" + nextEventName + "</b><br />" + timeString + " (" + countdown + ")</html>");
+        nextEventLabel.setVisible(true);
+    }
+
+    /**
+     * CREATE FUNCTIONS
+     */
 
     /**
      * Create panel to hold each days events
@@ -468,77 +549,8 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
-     * Find and display next event
+     * MISC FUNCTIONS
      */
-    private void updateNextEventDisplay()
-    {
-        if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty())
-        {
-            nextEventLabel.setVisible(false);
-            return;
-        }
-
-        ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime nextEventTime = null;
-        String nextEventName = null;
-
-        // loop through schedule
-        for (SithClanDaySchedule day : eventSchedule.getSchedule())
-        {
-            for (SithClanEvent event : day.getEvents())
-            {
-                try
-                {
-                    ZonedDateTime estTime = ZonedDateTime.of(
-                            LocalDate.parse(day.getDate(), SithClanPluginConstants.DATE_FORMATTER),
-                            LocalTime.parse(event.getEventTime(), SithClanPluginConstants.TIME_FORMATTER),
-                            SithClanPluginConstants.EST_ZONE);
-                    ZonedDateTime localTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
-
-                    // check event hasn't happened yet
-                    if (localTime.isAfter(now))
-                    {
-                        if (nextEventTime == null || localTime.isBefore(nextEventTime))
-                        {
-                            nextEventTime = localTime;
-                            nextEventName = SithClanPluginUtil.removeEmojis(event.getEventTitle());
-                        }
-                    }
-                } catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        // no future events found
-        if (nextEventTime == null)
-        {
-            nextEventLabel.setText(NO_UPCOMING_EVENTS);
-            nextEventLabel.setVisible(true);
-            return;
-        }
-
-        // calculate how long until event
-        long minutesUntil = ChronoUnit.MINUTES.between(now, nextEventTime);
-        long hours = minutesUntil / 60;
-        long minutes = minutesUntil % 60;
-
-        // display time
-        String countdown;
-        if (hours > 0)
-        {
-            countdown = "in " + hours + "h " + minutes + "m";
-        } else
-        {
-            countdown = "in " + minutes + "m";
-        }
-
-        String timeString = nextEventTime.format(SithClanPluginConstants.TIME_FORMATTER);
-
-        nextEventLabel.setText("<html><b>" + nextEventName + "</b><br />" + timeString + " (" + countdown + ")</html>");
-        nextEventLabel.setVisible(true);
-    }
 
     /**
      * Check if event schedule is expired

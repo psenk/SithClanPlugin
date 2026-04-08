@@ -214,6 +214,10 @@ public class SithClanPluginPanel extends PluginPanel
     }
 
     /**
+     * DISPLAY FUNCTIONS
+     */
+
+    /**
      * Show main panel after successful clan verification
      */
     public void showMainPanel()

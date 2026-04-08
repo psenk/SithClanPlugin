@@ -35,30 +35,8 @@ public class SithClanPluginFileManager
     }
 
     /**
-     * Create plugin specific files and directories
-     * 
-     * @throws IOException
+     * SCHEDULE FUNCTIONS
      */
-    public void initializeFiles() throws IOException
-    {
-        // main plugin directory
-        if (!localDirectory.exists())
-        {
-            localDirectory.mkdirs();
-        }
-
-        // saved event schedule file
-        if (!storedScheduleFile.exists())
-        {
-            storedScheduleFile.createNewFile();
-        }
-
-        // event subscriptions file
-        if (!storedSubscriptionsFile.exists())
-        {
-            storedSubscriptionsFile.createNewFile();
-        }
-    }
 
     /**
      * Check if user has a saved event schedule file to load
@@ -200,5 +178,35 @@ public class SithClanPluginFileManager
     {
         ArrayList<String> subscriptions = loadSubscriptions();
         return subscriptions.contains(eventTitle);
+    }
+
+    /**
+     * MISC FUNCTIONS
+     */
+
+    /**
+     * Create plugin specific files and directories
+     * 
+     * @throws IOException
+     */
+    public void initializeFiles() throws IOException
+    {
+        // main plugin directory
+        if (!localDirectory.exists())
+        {
+            localDirectory.mkdirs();
+        }
+
+        // saved event schedule file
+        if (!storedScheduleFile.exists())
+        {
+            storedScheduleFile.createNewFile();
+        }
+
+        // event subscriptions file
+        if (!storedSubscriptionsFile.exists())
+        {
+            storedSubscriptionsFile.createNewFile();
+        }
     }
 }
