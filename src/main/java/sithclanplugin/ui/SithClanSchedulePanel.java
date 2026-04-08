@@ -13,6 +13,8 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,6 +76,7 @@ public class SithClanSchedulePanel extends JPanel
     private final JPanel scheduleContainer;
     private final Icon rightArrowIcon;
     private final Icon downArrowIcon;
+    private ScheduledFuture<?> nextEventRefreshTask;
     private Runnable onRefreshCallback;
 
     private static final String EVENT_SCHEDULE = "Event Schedule";
@@ -174,6 +177,11 @@ public class SithClanSchedulePanel extends JPanel
         });
 
         this.setVisible(true);
+
+        // periodically refresh next event display
+        nextEventRefreshTask = executor.scheduleAtFixedRate(
+                () -> SwingUtilities.invokeLater(this::updateNextEventDisplay),
+                1, 1, TimeUnit.MINUTES);
     }
 
     /**
@@ -610,5 +618,16 @@ public class SithClanSchedulePanel extends JPanel
     public void setOnRefreshCallback(Runnable callback)
     {
         this.onRefreshCallback = callback;
+    }
+
+    /**
+     * Cancel the next event refresh timer
+     */
+    public void shutDown()
+    {
+        if (nextEventRefreshTask != null)
+        {
+            nextEventRefreshTask.cancel(false);
+        }
     }
 }

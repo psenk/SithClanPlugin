@@ -171,6 +171,7 @@ public class SithClanPlugin extends Plugin
 	{
 		clientToolbar.removeNavigation(uiNavigationButton);
 		notificationManager.shutDown();
+		uiPanel.get().getSchedulePanel().shutDown();
 	}
 
 	/**
