@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.Notifier;
 import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
@@ -24,6 +25,7 @@ import sithclanplugin.eventschedule.SithClanEvent;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
 
+@Slf4j
 @Singleton
 public class SithClanPluginNotificationManager
 {
@@ -57,6 +59,7 @@ public class SithClanPluginNotificationManager
             return;
         }
 
+        log.info("Scheduling event notifications..");
         // cancel notifications if no longer in schedule
         Set<String> incomingEvents = new HashSet<>();
         for (SithClanDaySchedule day : schedule)
@@ -122,7 +125,7 @@ public class SithClanPluginNotificationManager
                     }
                 } catch (Exception e)
                 {
-                    e.printStackTrace();
+                    log.error("Exception while scheduling event notifications: {}", e.getMessage(), e);
                 }
             }
         }

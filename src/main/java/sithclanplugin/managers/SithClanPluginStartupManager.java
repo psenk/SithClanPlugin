@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import sithclanplugin.announcements.SithClanAnnouncements;
 import sithclanplugin.dto.StartupResponse;
@@ -11,6 +12,7 @@ import sithclanplugin.eventschedule.SithClanEventSchedule;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
 
+@Slf4j
 @Singleton
 public class SithClanPluginStartupManager
 {
@@ -43,14 +45,19 @@ public class SithClanPluginStartupManager
      */
     public int parseStartupInfoFromGet()
     {
+        log.info("Fetching plugin startup info from server..");
+
         // get fresh startup info
         String jsonStartupInfo = getStartupInfo();
         if (jsonStartupInfo == null)
         {
+            log.error("Failed to fetch startup info --  server returned null.");
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
+        log.info("Startup info retrieved successfully, deserializing..");
         // convert startup info to JSON
         deserializeStartupInfo(jsonStartupInfo);
+        log.info("Startup info loaded successfully");
         return SithClanPluginConstants.STATUS_OK;
     }
 

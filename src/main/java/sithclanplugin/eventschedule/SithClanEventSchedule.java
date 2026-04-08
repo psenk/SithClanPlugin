@@ -12,6 +12,7 @@ import com.google.inject.Singleton;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.managers.SithClanPluginFileManager;
@@ -23,6 +24,7 @@ import sithclanplugin.util.SithClanPluginUtil;
  * Event Schedule Object
  */
 
+@Slf4j
 @Getter
 @Singleton
 public class SithClanEventSchedule
@@ -101,19 +103,25 @@ public class SithClanEventSchedule
         if (SithClanPluginUtil.isRateLimited(lastTimeScheduleFetched, SCHEDULE_FETCH_COOLDOWN_MINUTES,
                 isSenateMember))
         {
+            log.debug("Schedule fetch skipped: rate limited");
             return SithClanPluginConstants.STATUS_RATE_LIMITED;
         }
 
+        log.info("Fetching schedule from server..");
         // get fresh event schedule
         String jsonSchedule = getEventSchedule();
         if (jsonSchedule == null)
         {
+            log.warn("Schedule fetch returned null");
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
         // convert schedule to JSON
         this.schedule = deserializeSchedule(jsonSchedule);
+        log.info("Schedule loaded successfully: {} days",
+                schedule != null ? schedule.size() : 0);
         // saves schedule
         fileManager.saveScheduleLocally(jsonSchedule);
+        log.info("Schedule saved locally.");
         // refresh rate limiting
         this.lastTimeScheduleFetched = LocalDateTime.now();
         // schedule event notifications
@@ -134,14 +142,17 @@ public class SithClanEventSchedule
     {
         if (scheduleInput.isBlank())
         {
+            log.warn("Schedule post failed: no input");
             return SithClanPluginConstants.STATUS_BAD_INPUT;
         }
+        log.info("Uploading schedule to server..");
         // split input into list of strings
         String[] scheduleInputList = scheduleInput.split("\\r?\\n");
         // turn list into event schedule
         ArrayList<SithClanDaySchedule> newSchedule = convertSchedule(scheduleInputList);
         if (newSchedule == null || newSchedule.isEmpty())
         {
+            log.warn("Schedule conversion failed.");
             return SithClanPluginConstants.STATUS_BAD_INPUT;
         }
         // store schedule as JSON object
@@ -158,6 +169,7 @@ public class SithClanEventSchedule
         fileManager.saveScheduleLocally(data);
         // schedule event notifications
         notificationManager.scheduleNotifications(schedule);
+        log.info("Schedule uploaded successfully.");
         return SithClanPluginConstants.STATUS_OK;
     }
 
@@ -174,16 +186,19 @@ public class SithClanEventSchedule
             String jsonSchedule = fileManager.readScheduleFile();
             if (jsonSchedule == null || jsonSchedule.isBlank())
             {
+                log.warn("Schedule loading from file failed: no file input");
                 return SithClanPluginConstants.STATUS_BAD_INPUT;
             }
+            log.info("Reading schedule from file..");
             // convert schedule to JSON
             this.schedule = deserializeSchedule(jsonSchedule);
             // schedule event notifications
             notificationManager.scheduleNotifications(schedule);
+            log.info("Schedule loaded from file successfully.");
             return SithClanPluginConstants.STATUS_OK;
         } catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("Exception during loading local schedule file: {}", e.getMessage(), e);
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
     }

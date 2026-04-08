@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.gson.JsonObject;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -13,6 +14,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import sithclanplugin.SithClanPluginConfig;
 
+@Slf4j
 public class SithClanPluginUtil
 {
 
@@ -136,17 +138,22 @@ public class SithClanPluginUtil
      */
     private static String executeRequest(OkHttpClient client, Request request)
     {
+        log.debug("Sending {} request to {}", request.method(), request.url());
+
         try (Response response = client.newCall(request).execute())
         {
             ResponseBody responseBody = response.body();
             if (responseBody == null || !response.isSuccessful())
             {
+                log.warn("Request to {} failed with status code: {}", request.url(), response.code());
                 return null;
             }
-            return responseBody.string();
+            String body = responseBody.string();
+            log.debug("Request to {} succeeded ({} bytes)", request.url(), body.length());
+            return body;
         } catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("Exception during request to {}: {}", request.url(), e.getMessage(), e);
             return null;
         }
     }
@@ -186,6 +193,8 @@ public class SithClanPluginUtil
      */
     public static boolean validateApiKey(OkHttpClient client, SithClanPluginConfig config)
     {
+        log.info("Validating API key..");
+
         // create HTTP GET request
         Request request = new Request.Builder()
                 .url(SithClanPluginConstants.VALIDATE_URI)
@@ -198,14 +207,16 @@ public class SithClanPluginUtil
             ResponseBody responseBody = response.body();
             if (responseBody == null)
             {
+                log.warn("API key validation returned null response body.");
                 return false;
             }
             // validate response
             boolean isSenateMember = response.code() == 200;
+            log.info("API key validation result: {} (HTTP {})", isSenateMember ? "VALID" : "INVALID", response.code());
             return isSenateMember;
         } catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("Exception during API key validation: {}", e.getMessage(), e);
             return false;
         }
     }

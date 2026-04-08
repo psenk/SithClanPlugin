@@ -31,6 +31,7 @@ import javax.swing.SwingUtilities;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
@@ -45,6 +46,7 @@ import sithclanplugin.managers.SithClanPluginNotificationManager;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
 
+@Slf4j
 @Singleton
 public class SithClanSchedulePanel extends JPanel
 {
@@ -274,7 +276,7 @@ public class SithClanSchedulePanel extends JPanel
                     }
                 } catch (Exception e)
                 {
-                    e.printStackTrace();
+                    log.error("Exception while updating next event display: {}", e.getMessage(), e);
                 }
             }
         }

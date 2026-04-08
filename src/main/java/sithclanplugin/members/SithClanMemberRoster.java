@@ -12,6 +12,7 @@ import com.google.inject.Singleton;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import sithclanplugin.SithClanPluginConfig;
 import sithclanplugin.dto.RosterResponse;
@@ -22,6 +23,7 @@ import sithclanplugin.util.SithClanPluginUtil;
  * Member Roster Object
  */
 
+@Slf4j
 @Getter
 @Singleton
 public class SithClanMemberRoster
@@ -92,17 +94,21 @@ public class SithClanMemberRoster
         // rate limiting
         if (SithClanPluginUtil.isRateLimited(lastTimeRosterFetched, ROSTER_FETCH_COOLDOWN_MINUTES, isSenateMember))
         {
+            log.debug("Roster fetch skipped: rate limited");
             return SithClanPluginConstants.STATUS_RATE_LIMITED;
         }
 
+        log.info("Fetching roster from server..");
         // get fresh member roster
         String jsonRoster = getMemberRoster();
         if (jsonRoster == null)
         {
+            log.warn("Roster fetch returned null");
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
         // convert roster to JSON
         this.roster = deserializeRoster(jsonRoster);
+        log.info("Roster loaded successfully");
         return SithClanPluginConstants.STATUS_OK;
     }
 
@@ -117,15 +123,17 @@ public class SithClanMemberRoster
     {
         if (rosterInput.isBlank())
         {
+            log.warn("Roster post failed: no input");
             return SithClanPluginConstants.STATUS_BAD_INPUT;
         }
-
+        log.info("Posting member roster to server..");
         // split input into list of strings
         String[] rosterInputList = rosterInput.split("\\r?\\n");
         // turn list into member roster
         HashMap<String, SithClanMember> newRoster = convertRoster(rosterInputList);
         if (newRoster == null || newRoster.isEmpty())
         {
+            log.warn("Roster conversion failed.");
             return SithClanPluginConstants.STATUS_BAD_INPUT;
         }
 
@@ -144,6 +152,7 @@ public class SithClanMemberRoster
         // save roster
         this.roster = newRoster;
         this.dateRosterPosted = ZonedDateTime.now();
+        log.info("Member roster posted successfully.");
         return SithClanPluginConstants.STATUS_OK;
     }
 

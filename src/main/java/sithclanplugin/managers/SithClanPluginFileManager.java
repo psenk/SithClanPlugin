@@ -13,9 +13,11 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.RuneLite;
 import sithclanplugin.util.SithClanPluginConstants;
 
+@Slf4j
 @Singleton
 public class SithClanPluginFileManager
 {
@@ -56,13 +58,15 @@ public class SithClanPluginFileManager
      */
     public void saveScheduleLocally(String data)
     {
+        log.info("Saving schedule to file..");
         try (FileWriter fileWriter = new FileWriter(storedScheduleFile))
         {
             // write data to file
             fileWriter.write(data);
+            log.info("Schedule saved successfully.");
         } catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("Exception while saving schedule to file: {}", e.getMessage(), e);
         }
     }
 
@@ -75,12 +79,13 @@ public class SithClanPluginFileManager
     {
         try
         {
+            log.info("Reading schedule from file..");
             // read schedule from file
             String jsonSchedule = Files.readString(storedScheduleFile.toPath(), StandardCharsets.UTF_8);
             return jsonSchedule.isBlank() ? null : jsonSchedule;
         } catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("Exception while reading schedule from file: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -100,7 +105,7 @@ public class SithClanPluginFileManager
             fileWriter.write(gson.toJson(subscriptions));
         } catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("Exception while saving event subscriptions: {}", e.getMessage(), e);
         }
     }
 
@@ -133,7 +138,7 @@ public class SithClanPluginFileManager
             return cachedSubscriptions;
         } catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("Exception while loading event subscriptions: {}", e.getMessage(), e);
             return new ArrayList<>();
         }
     }
