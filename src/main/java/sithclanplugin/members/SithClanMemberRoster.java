@@ -42,9 +42,6 @@ public class SithClanMemberRoster
 
     private HashMap<String, SithClanMember> roster;
     private ZonedDateTime dateRosterPosted;
-    private LocalDateTime lastTimeRosterFetched;
-
-    private static final int ROSTER_FETCH_COOLDOWN_MINUTES = 30;
 
     public SithClanMemberRoster()
     {
@@ -91,13 +88,6 @@ public class SithClanMemberRoster
      */
     public int parseRosterFromGet()
     {
-        // rate limiting
-        if (SithClanPluginUtil.isRateLimited(lastTimeRosterFetched, ROSTER_FETCH_COOLDOWN_MINUTES, isSenateMember))
-        {
-            log.debug("Roster fetch skipped: rate limited");
-            return SithClanPluginConstants.STATUS_RATE_LIMITED;
-        }
-
         log.info("Fetching roster from server..");
         // get fresh member roster
         String jsonRoster = getMemberRoster();
