@@ -1,7 +1,6 @@
 package sithclanplugin.eventschedule;
 
 import java.lang.reflect.Type;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
