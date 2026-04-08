@@ -13,13 +13,14 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.event.HyperlinkEvent;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -27,6 +28,7 @@ import com.google.inject.Singleton;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
+import net.runelite.client.util.LinkBrowser;
 import sithclanplugin.announcements.SithClanAnnouncement;
 import sithclanplugin.announcements.SithClanAnnouncements;
 import sithclanplugin.util.SithClanPluginConstants;
@@ -156,18 +158,26 @@ public class SithClanAnnouncementsPanel extends JPanel
                 // create each announcement
                 for (SithClanAnnouncement announcement : announcementsList)
                 {
-                    JTextArea textArea = new JTextArea(announcement.getAnnouncementText());
-                    textArea.setEditable(false);
-                    textArea.setLineWrap(true);
-                    textArea.setWrapStyleWord(true);
-                    textArea.setOpaque(false);
-                    textArea.setBorder(ANNOUNCEMENT_BORDER);
-                    textArea.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 60));
-                    textArea.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 60));
-                    textArea.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 60));
+                    JEditorPane editorPane = new JEditorPane();
+                    editorPane.setContentType("text/html");
+                    editorPane.setText(convertLinks(announcement.getAnnouncementText()));
+                    editorPane.setEditable(false);
+                    editorPane.setOpaque(false);
+                    editorPane.setBorder(ANNOUNCEMENT_BORDER);
+                    editorPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 60));
+                    editorPane.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 60));
+
+                    // open links
+                    editorPane.addHyperlinkListener(e ->
+                    {
+                        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+                        {
+                            LinkBrowser.browse(e.getURL().toString());
+                        }
+                    });
 
                     // add to announcement list
-                    announcementsListPanel.add(textArea);
+                    announcementsListPanel.add(editorPane);
                     announcementsListPanel.add(Box.createRigidArea(new Dimension(0, 5)));
                 }
             }
@@ -199,5 +209,26 @@ public class SithClanAnnouncementsPanel extends JPanel
             default:
                 break;
         }
+    }
+
+    /**
+     * Convert URL to clickable link
+     * 
+     * @param text
+     *                 String input text
+     * @return String output HTML link for display
+     */
+    private String convertLinks(String text)
+    {
+        // detect urls
+        String urlPattern = "(https?://\\S+)";
+
+        // replace characters
+        String escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+        String withBreaks = escaped.replace("\n", "<br>");
+
+        // add HTML tags
+        String withLinks = withBreaks.replaceAll(urlPattern, "<a href='$1'>$1</a>");
+        return "<html>" + withLinks + "</html>";
     }
 }
