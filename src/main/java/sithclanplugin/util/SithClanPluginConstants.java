@@ -6,8 +6,7 @@ import java.time.format.DateTimeFormatter;
 public class SithClanPluginConstants
 {
         // testing
-        // TODO: set false before release
-        public static final boolean BYPASS_CLAN_CHECK = true;
+        public static final boolean BYPASS_CLAN_CHECK = false;
 
         // clan info
         // name
