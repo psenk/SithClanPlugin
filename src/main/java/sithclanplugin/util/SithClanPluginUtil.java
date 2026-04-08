@@ -17,6 +17,7 @@ import sithclanplugin.SithClanPluginConfig;
 @Slf4j
 public class SithClanPluginUtil
 {
+    private static OkHttpClient cachedTimeoutClient = null;
 
     private static final int TIMEOUT_SECONDS = 60;
 
@@ -58,13 +59,6 @@ public class SithClanPluginUtil
      */
     public static String sendPostRequest(OkHttpClient client, String apiKey, String data, String uri)
     {
-        // new client with longer timeout
-        OkHttpClient clientWithTimeout = client.newBuilder()
-                .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .build();
-
         // build HTTP POST request
         Request request = new Request.Builder()
                 .url(uri)
@@ -73,7 +67,7 @@ public class SithClanPluginUtil
                 .post(RequestBody.create(MediaType.parse("application/json"), data))
                 .build();
 
-        return executeRequest(clientWithTimeout, request);
+        return executeRequest(getTimeoutClient(client), request);
     }
 
     /**
@@ -237,6 +231,27 @@ public class SithClanPluginUtil
         if (isSenateMember)
             return false;
         return lastFetched != null && LocalDateTime.now().isBefore(lastFetched.plusMinutes((cooldownMinutes)));
+    }
+
+    /**
+     * Lazy initialization of OkHttpClient with increased timeout
+     * 
+     * @param client
+     *                   OkHttpClient instance
+     * @return OkHttpClient instance with increased timeout
+     */
+    private static OkHttpClient getTimeoutClient(OkHttpClient client)
+    {
+        if (cachedTimeoutClient == null)
+        {
+            // new client with longer timeout
+            cachedTimeoutClient = client.newBuilder()
+                    .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                    .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                    .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                    .build();
+        }
+        return cachedTimeoutClient;
     }
 
     /**
