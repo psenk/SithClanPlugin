@@ -18,6 +18,7 @@ import sithclanplugin.SithClanPluginConfig;
 public class SithClanPluginUtil
 {
     private static OkHttpClient cachedTimeoutClient = null;
+    private static OkHttpClient cachedTimeoutClient = null;
 
     private static final int TIMEOUT_SECONDS = 60;
 
@@ -67,6 +68,7 @@ public class SithClanPluginUtil
                 .post(RequestBody.create(MediaType.parse("application/json"), data))
                 .build();
 
+        return executeRequest(getTimeoutClient(client), request);
         return executeRequest(getTimeoutClient(client), request);
     }
 
