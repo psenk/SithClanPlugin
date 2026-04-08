@@ -131,7 +131,6 @@ public class SithClanAnnouncements
         String jsonAnnouncements = getAnnouncements();
         if (jsonAnnouncements == null)
         {
-            log.warn("Announcements fetch returned null");
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
         // convert announcements to JSON

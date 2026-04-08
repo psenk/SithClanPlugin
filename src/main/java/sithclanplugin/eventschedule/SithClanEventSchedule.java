@@ -112,7 +112,6 @@ public class SithClanEventSchedule
         String jsonSchedule = getEventSchedule();
         if (jsonSchedule == null)
         {
-            log.warn("Schedule fetch returned null");
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
         // convert schedule to JSON

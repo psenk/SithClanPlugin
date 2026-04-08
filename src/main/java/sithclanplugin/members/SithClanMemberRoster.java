@@ -92,7 +92,6 @@ public class SithClanMemberRoster
         String jsonRoster = getMemberRoster();
         if (jsonRoster == null)
         {
-            log.warn("Roster fetch returned null");
             return SithClanPluginConstants.STATUS_NOT_FOUND;
         }
         // convert roster to JSON
