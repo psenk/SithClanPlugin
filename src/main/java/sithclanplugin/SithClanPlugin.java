@@ -372,6 +372,11 @@ public class SithClanPlugin extends Plugin
 		return clanSettings.getName().equalsIgnoreCase(SithClanPluginConstants.CLAN_NAME);
 	}
 
+	/**
+	 * Parse schedule and announcements on plugin startup
+	 * 
+	 * @return int status code
+	 */
 	private int parseStartupInfo()
 	{
 		log.info("Fetching startup info from server..");
