@@ -74,6 +74,7 @@ public class SithClanMembersPanel extends JPanel
     private static final String MEMBER_CREDITS_NEEDED = "Credits until promotion: "; // trailing space intentional
     private static final String MEMBER_DAYS_NEEDED = "Days until promotion: "; // trailing space intentional
     private static final String MEMBER_NONE_NEEDED = "None! Coming soon..";
+    private static final String SENATE_MEMBER = "Senate Member";
     private static final String MEMBER_CREDITS = " Imperial Credits"; // leading space intentional
     private static final String MEMBER_JOINED = "Joined: "; // trailing space intentional
     private static final String MEMBER_ALT = "Alt: "; // trailing space intentional
@@ -430,6 +431,13 @@ public class SithClanMembersPanel extends JPanel
         JLabel memberNameLabel = new JLabel(memberName);
         memberNameLabel.setFont(MEMBER_NAME_FONT);
         rightPanel.add(memberNameLabel);
+
+        if (rankInt <= 15 && rankInt >= 13)
+        {
+            JLabel leadershipLabel = new JLabel();
+            leadershipLabel.setText("<html><b>" + SENATE_MEMBER + "</b></html>");
+            rightPanel.add(leadershipLabel);
+        }
 
         // member rank
         JLabel memberRank = new JLabel(MEMBER_RANK + SithClanPluginConstants.CLAN_RANKS[rankInt - 1]);
