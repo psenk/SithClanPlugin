@@ -1,6 +1,6 @@
 package sithclanplugin.util;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
 import com.google.gson.JsonObject;
@@ -219,18 +219,18 @@ public class SithClanPluginUtil
      * Checks if a request is rate limited
      * 
      * @param lastFetched
-     *                            LocalDateTime timestamp of last fetch
+     *                            ZonedDateTime timestamp of last fetch
      * @param cooldownMinutes
      *                            int rate limiting amount in minutes
      * @param isSenateMember
      *                            boolean if senate bypass rate limiting
      * @return boolean if rate limited
      */
-    public static boolean isRateLimited(LocalDateTime lastFetched, int cooldownMinutes, boolean isSenateMember)
+    public static boolean isRateLimited(ZonedDateTime lastFetched, int cooldownMinutes, boolean isSenateMember)
     {
         if (isSenateMember)
             return false;
-        return lastFetched != null && LocalDateTime.now().isBefore(lastFetched.plusMinutes((cooldownMinutes)));
+        return lastFetched != null && ZonedDateTime.now().isBefore(lastFetched.plusMinutes((cooldownMinutes)));
     }
 
     /**

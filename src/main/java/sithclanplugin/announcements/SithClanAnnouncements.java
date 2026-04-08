@@ -41,7 +41,7 @@ public class SithClanAnnouncements
     private boolean isSenateMember = false;
 
     private ArrayList<SithClanAnnouncement> announcementsList;
-    private LocalDateTime lastTimeAnnouncementsFetched;
+    private ZonedDateTime lastTimeAnnouncementsFetched;
 
     private static final int ANNOUNCEMENTS_FETCH_COOLDOWN_MINUTES = 5;
 
@@ -140,7 +140,7 @@ public class SithClanAnnouncements
         log.info("Announcements loaded successfully: {} announcements",
                 announcementsList.isEmpty() ? 0 : announcementsList.size());
         // refresh rate limiting timestamp
-        this.lastTimeAnnouncementsFetched = LocalDateTime.now();
+        this.lastTimeAnnouncementsFetched = ZonedDateTime.now();
         return SithClanPluginConstants.STATUS_OK;
     }
 
@@ -327,7 +327,7 @@ public class SithClanAnnouncements
     {
         this.announcementsList = announcements;
         setAnnouncementsUpdated(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
-        this.lastTimeAnnouncementsFetched = LocalDateTime.now();
+        this.lastTimeAnnouncementsFetched = ZonedDateTime.now();
     }
 
     /**

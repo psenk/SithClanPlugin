@@ -2,6 +2,7 @@ package sithclanplugin.eventschedule;
 
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
@@ -48,7 +49,7 @@ public class SithClanEventSchedule
     private boolean isSenateMember = false;
 
     private ArrayList<SithClanDaySchedule> schedule;
-    private LocalDateTime lastTimeScheduleFetched;
+    private ZonedDateTime lastTimeScheduleFetched;
 
     private static final int SCHEDULE_FETCH_COOLDOWN_MINUTES = 5;
 
@@ -123,7 +124,7 @@ public class SithClanEventSchedule
         fileManager.saveScheduleLocally(jsonSchedule);
         log.info("Schedule saved locally.");
         // refresh rate limiting
-        this.lastTimeScheduleFetched = LocalDateTime.now();
+        this.lastTimeScheduleFetched = ZonedDateTime.now();
         // schedule event notifications
         notificationManager.scheduleNotifications(schedule);
         return SithClanPluginConstants.STATUS_OK;
@@ -352,7 +353,7 @@ public class SithClanEventSchedule
         // save schedule locally
         fileManager.saveScheduleLocally(startupJson);
         // refresh rate limiting
-        this.lastTimeScheduleFetched = LocalDateTime.now();
+        this.lastTimeScheduleFetched = ZonedDateTime.now();
         // schedule event notifications
         notificationManager.scheduleNotifications(schedule);
     }
