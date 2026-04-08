@@ -56,8 +56,9 @@ public class SithClanEventLogPanel extends JPanel
     private static final String ROSTER_ERROR_WARNING = "Unable to load member roster.";
     private static final String POST_SUCCESS = "Event log posted to Discord";
     private static final String POST_FAILURE = "Failed to post event log to Discord";
-
     private static final int DISCORD_MAX_LENGTH = 2000;
+    private static final String DISCORD_WEBHOOK_PREFIX = "https://discord.com/webhooks/";
+    private static final Object INVALID_WEBHOOK_URL = "Invalid Discord webhook URL";
 
     SithClanEventLogPanel()
     {
@@ -118,6 +119,13 @@ public class SithClanEventLogPanel extends JPanel
         if (webhookUrl == null || webhookUrl.isBlank())
         {
             SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, NO_WEBHOOK_URL_WARNING));
+            return;
+        }
+
+        // validate webhook URL
+        if (!webhookUrl.startsWith(DISCORD_WEBHOOK_PREFIX))
+        {
+            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, INVALID_WEBHOOK_URL));
             return;
         }
 
