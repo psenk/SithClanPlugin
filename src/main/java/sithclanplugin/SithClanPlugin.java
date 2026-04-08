@@ -6,9 +6,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 
+import com.google.gson.Gson;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -35,15 +37,16 @@ import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
 import okhttp3.OkHttpClient;
 import sithclanplugin.announcements.SithClanAnnouncements;
+import sithclanplugin.dto.StartupResponse;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
 import sithclanplugin.managers.SithClanPluginFileManager;
 import sithclanplugin.managers.SithClanPluginNotificationManager;
-import sithclanplugin.managers.SithClanPluginStartupManager;
 import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.ui.SithClanPluginPanel;
 import sithclanplugin.util.SithClanPluginConstants;
 import sithclanplugin.util.SithClanPluginUtil;
 
+@Slf4j
 @PluginDescriptor(name = "Sith Clan Plugin", description = "Enable the Sith Clan Plugin")
 public class SithClanPlugin extends Plugin
 {
@@ -69,10 +72,10 @@ public class SithClanPlugin extends Plugin
 	private ScheduledExecutorService executor;
 
 	@Inject
-	private SithClanPluginConfig config;
+	private Gson gson;
 
 	@Inject
-	private SithClanPluginStartupManager startupManager;
+	private SithClanPluginConfig config;
 
 	@Inject
 	private SithClanPluginFileManager fileManager;
@@ -137,7 +140,7 @@ public class SithClanPlugin extends Plugin
 		executor.submit(() ->
 		{
 			// get startup info and parse
-			int status = startupManager.parseStartupInfoFromGet();
+			int status = parseStartupInfo();
 			// if fails, load from local file
 			if (status != SithClanPluginConstants.STATUS_OK)
 			{
@@ -367,5 +370,23 @@ public class SithClanPlugin extends Plugin
 		}
 
 		return clanSettings.getName().equalsIgnoreCase(SithClanPluginConstants.CLAN_NAME);
+	}
+
+	private int parseStartupInfo()
+	{
+		log.info("Fetching startup info from server..");
+		String jsonStartupInfo = SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.STARTUP_URI);
+		if (jsonStartupInfo == null)
+		{
+			log.error("Failed to fetch startup info -- server returned null");
+			return SithClanPluginConstants.STATUS_NOT_FOUND;
+		}
+		log.info("Startup info retrieved successfully, deserializing..");
+		StartupResponse startupResponse = gson.fromJson(jsonStartupInfo, StartupResponse.class);
+		String scheduleJson = gson.toJson(startupResponse.getStartupSchedule());
+		eventSchedule.loadStartupSchedule(startupResponse.getStartupSchedule(), scheduleJson);
+		announcements.loadStartupAnnouncements(startupResponse.getStartupAnnouncements());
+		log.info("Startup info loaded successfully.");
+		return SithClanPluginConstants.STATUS_OK;
 	}
 }
