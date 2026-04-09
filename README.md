@@ -58,6 +58,7 @@ Open the RuneLite settings panel by clicking the wrench icon at the top of the r
 | --- |
 
 | NOTE: Senate API keys will be handed out by the plugins author only. |
+| --- |
 
 ![Configuration](./assets/plugin_config.png "Configuration")
 
