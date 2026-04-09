@@ -508,7 +508,7 @@ public class SithClanSchedulePanel extends JPanel
                         LinkBrowser.browse(channelUrl);
                     } catch (Exception ex)
                     {
-                        ex.printStackTrace();
+                        log.error("Exception while creating Discord link: {}", ex.getMessage(), ex);
                     }
                 }
             });
@@ -546,7 +546,7 @@ public class SithClanSchedulePanel extends JPanel
                     plugin.hopTo(Integer.parseInt(worldId));
                 } catch (Exception ex)
                 {
-                    ex.printStackTrace();
+                    log.error("Exception while creating Discord link: {}", ex.getMessage(), ex);
                 }
             }
         });
