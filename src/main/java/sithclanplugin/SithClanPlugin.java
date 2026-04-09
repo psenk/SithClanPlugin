@@ -2,6 +2,7 @@ package sithclanplugin;
 
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
@@ -161,6 +162,9 @@ public class SithClanPlugin extends Plugin
 				uiPanel.get().getSenateButton().setVisible(isSenateMember);
 			});
 		});
+
+		// schedule next event refresh event
+		uiPanel.get().getSchedulePanel().startNextEventRefresh();
 	}
 
 	/**
@@ -171,7 +175,7 @@ public class SithClanPlugin extends Plugin
 	{
 		clientToolbar.removeNavigation(uiNavigationButton);
 		notificationManager.shutDown();
-		uiPanel.get().getSchedulePanel().shutDown();
+		uiPanel.get().getSchedulePanel().stopNextEventRefresh();
 	}
 
 	/**

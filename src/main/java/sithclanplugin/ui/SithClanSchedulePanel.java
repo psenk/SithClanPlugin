@@ -177,11 +177,6 @@ public class SithClanSchedulePanel extends JPanel
         });
 
         this.setVisible(true);
-
-        // periodically refresh next event display
-        nextEventRefreshTask = executor.scheduleAtFixedRate(
-                () -> SwingUtilities.invokeLater(this::updateNextEventDisplay),
-                1, 1, TimeUnit.MINUTES);
     }
 
     /**
@@ -248,7 +243,7 @@ public class SithClanSchedulePanel extends JPanel
     /**
      * Find and display next event
      */
-    private void updateNextEventDisplay()
+    public void updateNextEventDisplay()
     {
         if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty())
         {
@@ -621,9 +616,19 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
-     * Cancel the next event refresh timer
+     * Starts task to refresh next event display
      */
-    public void shutDown()
+    public void startNextEventRefresh()
+    {
+        nextEventRefreshTask = executor.scheduleAtFixedRate(
+                () -> SwingUtilities.invokeLater(this::updateNextEventDisplay),
+                1, 1, TimeUnit.MINUTES);
+    }
+
+    /**
+     * Ends task to refresh next event display
+     */
+    public void stopNextEventRefresh()
     {
         if (nextEventRefreshTask != null)
         {
