@@ -13,30 +13,22 @@ repositories {
 	mavenCentral()
 }
 
-test {
-	testLogging {
-		showStandardStreams = true
-	}
-}
-
 def runeLiteVersion = 'latest.release'
 def pluginMainClass = 'sithclanplugin.SithClanPluginTest'
 
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
 
-	compileOnly 'org.projectlombok:lombok:1.18.36'
-	compileOnly 'com.google.code.gson:gson:2.10.1'
-	annotationProcessor 'org.projectlombok:lombok:1.18.36'
+	compileOnly 'org.projectlombok:lombok:1.18.30'
+	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
 	testImplementation 'junit:junit:4.12'
-	testImplementation 'org.mockito:mockito-core:4.0.0'
 	testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name:'jshell', version: runeLiteVersion
 }
 
 group = 'sithclanplugin'
-version = '1.0-SNAPSHOT'
+version = '1.0'
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
@@ -48,7 +40,7 @@ tasks.register('run', JavaExec) {
 	mainClass = pluginMainClass
 
 	jvmArgs "-ea"
-	args "--developer-mode", "--safe-mode", "--insecure-skip-tls-verification"
+	args "--developer-mode", "--debug"
 }
 
 tasks.register('shadowJar', Jar) {
