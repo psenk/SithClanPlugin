@@ -1,14 +1,3 @@
 {
-    "java.configuration.runtimes": [
-        {
-            "name": "JavaSE-11",
-            "path": "F:/Java/JDK 11",
-            "default": true
-        }
-    ],
-    "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "java.jdt.ls.lombokSupport.enabled": true,
-    "java.debug.settings.onBuildFailureProceed": true,
-    "java.format.settings.url": "F:\\Java\\google-java-formatter.xml"
+"isGitignoreExtActive": true,
 }
