@@ -347,6 +347,7 @@ public class SithClanSchedulePanel extends JPanel
         dailyEvents.setLayout(new BoxLayout(dailyEvents, BoxLayout.Y_AXIS));
         dailyEvents.setAlignmentX(Component.LEFT_ALIGNMENT);
         dailyEvents.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
+        dailyEvents.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
         dailyEvents.setVisible(false);
         return dailyEvents;
     }
@@ -438,11 +439,11 @@ public class SithClanSchedulePanel extends JPanel
             notificationManager.scheduleNotifications(eventSchedule.getSchedule());
         });
 
-        eventContainer.add(singleEvent, BorderLayout.WEST);
+        eventContainer.add(singleEvent, BorderLayout.CENTER);
         eventContainer.add(notificationCheckbox, BorderLayout.EAST);
 
         // event title
-        JLabel eventTitle = new JLabel(eventTitleString);
+        JLabel eventTitle = new JLabel(wrapLabelText(eventTitleString));
         eventTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventTitle);
 
@@ -459,7 +460,8 @@ public class SithClanSchedulePanel extends JPanel
         // event host (optional info)
         if (event.getEventHost() != null && !event.getEventHost().isBlank())
         {
-            JLabel eventHost = new JLabel("Hosted by: " + SithClanPluginUtil.removeEmojis(event.getEventHost()));
+            JLabel eventHost = new JLabel(
+                    wrapLabelText("Hosted by: " + SithClanPluginUtil.removeEmojis(event.getEventHost())));
             eventHost.setAlignmentX(Component.LEFT_ALIGNMENT);
             singleEvent.add(eventHost);
         }
@@ -491,8 +493,7 @@ public class SithClanSchedulePanel extends JPanel
         }
 
         // size constraints after children added
-        eventContainer.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 100));
-        eventContainer.setMaximumSize(new Dimension(Short.MAX_VALUE, eventContainer.getPreferredSize().height));
+        eventContainer.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
         return eventContainer;
     }
@@ -533,7 +534,7 @@ public class SithClanSchedulePanel extends JPanel
             });
             return channelLink;
         }
-        return new JLabel(text);
+        return new JLabel("<html>" + text + "</html>");
     }
 
     /**
@@ -653,5 +654,17 @@ public class SithClanSchedulePanel extends JPanel
         {
             nextEventRefreshTask.cancel(false);
         }
+    }
+
+    /**
+     * Wraps String in HTML tags
+     * 
+     * @param text
+     *                 String text to wrap
+     * @return String text wrapped in HTML tags
+     */
+    private String wrapLabelText(String text)
+    {
+        return "<html>" + text + "</html>";
     }
 }
