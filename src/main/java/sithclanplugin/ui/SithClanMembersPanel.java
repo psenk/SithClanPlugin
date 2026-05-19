@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.swing.BorderFactory;
@@ -321,6 +322,8 @@ public class SithClanMembersPanel extends JPanel
     {
         // fresh panel
         membersAreaPanel.removeAll();
+        rosterList = null;
+        pageIndex = 0;
 
         JPanel singleMemberPanel = buildMemberCard(member);
 
@@ -342,14 +345,13 @@ public class SithClanMembersPanel extends JPanel
         membersAreaPanel.removeAll();
 
         // sort roster by clan rank descending
-        rosterList = new ArrayList<>(rosterCollection);
+        rosterList = new ArrayList<>(new LinkedHashSet<>(rosterCollection));
         rosterList.sort(Comparator.comparingInt(SithClanMember::getMemberRank).reversed()
                 .thenComparing(SithClanMember::getMemberName));
 
         // reset pagination and load first page
         pageIndex = 0;
         loadNextPage();
-
     }
 
     /**
