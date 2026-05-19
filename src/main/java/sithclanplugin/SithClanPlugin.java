@@ -48,8 +48,7 @@ import sithclanplugin.util.SithClanPluginUtil;
 
 @Slf4j
 @PluginDescriptor(name = "Sith Clan Plugin", description = "Enable the Sith Clan Plugin")
-public class SithClanPlugin extends Plugin
-{
+public class SithClanPlugin extends Plugin {
 	@Inject
 	private Client client;
 
@@ -113,8 +112,7 @@ public class SithClanPlugin extends Plugin
 	 * Runs when plugin starts up
 	 */
 	@Override
-	protected void startUp() throws Exception
-	{
+	protected void startUp() throws Exception {
 		// navigation bar icon
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), PLUGIN_ICON_PATH);
 		uiNavigationButton = NavigationButton.builder()
@@ -130,20 +128,17 @@ public class SithClanPlugin extends Plugin
 		fileManager.initializeFiles();
 
 		// bypass check for testing
-		if (SithClanPluginConstants.BYPASS_CLAN_CHECK)
-		{
+		if (SithClanPluginConstants.BYPASS_CLAN_CHECK) {
 			pendingClanCheck = false;
 			SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
 		}
 
 		// startup loading
-		executor.submit(() ->
-		{
+		executor.submit(() -> {
 			// get startup info and parse
 			int status = parseStartupInfo();
 			// if fails, load from local file
-			if (status != SithClanPluginConstants.STATUS_OK)
-			{
+			if (status != SithClanPluginConstants.STATUS_OK) {
 				eventSchedule.parseScheduleFromFile();
 			}
 			// validate API key of Senate members
@@ -151,8 +146,7 @@ public class SithClanPlugin extends Plugin
 			eventSchedule.setSenateMember(isSenateMember);
 			announcements.setSenateMember(isSenateMember);
 			memberRoster.setSenateMember(isSenateMember);
-			SwingUtilities.invokeLater(() ->
-			{
+			SwingUtilities.invokeLater(() -> {
 				// display event schedule
 				uiPanel.get().getSchedulePanel().displaySchedule();
 				// display clan announcements
@@ -170,8 +164,7 @@ public class SithClanPlugin extends Plugin
 	 * Runs when plugin shuts down
 	 */
 	@Override
-	protected void shutDown() throws Exception
-	{
+	protected void shutDown() throws Exception {
 		clientToolbar.removeNavigation(uiNavigationButton);
 		notificationManager.shutDown();
 		uiPanel.get().getSchedulePanel().stopNextEventRefresh();
@@ -181,13 +174,11 @@ public class SithClanPlugin extends Plugin
 	 * Runs whenever game state has been changed
 	 * 
 	 * @param event
-	 *                  game state event
+	 *              game state event
 	 */
 	@Subscribe
-	public void onGameStateChanged(GameStateChanged event)
-	{
-		if (event.getGameState() == GameState.LOGGED_IN)
-		{
+	public void onGameStateChanged(GameStateChanged event) {
+		if (event.getGameState() == GameState.LOGGED_IN) {
 			pendingClanCheck = true;
 		}
 	}
@@ -196,25 +187,19 @@ public class SithClanPlugin extends Plugin
 	 * Runs every game tick
 	 * 
 	 * @param event
-	 *                  GameTick gametick event object
+	 *              GameTick gametick event object
 	 */
 	@Subscribe
-	public void onGameTick(GameTick event)
-	{
+	public void onGameTick(GameTick event) {
 		// clan check logic
-		if (pendingClanCheck)
-		{
-			if (client.getClanSettings() != null)
-			{
+		if (pendingClanCheck) {
+			if (client.getClanSettings() != null) {
 				pendingClanCheck = false;
 				// if not in clan hide panels
-				SwingUtilities.invokeLater(() ->
-				{
-					if (isInClan())
-					{
+				SwingUtilities.invokeLater(() -> {
+					if (isInClan()) {
 						uiPanel.get().showMainPanel();
-					} else
-					{
+					} else {
 						uiPanel.get().userNotInClan();
 					}
 				});
@@ -223,21 +208,17 @@ public class SithClanPlugin extends Plugin
 		}
 
 		// world hopping logic
-		if (quickHopTargetWorld == null)
-		{
+		if (quickHopTargetWorld == null) {
 			return;
 		}
 		// open worlds list
-		if (client.getWidget(InterfaceID.Worldswitcher.BUTTONS) == null)
-		{
+		if (client.getWidget(InterfaceID.Worldswitcher.BUTTONS) == null) {
 			client.openWorldHopper();
-			if (++displaySwitcherAttempts >= DISPLAY_SWITCHER_MAX_ATTEMPTS)
-			{
+			if (++displaySwitcherAttempts >= DISPLAY_SWITCHER_MAX_ATTEMPTS) {
 				quickHopTargetWorld = null;
 				displaySwitcherAttempts = 0;
 			}
-		} else
-		{
+		} else {
 			client.hopToWorld(quickHopTargetWorld);
 			quickHopTargetWorld = null;
 			displaySwitcherAttempts = 0;
@@ -248,18 +229,14 @@ public class SithClanPlugin extends Plugin
 	 * Run whenever players clan channel changes (joined, leaves, kicked)
 	 * 
 	 * @param event
-	 *                  ClanChannelChanged event object
+	 *              ClanChannelChanged event object
 	 */
 	@Subscribe
-	public void onClanChannelChanged(ClanChannelChanged event)
-	{
-		SwingUtilities.invokeLater(() ->
-		{
-			if (isInClan())
-			{
+	public void onClanChannelChanged(ClanChannelChanged event) {
+		SwingUtilities.invokeLater(() -> {
+			if (isInClan()) {
 				uiPanel.get().showMainPanel();
-			} else
-			{
+			} else {
 				uiPanel.get().userNotInClan();
 			}
 		});
@@ -269,12 +246,11 @@ public class SithClanPlugin extends Plugin
 	 * Allow config to be accessible from RL settings panel
 	 * 
 	 * @param configManager
-	 *                          ConfigManager configuration manager object
+	 *                      ConfigManager configuration manager object
 	 * @return ConfigManager plugin configuration
 	 */
 	@Provides
-	SithClanPluginConfig provideConfig(ConfigManager configManager)
-	{
+	SithClanPluginConfig provideConfig(ConfigManager configManager) {
 		return configManager.getConfig(SithClanPluginConfig.class);
 	}
 
@@ -286,10 +262,9 @@ public class SithClanPlugin extends Plugin
 	 * Entry point to transfer from EDT to client thread
 	 * 
 	 * @param worldId
-	 *                    int id of world to hop to
+	 *                int id of world to hop to
 	 */
-	public void hopTo(int worldId)
-	{
+	public void hopTo(int worldId) {
 		clientThread.invoke(() -> hop(worldId));
 	}
 
@@ -297,18 +272,15 @@ public class SithClanPlugin extends Plugin
 	 * Find World from list and passes forward to hop
 	 * 
 	 * @param worldId
-	 *                    int id of world to hop to
+	 *                int id of world to hop to
 	 */
-	private void hop(int worldId)
-	{
+	private void hop(int worldId) {
 		WorldResult worldResult = worldService.getWorlds();
-		if (worldResult == null)
-		{
+		if (worldResult == null) {
 			return;
 		}
 		World world = worldResult.findWorld(worldId);
-		if (world == null)
-		{
+		if (world == null) {
 			return;
 		}
 		hop(world);
@@ -318,10 +290,9 @@ public class SithClanPlugin extends Plugin
 	 * Hop to provided world on next gametick
 	 * 
 	 * @param world
-	 *                  World world to hop to in game
+	 *              World world to hop to in game
 	 */
-	private void hop(World world)
-	{
+	private void hop(World world) {
 		assert client.isClientThread(); // must be run on client thread
 
 		// creating world object
@@ -334,8 +305,7 @@ public class SithClanPlugin extends Plugin
 		rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
 
 		// if logged out can just swap worlds
-		if (client.getGameState() == GameState.LOGIN_SCREEN)
-		{
+		if (client.getGameState() == GameState.LOGIN_SCREEN) {
 			client.changeWorld(rsWorld);
 			return;
 		}
@@ -363,13 +333,11 @@ public class SithClanPlugin extends Plugin
 	 * 
 	 * @return boolean if member in clan
 	 */
-	private boolean isInClan()
-	{
+	private boolean isInClan() {
 		ClanSettings clanSettings = client.getClanSettings();
 
 		// not in a clan
-		if (clanSettings == null)
-		{
+		if (clanSettings == null) {
 			return false;
 		}
 
@@ -381,12 +349,10 @@ public class SithClanPlugin extends Plugin
 	 * 
 	 * @return int status code
 	 */
-	private int parseStartupInfo()
-	{
+	private int parseStartupInfo() {
 		log.info("Fetching startup info from server..");
 		String jsonStartupInfo = SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.STARTUP_URI);
-		if (jsonStartupInfo == null)
-		{
+		if (jsonStartupInfo == null) {
 			log.error("Failed to fetch startup info -- server returned null");
 			return SithClanPluginConstants.STATUS_NOT_FOUND;
 		}

@@ -85,6 +85,7 @@ public class SithClanSenatePanel extends JPanel
         // uploading schedule/roster
         uploadingLabel = new JLabel(UPLOADING);
         uploadingLabel.setVisible(false);
+        uploadingLabel.setForeground(ColorScheme.BRAND_ORANGE);
         uploadingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         statusPanel.add(uploadingLabel);
