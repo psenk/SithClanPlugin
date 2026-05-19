@@ -52,6 +52,7 @@ import sithclanplugin.util.SithClanPluginUtil;
 @Singleton
 public class SithClanSchedulePanel extends JPanel
 {
+
     @Inject
     private ScheduledExecutorService executor;
 
@@ -80,7 +81,7 @@ public class SithClanSchedulePanel extends JPanel
     private Runnable onRefreshCallback;
 
     private static final String EVENT_SCHEDULE = "Event Schedule";
-    private static final String SCHEDULE_EXPIRED_WARNING = "Schedule is expired! Please refresh";
+    private static final String SCHEDULE_EXPIRED_WARNING = "<html><center>Schedule is expired! Please refresh.<br />If still expired, contact a Senate member.</center></html>";
     private static final String REFRESH_SCHEDULE_BUTTON = "Refresh Schedule";
     private static final String ARROW_RIGHT_IMG_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_IMG_PATH = "/arrow_down.png";
@@ -90,7 +91,7 @@ public class SithClanSchedulePanel extends JPanel
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
     private static final String NO_NEXT_EVENT = "Next Event: None";
     private static final String NEXT_EVENT = "Next Event";
-
+    private static final String NO_EVENTS_SCHEDULED_TODAY = "No events scheduled today.";
     private static final String NO_UPCOMING_EVENTS = "No upcoming events";
 
     SithClanSchedulePanel()
@@ -113,6 +114,7 @@ public class SithClanSchedulePanel extends JPanel
         scheduleExpiredSpace = Box.createRigidArea(new Dimension(0, 5));
         scheduleExpiredSpace.setVisible(false);
         this.add(scheduleExpiredSpace);
+        this.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // organization, contains panel title and expiration warning
         JPanel topPanel = new JPanel();
@@ -207,6 +209,7 @@ public class SithClanSchedulePanel extends JPanel
         for (SithClanDaySchedule day : eventSchedule.getSchedule())
         {
             currentDay = day.getDate();
+
             // create panel for each days events
             JPanel dailyEvents = createDailyEventsPanel();
             // create interactable date label to collapse/expand days events
@@ -216,18 +219,34 @@ public class SithClanSchedulePanel extends JPanel
             scheduleContainer.add(dailyEvents);
 
             // sort events by time
-            ArrayList<SithClanEvent> events = new ArrayList<>(day.getEvents());
+            // add blank list if no events on day
+            ArrayList<SithClanEvent> rawEvents = day.getEvents();
+            ArrayList<SithClanEvent> events = (rawEvents != null) ? new ArrayList<>(rawEvents) : new ArrayList<>();
             events.sort((e1, e2) -> LocalTime.parse(e1.getEventTime(), SithClanPluginConstants.TIME_FORMATTER)
                     .compareTo(LocalTime.parse(e2.getEventTime(), SithClanPluginConstants.TIME_FORMATTER)));
 
-            // iterate through all events in day
-            for (SithClanEvent event : events)
+            // if there are no scheduled events this day
+            if (events.isEmpty() || events == null)
             {
-                // create each event
-                JPanel singleEvent = createEvent(event, day.getDate());
+                JLabel noEventsLabel = new JLabel(NO_EVENTS_SCHEDULED_TODAY);
+                noEventsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                noEventsLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
+                noEventsLabel.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+                noEventsLabel.setMinimumSize(
+                        new Dimension(PluginPanel.PANEL_WIDTH - 10, noEventsLabel.getPreferredSize().height));
+                noEventsLabel.setMaximumSize(new Dimension(Short.MAX_VALUE, noEventsLabel.getPreferredSize().height));
+                dailyEvents.add(noEventsLabel);
+            } else
+            {
+                // iterate through all events in day
+                for (SithClanEvent event : events)
+                {
+                    // create each event
+                    JPanel singleEvent = createEvent(event, day.getDate());
 
-                dailyEvents.add(singleEvent);
-                dailyEvents.add(Box.createRigidArea(new Dimension(0, 10)));
+                    dailyEvents.add(singleEvent);
+                    dailyEvents.add(Box.createRigidArea(new Dimension(0, 10)));
+                }
             }
         }
         // check if schedule is expired
