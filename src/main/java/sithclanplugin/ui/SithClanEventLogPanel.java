@@ -57,8 +57,8 @@ public class SithClanEventLogPanel extends JPanel
     private static final String POST_SUCCESS = "Event log posted to Discord";
     private static final String POST_FAILURE = "Failed to post event log to Discord";
     private static final int DISCORD_MAX_LENGTH = 2000;
-    private static final String DISCORD_WEBHOOK_PREFIX = "https://discord.com/webhooks/";
-    private static final Object INVALID_WEBHOOK_URL = "Invalid Discord webhook URL";
+    private static final String DISCORD_WEBHOOK_PREFIX = "https://discord.com/";
+    private static final String INVALID_WEBHOOK_URL = "Invalid Discord webhook URL";
 
     SithClanEventLogPanel()
     {
