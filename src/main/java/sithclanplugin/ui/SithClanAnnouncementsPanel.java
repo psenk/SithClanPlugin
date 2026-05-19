@@ -164,8 +164,11 @@ public class SithClanAnnouncementsPanel extends JPanel
                     editorPane.setEditable(false);
                     editorPane.setOpaque(false);
                     editorPane.setBorder(ANNOUNCEMENT_BORDER);
-                    editorPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 60));
-                    editorPane.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 60));
+                    editorPane.setSize(PluginPanel.PANEL_WIDTH, Short.MAX_VALUE);
+                    int editorPaneHeight = editorPane.getPreferredSize().height;
+                    editorPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, editorPaneHeight));
+                    editorPane.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, editorPaneHeight));
+                    editorPane.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, editorPaneHeight));
 
                     // open links
                     editorPane.addHyperlinkListener(e ->
