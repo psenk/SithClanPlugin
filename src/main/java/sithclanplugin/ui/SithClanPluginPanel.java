@@ -190,16 +190,18 @@ public class SithClanPluginPanel extends PluginPanel
         notLoggedInPanel = new JPanel();
         notLoggedInPanel.setLayout(new BoxLayout(notLoggedInPanel, BoxLayout.Y_AXIS));
         JLabel notLoggedInLabel = new JLabel(NOT_LOGGED_IN_MESSAGE);
+        notLoggedInLabel.setSize(PluginPanel.PANEL_WIDTH - 10, Short.MAX_VALUE);
         notLoggedInLabel.setMaximumSize(
-                new Dimension(PluginPanel.PANEL_WIDTH - 10, notLoggedInLabel.getPreferredSize().height * 2));
+                new Dimension(PluginPanel.PANEL_WIDTH - 10, notLoggedInLabel.getPreferredSize().height));
         notLoggedInPanel.add(notLoggedInLabel);
 
         // panel for users not in the clan
         notClanMemberPanel = new JPanel();
         notClanMemberPanel.setLayout(new BoxLayout(notClanMemberPanel, BoxLayout.Y_AXIS));
         JLabel notClanMemberLabel = new JLabel(NON_MEMBER_MESSAGE);
+        notClanMemberLabel.setSize(PluginPanel.PANEL_WIDTH - 10, Short.MAX_VALUE);
         notClanMemberLabel.setMaximumSize(
-                new Dimension(PluginPanel.PANEL_WIDTH - 10, notClanMemberLabel.getPreferredSize().height * 2));
+                new Dimension(PluginPanel.PANEL_WIDTH - 10, notClanMemberLabel.getPreferredSize().height));
         notClanMemberPanel.add(notClanMemberLabel);
 
         // add center state cards into outer panel
