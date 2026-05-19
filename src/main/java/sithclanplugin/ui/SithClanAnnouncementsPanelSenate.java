@@ -226,11 +226,6 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         // create announcement panel
         JPanel singleAnnouncementPanel = new JPanel();
         singleAnnouncementPanel.setLayout(new BoxLayout(singleAnnouncementPanel, BoxLayout.Y_AXIS));
-        singleAnnouncementPanel
-                .setPreferredSize(
-                        new Dimension(PluginPanel.PANEL_WIDTH, 90));
-        singleAnnouncementPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 90));
-        singleAnnouncementPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 90));
         singleAnnouncementPanel.setBorder(ANNOUNCEMENT_BORDER);
 
         // create text area to type announcement
@@ -238,7 +233,13 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         announcementTextArea.setEditable(false);
         announcementTextArea.setLineWrap(true);
         announcementTextArea.setWrapStyleWord(true);
-        announcementTextArea.setRows(3);
+        announcementTextArea.setColumns(1);
+        int textAreaWidth = PluginPanel.PANEL_WIDTH - 10;
+        announcementTextArea.setSize(textAreaWidth, Short.MAX_VALUE);
+        int textAreaHeight = announcementTextArea.getPreferredSize().height;
+        announcementTextArea.setPreferredSize(new Dimension(textAreaWidth, textAreaHeight));
+        announcementTextArea.setMaximumSize(new Dimension(textAreaWidth, textAreaHeight));
+        announcementTextArea.setMinimumSize(new Dimension(textAreaWidth, textAreaHeight));
 
         // row of buttons, edit and delete announcements
         JPanel buttonPanel = new JPanel();
