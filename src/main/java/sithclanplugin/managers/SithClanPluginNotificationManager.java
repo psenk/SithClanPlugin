@@ -144,11 +144,10 @@ public class SithClanPluginNotificationManager
     }
 
     /**
-     * Shut executor down
+     * Cancel all notifications
      */
     public void shutDown()
     {
         cancelAllNotifications();
-        executor.shutdown();
     }
 }
