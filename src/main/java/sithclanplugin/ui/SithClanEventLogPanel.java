@@ -72,7 +72,7 @@ public class SithClanEventLogPanel extends JPanel
 
         // text area to paste log
         eventLogTextArea = new JTextArea(TEXT_AREA_DEFAULT);
-        eventLogTextArea.setRows(10);
+        eventLogTextArea.setRows(20);
 
         // highlights all text when box focused
         eventLogTextArea.addFocusListener(new FocusAdapter()
@@ -86,6 +86,7 @@ public class SithClanEventLogPanel extends JPanel
 
         JScrollPane scrollPane = new JScrollPane(eventLogTextArea);
         scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, scrollPane.getPreferredSize().height));
         this.add(scrollPane);
 
         // submit button
