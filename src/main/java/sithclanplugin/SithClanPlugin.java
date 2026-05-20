@@ -160,6 +160,31 @@ public class SithClanPlugin extends Plugin
 				// display senate options button if senate
 				uiPanel.get().getSenateButton().setVisible(isSenateMember);
 			});
+
+			// allow plugin to work immediately on install
+			clientThread.invokeLater(() ->
+			{
+				if (client.getGameState() == GameState.LOGGED_IN)
+				{
+					if (client.getClanSettings() != null)
+					{
+						boolean isInClan = isInClan();
+						SwingUtilities.invokeLater(() ->
+						{
+							if (isInClan)
+							{
+								uiPanel.get().showMainPanel();
+							} else
+							{
+								uiPanel.get().userNotInClan();
+							}
+						});
+					} else
+					{
+						pendingClanCheck = true;
+					}
+				}
+			});
 		});
 
 		// schedule next event refresh event
@@ -207,10 +232,11 @@ public class SithClanPlugin extends Plugin
 			if (client.getClanSettings() != null)
 			{
 				pendingClanCheck = false;
+				boolean isInClan = isInClan();
 				// if not in clan hide panels
 				SwingUtilities.invokeLater(() ->
 				{
-					if (isInClan())
+					if (isInClan)
 					{
 						uiPanel.get().showMainPanel();
 					} else
@@ -253,9 +279,10 @@ public class SithClanPlugin extends Plugin
 	@Subscribe
 	public void onClanChannelChanged(ClanChannelChanged event)
 	{
+		boolean isInClan = isInClan();
 		SwingUtilities.invokeLater(() ->
 		{
-			if (isInClan())
+			if (isInClan)
 			{
 				uiPanel.get().showMainPanel();
 			} else
