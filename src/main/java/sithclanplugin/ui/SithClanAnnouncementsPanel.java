@@ -79,6 +79,7 @@ public class SithClanAnnouncementsPanel extends JPanel
         // announcements list panel
         announcementsListPanel = new JPanel();
         announcementsListPanel.setLayout(new BoxLayout(announcementsListPanel, BoxLayout.Y_AXIS));
+        announcementsListPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         announcementsScrollPane = new JScrollPane(announcementsListPanel);
         announcementsScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 150));
@@ -156,11 +157,11 @@ public class SithClanAnnouncementsPanel extends JPanel
             } else
             {
                 // create each announcement
-                for (SithClanAnnouncement announcement : announcementsList)
+                for (int i = announcementsList.size() - 1; i >= 0; i--)
                 {
                     JEditorPane editorPane = new JEditorPane();
                     editorPane.setContentType("text/html");
-                    editorPane.setText(convertLinks(announcement.getAnnouncementText()));
+                    editorPane.setText(convertLinks(announcementsList.get(i).getAnnouncementText()));
                     editorPane.setEditable(false);
                     editorPane.setOpaque(false);
                     editorPane.setBorder(ANNOUNCEMENT_BORDER);
