@@ -1,7 +1,12 @@
 package sithclanplugin.util;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
+
+import javax.swing.JLabel;
+import javax.swing.Timer;
 
 import com.google.gson.JsonObject;
 
@@ -268,5 +273,26 @@ public class SithClanPluginUtil
     public static String removeEmojis(String input)
     {
         return input.replaceAll(":[a-zA-Z0-9_]+:", "").trim();
+    }
+
+    /**
+     * Creates timer to set status label as not visible
+     * 
+     * @param label
+     *                  JLabel status label to hide after timer
+     */
+    public static void statusTimer(JLabel label)
+    {
+        Timer timer = new Timer(5000, new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent event)
+            {
+                label.setVisible(false);
+            }
+        });
+
+        timer.setRepeats(false);
+        timer.start();
     }
 }
