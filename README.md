@@ -47,12 +47,13 @@ Features options that allow for managing the Sith clan plugin info. This section
 
 Open the RuneLite settings panel by clicking the wrench icon at the top of the right navigation bar and search **Sith Clan Plugin** to access the following options:
 
-| Setting                       | Description                                                    | Default   |
-| ----------------------------- | -------------------------------------------------------------- | --------- |
-| Event Alerts                  | Enables or disables notifications for upcoming clan events     | Off       |
-| Alert Time Buffer             | How many minutes before an event the notification fires (1–60) | 15        |
-| Discord Event Log Webhook URL | The Discord webhook URL used to post event logs                | _(empty)_ |
-| Senate API Key                | API key granting access to Senate member options               | _(empty)_ |
+| Setting                       | Description                                                        | Default   |
+| ----------------------------- | ------------------------------------------------------------------ | --------- |
+| Event Alerts                  | Enables or disables notifications for upcoming clan events         | Off       |
+| Alert Time Buffer             | How many minutes before an event the notification fires (1–60)     | 15        |
+| Clan Member Lookup            | Enables or disables option to lookup clan members via right click  | Off       |
+| Discord Event Log Webhook URL | The Discord webhook URL used to post event logs                    | _(empty)_ |
+| Senate API Key                | API key granting access to Senate member options                   | _(empty)_ |
 
 | NOTE: The Discord Webhook URL will need to be obtained from a qualified Sith clan member. |
 | --- |
@@ -90,5 +91,6 @@ Portions of this plugin were inspired by or derived from:
 
 - [Clan Event Attendance](https://github.com/JoRouss/runelite-ClanEventAttendance) - Licensed under BSD 2-Clause License
 - [World Hopper](https://github.com/runelite/runelite/tree/master/runelite-client/src/main/java/net/runelite/client/plugins/worldhopper) - Licensed under BSD 2-Clause License
+- [Hiscore Plugin](https://github.com/runelite/runelite/tree/master/runelite-client/src/main/java/net/runelite/client/plugins/hiscore) - Licensed under BSD 2-Clause License
 
 See the LICENSES directory for third-party details.

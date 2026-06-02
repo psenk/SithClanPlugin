@@ -243,6 +243,7 @@ public class SithClanMembersPanel extends JPanel
                 SithClanMember member = memberRoster.getMemberByName(membersSearchTextField.getText());
                 SwingUtilities.invokeLater(() ->
                 {
+                    // if member does not exist
                     if (member == null)
                     {
                         memberDoesNotExistLabel.setVisible(true);
@@ -533,5 +534,49 @@ public class SithClanMembersPanel extends JPanel
         rosterDateLabel
                 .setText(ROSTER_DATE_PREFIX + timeStamp.format(SithClanPluginConstants.DATE_FORMATTER));
         rosterDateLabel.setVisible(true);
+    }
+
+    /**
+     * TODO: FUNCTIONALITY
+     * TODO: DOCUMENTATION
+     * 
+     * @param username
+     */
+    public void searchMemberFromMenu(String username)
+    {
+        executor.submit(() ->
+        {
+            // get roster if not already in memory
+            if (memberRoster.getRoster().isEmpty())
+            {
+                int status = memberRoster.parseRosterFromGet();
+
+                if (status == SithClanPluginConstants.STATUS_NOT_FOUND)
+                {
+                    SwingUtilities.invokeLater(() ->
+                    {
+                        JOptionPane.showMessageDialog(null, ROSTER_UNOBTAINABLE_WARNING);
+                    });
+                    return;
+                }
+            }
+
+            // get specific member
+            SithClanMember member = memberRoster.getMemberByName(username);
+            SwingUtilities.invokeLater(() ->
+            {
+                // if member does not exist
+                if (member == null)
+                {
+                    memberDoesNotExistLabel.setVisible(true);
+                } else
+                {
+                    membersSearchTextField.setText(username);
+                    memberDoesNotExistLabel.setVisible(false);
+                    updateRosterDateLabel(memberRoster.getDateRosterPosted());
+                    displaySingleMember(member);
+                }
+            });
+        });
     }
 }

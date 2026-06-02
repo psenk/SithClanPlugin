@@ -54,8 +54,8 @@ public class SithClanPluginPanel extends PluginPanel
     @Getter
     private final JButton senateButton;
 
-    private final CardLayout cardLayout;
-    private final CardLayout outerCardLayout = new CardLayout();
+    private final CardLayout cardLayout; // swaps between plugin panels
+    private final CardLayout outerCardLayout = new CardLayout(); // swaps between main panel and not allowed panels
     private final JPanel outerCardPanel = new JPanel(outerCardLayout);
     private final JPanel cardPanel;
     private final JPanel navPanel;
@@ -241,5 +241,13 @@ public class SithClanPluginPanel extends PluginPanel
         outerCardLayout.show(outerCardPanel, NOT_CLAN_MEMBER_CARD);
         revalidate();
         repaint();
+    }
+
+    /**
+     * Navigates card layout to member roster card panel
+     */
+    public void navigateToMemberCard()
+    {
+        cardLayout.show(cardPanel, MEMBERS_CARD);
     }
 }

@@ -14,11 +14,16 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.Menu;
+import net.runelite.api.MenuAction;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.clan.ClanSettings;
 import net.runelite.api.events.ClanChannelChanged;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.widgets.WidgetUtil;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
@@ -27,11 +32,13 @@ import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.WorldService;
+import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
+import net.runelite.client.util.Text;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
@@ -58,6 +65,9 @@ public class SithClanPlugin extends Plugin
 
 	@Inject
 	private ClientToolbar clientToolbar;
+
+	@Inject
+	private MenuManager menuManager;
 
 	@Inject
 	private WorldService worldService;
@@ -102,6 +112,7 @@ public class SithClanPlugin extends Plugin
 
 	private static final String PLUGIN_ICON_PATH = "/icon.png";
 	private static final String PLUGIN_TOOLTIP = "Sith Clan Plugin";
+	private static final String SITH_LOOKUP = "Sith Lookup";
 	private static final int DISPLAY_SWITCHER_MAX_ATTEMPTS = 3;
 	private static final String QUICK_HOP_MESSAGE = "Quick hopping to World "; // trailing space intentional
 
@@ -125,6 +136,12 @@ public class SithClanPlugin extends Plugin
 				.build();
 
 		clientToolbar.addNavigation(uiNavigationButton);
+
+		// add member lookup option to menu
+		if (config.memberLookup())
+		{
+			menuManager.addPlayerMenuItem(SITH_LOOKUP);
+		}
 
 		// create plugin directory and config files
 		fileManager.initializeFiles();
@@ -200,6 +217,7 @@ public class SithClanPlugin extends Plugin
 		clientToolbar.removeNavigation(uiNavigationButton);
 		notificationManager.shutDown();
 		uiPanel.get().getSchedulePanel().stopNextEventRefresh();
+		menuManager.removePlayerMenuItem(SITH_LOOKUP);
 	}
 
 	/**
@@ -290,6 +308,61 @@ public class SithClanPlugin extends Plugin
 				uiPanel.get().userNotInClan();
 			}
 		});
+	}
+
+	/**
+	 * Called whenever a menu entry is added to a menu
+	 * 
+	 * @param event
+	 *                  MenuEntryAdded event
+	 */
+	@Subscribe
+	public void onMenuEntryAdded(MenuEntryAdded event)
+	{
+		if ((event.getType() != MenuAction.CC_OP.getId() && event.getType() != MenuAction.CC_OP_LOW_PRIORITY.getId())
+				|| !config.memberLookup())
+		{
+			return;
+		}
+
+		// get event metadata
+		final String option = event.getOption();
+		final int componentId = event.getActionParam1();
+		final int groupId = WidgetUtil.componentToInterface(componentId);
+
+		// checks to determine if menu being created in appropriate user areas (friends
+		// list, clan chat, etc.)
+		if (groupId == InterfaceID.FRIENDS && option.equals("Delete")
+				|| groupId == InterfaceID.CHATCHANNEL_CURRENT
+						&& (option.equals("Add ignore") || option.equals("Remove friend"))
+				|| groupId == InterfaceID.CHATBOX && (option.equals("Add ignore") || option.equals("Message"))
+				|| groupId == InterfaceID.IGNORE && option.equals("Delete")
+				|| (componentId == InterfaceID.ClansSidepanel.PLAYERLIST
+						|| componentId == InterfaceID.ClansGuestSidepanel.PLAYERLIST)
+						&& (option.equals("Add ignore") || option.equals("Remove friend"))
+				|| groupId == InterfaceID.PM_CHAT && (option.equals("Add ignore") || option.equals("Message"))
+				|| groupId == InterfaceID.GIM_SIDEPANEL && (option.equals("Add friend")
+						|| option.equals("Remove friend") || option.equals("Remove ignore")))
+		{
+
+			// create custom menu entry
+			Menu menu = client.getMenu();
+			MenuEntry menuEntry = menu.createMenuEntry(1);
+			menuEntry.setOption(SITH_LOOKUP);
+			menuEntry.setTarget(event.getTarget());
+			menuEntry.setType(MenuAction.RUNELITE);
+			menuEntry.setIdentifier(event.getIdentifier());
+			menuEntry.onClick(e ->
+			{
+				String username = Text.removeTags(e.getTarget()).replace("\u00A0", " ");
+				SwingUtilities.invokeLater(() ->
+				{
+					clientToolbar.openPanel(uiNavigationButton);
+					uiPanel.get().navigateToMemberCard();
+					uiPanel.get().getMembersPanel().searchMemberFromMenu(username);
+				});
+			});
+		}
 	}
 
 	/**
