@@ -16,7 +16,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -26,16 +25,20 @@ import javax.swing.border.Border;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 import sithclanplugin.announcements.SithClanAnnouncement;
 import sithclanplugin.announcements.SithClanAnnouncements;
 import sithclanplugin.util.SithClanPluginConstants;
+import sithclanplugin.util.SithClanPluginUtil;
 
+@Slf4j
 @Singleton
 public class SithClanAnnouncementsPanelSenate extends JPanel
 {
+
     @Inject
     private ScheduledExecutorService executor;
 
@@ -45,6 +48,11 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     private final JPanel announcementsListPanel;
     private final JTextArea newAnnouncementTextArea;
     private final JScrollPane announcementsScrollPane;
+    private final JPanel statusPanel;
+    private final JLabel postedLabel;
+    private final JLabel updatedLabel;
+    private final JLabel deletedLabel;
+    private final JLabel errorLabel;
 
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
@@ -56,10 +64,10 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     private static final String EDIT_ANNOUNCEMENT_BUTTON = "Edit";
     private static final String SAVE_ANNOUNCEMENT_BUTTON = "Save";
     private static final String DELETE_ANNOUNCEMENT_BUTTON = "Delete";
-    private static final String SUCCESSFUL_POST = "Announcement Updated";
-    private static final String RESOURCE_CREATED = "Announcement Created";
-    private static final String BAD_INPUT_WARNING = "There is a problem with your input.";
-    private static final String NOT_FOUND_WARNING = "Unable to post.";
+    private static final String ANNOUNCEMENT_POSTED = "Announcement Posted";
+    private static final String ANNOUNCEMENT_UPDATED = "Announcement Updated";
+    private static final String ANNOUNCEMENT_DELETED = "Announcement Deleted";
+    private static final String ANNOUNCEMENT_ERROR = "Announcement Error";
     private static final Border ANNOUNCEMENT_BORDER = BorderFactory.createMatteBorder(1, 1, 1, 1,
             ColorScheme.BORDER_COLOR);
 
@@ -76,6 +84,37 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+
+        // status label panel
+        statusPanel = new JPanel();
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+
+        // announcement posted status
+        postedLabel = new JLabel(ANNOUNCEMENT_POSTED);
+        postedLabel.setVisible(false);
+        postedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // announcement updated status
+        updatedLabel = new JLabel(ANNOUNCEMENT_UPDATED);
+        updatedLabel.setVisible(false);
+        updatedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // announcement deleted status
+        deletedLabel = new JLabel(ANNOUNCEMENT_DELETED);
+        deletedLabel.setVisible(false);
+        deletedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // announcement error status
+        errorLabel = new JLabel(ANNOUNCEMENT_ERROR);
+        errorLabel.setVisible(false);
+        errorLabel.setForeground(ColorScheme.BRAND_ORANGE);
+        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        statusPanel.add(postedLabel);
+        statusPanel.add(updatedLabel);
+        statusPanel.add(deletedLabel);
+        statusPanel.add(errorLabel);
+        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // announcements interactive label
         JLabel announcementsPanelLabel = new JLabel(ANNOUNCEMENTS_LABEL);
@@ -147,6 +186,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         JPanel announcementsCollapsiblePanel = new JPanel();
         announcementsCollapsiblePanel.setLayout((new BoxLayout(announcementsCollapsiblePanel, BoxLayout.Y_AXIS)));
         announcementsCollapsiblePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        announcementsCollapsiblePanel.add(statusPanel);
         announcementsCollapsiblePanel.add(topButtonPanel);
         announcementsCollapsiblePanel.add(Box.createRigidArea(new Dimension(0, 10)));
         announcementsCollapsiblePanel.add(newAnnouncementPanel);
@@ -288,7 +328,8 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                 {
                     if (status == SithClanPluginConstants.STATUS_OK)
                     {
-                        JOptionPane.showMessageDialog(null, "Announcement Deleted");
+                        deletedLabel.setVisible(true);
+                        SithClanPluginUtil.statusTimer(deletedLabel);
                     } else
                     {
                         handleAnnouncementStatus(status);
@@ -357,20 +398,21 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     {
         switch (statusCode)
         {
-            case SithClanPluginConstants.STATUS_OK:
-                JOptionPane.showMessageDialog(null,
-                        SUCCESSFUL_POST);
-                break;
             case SithClanPluginConstants.STATUS_RESOURCE_CREATED:
-                JOptionPane.showMessageDialog(null, RESOURCE_CREATED);
+                postedLabel.setVisible(true);
+                SithClanPluginUtil.statusTimer(postedLabel);
+                break;
+            case SithClanPluginConstants.STATUS_OK:
+                updatedLabel.setVisible(true);
+                SithClanPluginUtil.statusTimer(updatedLabel);
                 break;
             case SithClanPluginConstants.STATUS_BAD_INPUT:
-                JOptionPane.showMessageDialog(null,
-                        BAD_INPUT_WARNING);
+                errorLabel.setVisible(true);
+                SithClanPluginUtil.statusTimer(errorLabel);
                 break;
             case SithClanPluginConstants.STATUS_NOT_FOUND:
-                JOptionPane.showMessageDialog(null,
-                        NOT_FOUND_WARNING);
+                errorLabel.setVisible(true);
+                SithClanPluginUtil.statusTimer(errorLabel);
                 break;
             default:
                 break;

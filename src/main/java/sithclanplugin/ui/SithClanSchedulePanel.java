@@ -26,7 +26,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -77,6 +76,9 @@ public class SithClanSchedulePanel extends JPanel
     private final JPanel scheduleContainer;
     private final Icon rightArrowIcon;
     private final Icon downArrowIcon;
+    private final JPanel statusPanel;
+    private final JLabel rateLimitedLabel;
+    private final JLabel errorLabel;
     private ScheduledFuture<?> nextEventRefreshTask;
     private Runnable onRefreshCallback;
 
@@ -85,8 +87,8 @@ public class SithClanSchedulePanel extends JPanel
     private static final String REFRESH_SCHEDULE_BUTTON = "Refresh Schedule";
     private static final String ARROW_RIGHT_IMG_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_IMG_PATH = "/arrow_down.png";
-    private static final String RATE_LIMITED_WARNING = "The schedule has been retrieved too recently.  Try again in a few minutes.";
-    private static final String SCHEDULE_UNOBTAINABLE_WARNING = "Unable to obtain schedule.";
+    private static final String RATE_LIMITED_WARNING = "<html><center>The schedule has been retrieved too recently.  Try again in a few minutes.</center></html>";
+    private static final String SCHEDULE_ERROR = "<html><center>Unable to obtain schedule.</center></html>";
     private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
     private static final String NO_NEXT_EVENT = "Next Event: None";
@@ -105,6 +107,27 @@ public class SithClanSchedulePanel extends JPanel
         // top panel title
         JLabel schedulePanelLabel = new JLabel(EVENT_SCHEDULE);
         schedulePanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // status label panel
+        statusPanel = new JPanel();
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+
+        // rate limited status
+        rateLimitedLabel = new JLabel(RATE_LIMITED_WARNING);
+        rateLimitedLabel.setVisible(false);
+        rateLimitedLabel.setForeground(ColorScheme.BRAND_ORANGE);
+        rateLimitedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // announcement error status
+        errorLabel = new JLabel(SCHEDULE_ERROR);
+        errorLabel.setVisible(false);
+        errorLabel.setForeground(ColorScheme.BRAND_ORANGE);
+        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        statusPanel.add(rateLimitedLabel);
+        statusPanel.add(errorLabel);
+        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        this.add(statusPanel);
 
         // warning if schedule is expired
         scheduleExpiredLabel = new JLabel(SCHEDULE_EXPIRED_WARNING);
@@ -612,12 +635,12 @@ public class SithClanSchedulePanel extends JPanel
         switch (status)
         {
             case SithClanPluginConstants.STATUS_RATE_LIMITED:
-                JOptionPane.showMessageDialog(null,
-                        RATE_LIMITED_WARNING);
+                rateLimitedLabel.setVisible(true);
+                SithClanPluginUtil.statusTimer(rateLimitedLabel);
                 break;
             case SithClanPluginConstants.STATUS_NOT_FOUND:
-                JOptionPane.showMessageDialog(null,
-                        SCHEDULE_UNOBTAINABLE_WARNING);
+                errorLabel.setVisible(true);
+                SithClanPluginUtil.statusTimer(errorLabel);
                 break;
             default:
                 break;

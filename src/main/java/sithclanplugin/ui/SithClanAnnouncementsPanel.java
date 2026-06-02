@@ -15,7 +15,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -32,6 +31,7 @@ import net.runelite.client.util.LinkBrowser;
 import sithclanplugin.announcements.SithClanAnnouncement;
 import sithclanplugin.announcements.SithClanAnnouncements;
 import sithclanplugin.util.SithClanPluginConstants;
+import sithclanplugin.util.SithClanPluginUtil;
 
 @Singleton
 public class SithClanAnnouncementsPanel extends JPanel
@@ -44,14 +44,17 @@ public class SithClanAnnouncementsPanel extends JPanel
 
     private final JPanel announcementsListPanel;
     private final JScrollPane announcementsScrollPane;
+    private final JPanel statusPanel;
+    private final JLabel rateLimitedLabel;
+    private final JLabel errorLabel;
 
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
     private static final String ANNOUNCEMENTS_LABEL = "Clan Announcements";
     private static final String REFRESH_ANNOUNCEMENTS = "Refresh Announcements";
-    private static final String RATE_LIMITED_WARNING = "Announcements have been retrieved too recently. Try again in a few minutes.";
+    private static final String RATE_LIMITED_WARNING = "<html><center>Announcements have been retrieved too recently. Try again in a few minutes.</center></html>";
     private static final String NO_ANNOUNCEMENTS_LABEL = "No Announcements Currently";
-    private static final String ANNOUNCEMENTS_UNOBTAINABLE = "Unable to obtain announcements.";
+    private static final String ANNOUNCEMENTS_ERROR = "Error obtaining announcements.";
     private static final Border ANNOUNCEMENT_BORDER = BorderFactory.createMatteBorder(1, 1, 1, 1,
             ColorScheme.BORDER_COLOR);
 
@@ -75,6 +78,26 @@ public class SithClanAnnouncementsPanel extends JPanel
         JPanel collapsiblePanel = new JPanel();
         collapsiblePanel.setLayout(new BoxLayout(collapsiblePanel, BoxLayout.Y_AXIS));
         collapsiblePanel.setVisible(true);
+
+        // status label panel
+        statusPanel = new JPanel();
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+
+        // rate limited status
+        rateLimitedLabel = new JLabel(RATE_LIMITED_WARNING);
+        rateLimitedLabel.setVisible(false);
+        rateLimitedLabel.setForeground(ColorScheme.BRAND_ORANGE);
+        rateLimitedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // announcement error status
+        errorLabel = new JLabel(ANNOUNCEMENTS_ERROR);
+        errorLabel.setVisible(false);
+        errorLabel.setForeground(ColorScheme.BRAND_ORANGE);
+        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        statusPanel.add(rateLimitedLabel);
+        statusPanel.add(errorLabel);
+        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // announcements list panel
         announcementsListPanel = new JPanel();
@@ -119,6 +142,8 @@ public class SithClanAnnouncementsPanel extends JPanel
         });
 
         // assembling collapsible panel
+        collapsiblePanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        collapsiblePanel.add(statusPanel);
         collapsiblePanel.add(Box.createRigidArea(new Dimension(0, 5)));
         collapsiblePanel.add(announcementsScrollPane);
         collapsiblePanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -205,10 +230,12 @@ public class SithClanAnnouncementsPanel extends JPanel
         switch (statusCode)
         {
             case SithClanPluginConstants.STATUS_RATE_LIMITED:
-                JOptionPane.showMessageDialog(null, RATE_LIMITED_WARNING);
+                rateLimitedLabel.setVisible(true);
+                SithClanPluginUtil.statusTimer(rateLimitedLabel);
                 break;
             case SithClanPluginConstants.STATUS_NOT_FOUND:
-                JOptionPane.showMessageDialog(null, ANNOUNCEMENTS_UNOBTAINABLE);
+                errorLabel.setVisible(true);
+                SithClanPluginUtil.statusTimer(errorLabel);
                 break;
             default:
                 break;
