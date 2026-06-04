@@ -5,7 +5,6 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
 import javax.swing.Box;
@@ -14,28 +13,15 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 
 import com.google.inject.Singleton;
 
 import lombok.Getter;
 import net.runelite.client.ui.PluginPanel;
-import okhttp3.OkHttpClient;
-import sithclanplugin.SithClanPluginConfig;
-import sithclanplugin.util.SithClanPluginUtil;
 
 @Singleton
 public class SithClanPluginPanel extends PluginPanel
 {
-    @Inject
-    private OkHttpClient httpClient;
-
-    @Inject
-    private ScheduledExecutorService executor;
-
-    @Inject
-    private SithClanPluginConfig config;
-
     @Getter
     private final SithClanAnnouncementsPanel announcementsPanel;
 
@@ -174,16 +160,6 @@ public class SithClanPluginPanel extends PluginPanel
         senateButton.addActionListener(e ->
         {
             cardLayout.show(cardPanel, SENATE_CARD);
-        });
-
-        // show senate button if API key added LATER
-        schedulePanel.setOnRefreshCallback(() ->
-        {
-            executor.submit(() ->
-            {
-                boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
-                SwingUtilities.invokeLater(() -> senateButton.setVisible(isSenateMember));
-            });
         });
 
         // panel for users not logged in

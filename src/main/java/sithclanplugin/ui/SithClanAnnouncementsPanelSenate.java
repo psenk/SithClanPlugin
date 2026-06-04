@@ -378,10 +378,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         announcementsListPanel.repaint();
 
         // scroll back up
-        SwingUtilities.invokeLater(() ->
-        {
-            announcementsScrollPane.getVerticalScrollBar().setValue(0);
-        });
+        SwingUtilities.invokeLater(() -> announcementsScrollPane.getVerticalScrollBar().setValue(0));
     }
 
     /**

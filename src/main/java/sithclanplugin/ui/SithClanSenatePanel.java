@@ -132,10 +132,8 @@ public class SithClanSenatePanel extends JPanel
             {
                 uploadingLabel.setVisible(true);
                 int status = eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
-                SwingUtilities.invokeLater(() ->
-                {
-                    handlePostStatus(status, senatePostScheduleTextArea, EVENT_TEXT_AREA_DEFAULT);
-                });
+                SwingUtilities.invokeLater(
+                        () -> handlePostStatus(status, senatePostScheduleTextArea, EVENT_TEXT_AREA_DEFAULT));
             });
         });
 
@@ -157,10 +155,8 @@ public class SithClanSenatePanel extends JPanel
             {
                 uploadingLabel.setVisible(true);
                 int status = memberRoster.parseRosterForPost(senatePostRosterTextArea.getText());
-                SwingUtilities.invokeLater(() ->
-                {
-                    handlePostStatus(status, senatePostRosterTextArea, ROSTER_TEXT_AREA_DEFAULT);
-                });
+                SwingUtilities.invokeLater(
+                        () -> handlePostStatus(status, senatePostRosterTextArea, ROSTER_TEXT_AREA_DEFAULT));
             });
         });
 

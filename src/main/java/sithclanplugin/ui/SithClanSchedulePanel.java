@@ -80,7 +80,6 @@ public class SithClanSchedulePanel extends JPanel
     private final JLabel rateLimitedLabel;
     private final JLabel errorLabel;
     private ScheduledFuture<?> nextEventRefreshTask;
-    private Runnable onRefreshCallback;
 
     private static final String EVENT_SCHEDULE = "Event Schedule";
     private static final String SCHEDULE_EXPIRED_WARNING = "<html><center>Schedule is expired! Please refresh.<br />If still expired, contact a Senate member.</center></html>";
@@ -192,11 +191,6 @@ public class SithClanSchedulePanel extends JPanel
                     handleScheduleStatus(status);
                     // display schedule on panel
                     displaySchedule();
-                    // callback to reveal senate options button if API key added later
-                    if (onRefreshCallback != null)
-                    {
-                        onRefreshCallback.run();
-                    }
                 });
             });
         });
@@ -645,17 +639,6 @@ public class SithClanSchedulePanel extends JPanel
             default:
                 break;
         }
-    }
-
-    /**
-     * Callback function for refresh schedule button
-     * 
-     * @param callback
-     *                     Runnable callback function
-     */
-    public void setOnRefreshCallback(Runnable callback)
-    {
-        this.onRefreshCallback = callback;
     }
 
     /**
