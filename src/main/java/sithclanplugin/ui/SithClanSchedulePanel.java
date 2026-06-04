@@ -350,6 +350,40 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
+     * Enable or disable event notification checkboxes
+     * 
+     * @param enabled
+     *                    boolean should checkboxes be enabled
+     */
+    public void setCheckboxesEnabled(boolean enabled)
+    {
+
+        for (Component dayComponent : scheduleContainer.getComponents())
+        {
+            if (!(dayComponent instanceof JPanel))
+                continue;
+
+            JPanel dailyEvents = (JPanel) dayComponent;
+
+            for (Component eventComponent : dailyEvents.getComponents())
+            {
+                if (!(eventComponent instanceof JPanel))
+                    continue;
+
+                JPanel eventContainer = (JPanel) eventComponent;
+
+                for (Component inner : eventContainer.getComponents())
+                {
+                    if (inner instanceof JCheckBox)
+                    {
+                        ((JCheckBox) inner).setEnabled(enabled);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * CREATE FUNCTIONS
      */
 

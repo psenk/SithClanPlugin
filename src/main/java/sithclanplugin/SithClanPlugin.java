@@ -31,6 +31,7 @@ import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
@@ -362,6 +363,36 @@ public class SithClanPlugin extends Plugin
 					uiPanel.get().getMembersPanel().searchMemberFromMenu(username);
 				});
 			});
+		}
+	}
+
+	/**
+	 * Called whenever a config option is changed
+	 * 
+	 * @param event
+	 *                  ConfigChanged event
+	 */
+	@Subscribe
+	public void onConfigChange(ConfigChanged event)
+	{
+		// return if not relevant to plugin
+		if (!event.getGroup().equals("sithclanplugin"))
+		{
+			return;
+		}
+
+		// enable senate button
+		if (event.getKey().equals("apiKey"))
+		{
+			boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
+			SwingUtilities.invokeLater(() -> uiPanel.get().getSenateButton().setVisible(isSenateMember));
+		}
+
+		// enable/disable event notification checkboxes
+		if (event.getKey().equals("eventNotifications"))
+		{
+			SwingUtilities.invokeLater(
+					() -> uiPanel.get().getSchedulePanel().setCheckboxesEnabled(config.eventNotifications()));
 		}
 	}
 
