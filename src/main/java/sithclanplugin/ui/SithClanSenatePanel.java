@@ -14,7 +14,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -28,6 +27,7 @@ import net.runelite.client.util.ImageUtil;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
 import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.util.SithClanPluginConstants;
+import sithclanplugin.util.SithClanPluginUtil;
 
 @Singleton
 public class SithClanSenatePanel extends JPanel
@@ -41,11 +41,15 @@ public class SithClanSenatePanel extends JPanel
     @Inject
     private SithClanMemberRoster memberRoster;
 
+    @SuppressWarnings("unused")
     private final SithClanAnnouncementsPanelSenate announcementsPanelSenate;
     private final JTextArea senatePostScheduleTextArea;
     private final JTextArea senatePostRosterTextArea;
     private final JPanel statusPanel;
+    private final JLabel successLabel;
     private final JLabel uploadingLabel;
+    private final JLabel badInputLabel;
+    private final JLabel errorLabel;
 
     private static final String SENATE_OPTIONS_LABEL = "Senate Options";
     private static final String UPDATE_SCHEDULE_LABEL = "Post Event Schedule";
@@ -57,7 +61,7 @@ public class SithClanSenatePanel extends JPanel
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
     private static final String SUCCESSFUL_POST = "Posted successfully.";
     private static final String BAD_INPUT_WARNING = "There is a problem with your input.";
-    private static final String NOT_FOUND_WARNING = "Unable to post.";
+    private static final String ERROR_WARNING = "Unable to post.";
     private static final String UPLOADING = "Uploading...";
 
     @Inject
@@ -82,13 +86,33 @@ public class SithClanSenatePanel extends JPanel
         statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
+        // post successful status label
+        successLabel = new JLabel(SUCCESSFUL_POST);
+        successLabel.setVisible(false);
+        successLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         // uploading schedule/roster
         uploadingLabel = new JLabel(UPLOADING);
         uploadingLabel.setVisible(false);
         uploadingLabel.setForeground(ColorScheme.BRAND_ORANGE);
         uploadingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // bad input status label
+        badInputLabel = new JLabel(BAD_INPUT_WARNING);
+        badInputLabel.setVisible(false);
+        badInputLabel.setForeground(ColorScheme.BRAND_ORANGE);
+        badInputLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // error status label
+        errorLabel = new JLabel(ERROR_WARNING);
+        errorLabel.setVisible(false);
+        errorLabel.setForeground(ColorScheme.BRAND_ORANGE);
+        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        statusPanel.add(successLabel);
         statusPanel.add(uploadingLabel);
+        statusPanel.add(badInputLabel);
+        statusPanel.add(errorLabel);
         statusPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         this.add(statusPanel);
 
@@ -242,20 +266,20 @@ public class SithClanSenatePanel extends JPanel
         switch (statusCode)
         {
             case SithClanPluginConstants.STATUS_OK:
-                JOptionPane.showMessageDialog(null,
-                        SUCCESSFUL_POST);
-                textArea.setText(defaultText);
                 uploadingLabel.setVisible(false);
+                successLabel.setVisible(true);
+                textArea.setText(defaultText);
+                SithClanPluginUtil.statusTimer(successLabel);
                 break;
             case SithClanPluginConstants.STATUS_BAD_INPUT:
-                JOptionPane.showMessageDialog(null,
-                        BAD_INPUT_WARNING);
                 uploadingLabel.setVisible(false);
+                badInputLabel.setVisible(true);
+                SithClanPluginUtil.statusTimer(badInputLabel);
                 break;
             case SithClanPluginConstants.STATUS_NOT_FOUND:
-                JOptionPane.showMessageDialog(null,
-                        NOT_FOUND_WARNING);
                 uploadingLabel.setVisible(false);
+                errorLabel.setVisible(true);
+                SithClanPluginUtil.statusTimer(errorLabel);
                 break;
             default:
                 break;

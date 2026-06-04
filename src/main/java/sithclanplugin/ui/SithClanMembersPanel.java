@@ -23,7 +23,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -40,6 +39,7 @@ import net.runelite.client.util.ImageUtil;
 import sithclanplugin.members.SithClanMember;
 import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.util.SithClanPluginConstants;
+import sithclanplugin.util.SithClanPluginUtil;
 
 @Singleton
 public class SithClanMembersPanel extends JPanel
@@ -56,6 +56,7 @@ public class SithClanMembersPanel extends JPanel
     private final JButton membersShowAllButton;
     private final JPanel membersAreaPanel;
     private final JPanel statusPanel;
+    private final JLabel errorLabel;
     private final JLabel rosterDateLabel;
     private final JLabel memberDoesNotExistLabel;
     private final Icon[] rankIcons;
@@ -136,6 +137,12 @@ public class SithClanMembersPanel extends JPanel
         // status label panel
         statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+
+        // error status label
+        errorLabel = new JLabel(ROSTER_UNOBTAINABLE_WARNING);
+        errorLabel.setVisible(false);
+        errorLabel.setForeground(ColorScheme.BRAND_ORANGE);
+        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // current roster date
         rosterDateLabel = new JLabel();
@@ -226,19 +233,8 @@ public class SithClanMembersPanel extends JPanel
             executor.submit(() ->
             {
                 // get roster if not already in memory
-                if (memberRoster.getRoster().isEmpty())
-                {
-                    int status = memberRoster.parseRosterFromGet();
+                fetchRosterIfNeeded();
 
-                    if (status == SithClanPluginConstants.STATUS_NOT_FOUND)
-                    {
-                        SwingUtilities.invokeLater(() ->
-                        {
-                            JOptionPane.showMessageDialog(null, ROSTER_UNOBTAINABLE_WARNING);
-                        });
-                        return;
-                    }
-                }
                 // get specific member
                 SithClanMember member = memberRoster.getMemberByName(membersSearchTextField.getText());
                 SwingUtilities.invokeLater(() ->
@@ -263,18 +259,8 @@ public class SithClanMembersPanel extends JPanel
             executor.submit(() ->
             {
                 // get roster if not already in memory
-                if (memberRoster.getRoster().isEmpty())
-                {
-                    int status = memberRoster.parseRosterFromGet();
-                    if (status == SithClanPluginConstants.STATUS_NOT_FOUND)
-                    {
-                        SwingUtilities.invokeLater(() ->
-                        {
-                            JOptionPane.showMessageDialog(null, ROSTER_UNOBTAINABLE_WARNING);
-                        });
-                        return;
-                    }
-                }
+                fetchRosterIfNeeded();
+
                 // get all members
                 SwingUtilities.invokeLater(() ->
                 {
@@ -547,19 +533,7 @@ public class SithClanMembersPanel extends JPanel
         executor.submit(() ->
         {
             // get roster if not already in memory
-            if (memberRoster.getRoster().isEmpty())
-            {
-                int status = memberRoster.parseRosterFromGet();
-
-                if (status == SithClanPluginConstants.STATUS_NOT_FOUND)
-                {
-                    SwingUtilities.invokeLater(() ->
-                    {
-                        JOptionPane.showMessageDialog(null, ROSTER_UNOBTAINABLE_WARNING);
-                    });
-                    return;
-                }
-            }
+            fetchRosterIfNeeded();
 
             // get specific member
             SithClanMember member = memberRoster.getMemberByName(username);
@@ -578,5 +552,26 @@ public class SithClanMembersPanel extends JPanel
                 }
             });
         });
+    }
+
+    /**
+     * Fetches roster if not currently saved to memory
+     */
+    private void fetchRosterIfNeeded()
+    {
+        if (memberRoster.getRoster().isEmpty())
+        {
+            int status = memberRoster.parseRosterFromGet();
+
+            if (status == SithClanPluginConstants.STATUS_NOT_FOUND)
+            {
+                SwingUtilities.invokeLater(() ->
+                {
+                    errorLabel.setVisible(true);
+                    SithClanPluginUtil.statusTimer(errorLabel);
+                });
+                return;
+            }
+        }
     }
 }

@@ -118,7 +118,16 @@ public class SithClanMemberRoster
         // split input into list of strings
         String[] rosterInputList = rosterInput.split("\\r?\\n");
         // turn list into member roster
-        HashMap<String, SithClanMember> newRoster = convertRoster(rosterInputList);
+        HashMap<String, SithClanMember> newRoster = new HashMap<>();
+        try
+        {
+            newRoster = convertRoster(rosterInputList);
+        } catch (Exception e)
+        {
+            log.warn("Roster conversion failed.");
+            return SithClanPluginConstants.STATUS_BAD_INPUT;
+        }
+
         if (newRoster == null || newRoster.isEmpty())
         {
             log.warn("Roster conversion failed.");
