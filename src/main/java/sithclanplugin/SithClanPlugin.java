@@ -383,7 +383,7 @@ public class SithClanPlugin extends Plugin
 	 *                  ConfigChanged event
 	 */
 	@Subscribe
-	public void onConfigChange(ConfigChanged event)
+	public void onConfigChanged(ConfigChanged event)
 	{
 		// return if not relevant to plugin
 		if (!event.getGroup().equals("sithclanplugin"))
