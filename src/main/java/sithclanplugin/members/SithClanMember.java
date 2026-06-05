@@ -21,4 +21,5 @@ public class SithClanMember
     private String memberDateJoined;
     private String memberAltName = null;
     private String memberDatePromoted = null;
+    private String memberAboutMe = null;
 }

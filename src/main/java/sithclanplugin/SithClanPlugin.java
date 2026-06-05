@@ -233,6 +233,16 @@ public class SithClanPlugin extends Plugin
 		if (event.getGameState() == GameState.LOGGED_IN)
 		{
 			pendingClanCheck = true;
+			clientThread.invokeLater(() ->
+			{
+				String playerName = client.getLocalPlayer() != null ? client.getLocalPlayer().getName() : null;
+				SwingUtilities.invokeLater(() -> uiPanel.get().getMembersPanel().setCurrentPlayerName(playerName));
+			});
+		}
+
+		if (event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
+		{
+			SwingUtilities.invokeLater(() -> uiPanel.get().getMembersPanel().setCurrentPlayerName(null));
 		}
 	}
 
