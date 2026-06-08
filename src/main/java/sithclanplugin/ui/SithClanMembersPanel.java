@@ -73,6 +73,8 @@ public class SithClanMembersPanel extends JPanel
     private final JLabel memberDoesNotExistLabel;
     private final JButton editAboutMeButton;
     private final JPanel editAboutMePanel;
+    private final JTextArea editAboutMeTextArea;
+    private final JLabel editAboutMeCharCount;
     private final Icon[] rankIcons;
     private String playerName = null;
     private ArrayList<SithClanMember> rosterList;
@@ -201,7 +203,7 @@ public class SithClanMembersPanel extends JPanel
         membersSearchButton
                 .setPreferredSize(new Dimension(Short.MAX_VALUE, membersSearchButton.getPreferredSize().height));
         membersSearchArea.add(membersSearchTextField);
-        membersSearchArea.add(Box.createRigidArea(new Dimension(0, 5)));
+        membersSearchArea.add(Box.createRigidArea(new Dimension(0, 10)));
         membersSearchArea.add(membersSearchButton);
 
         // button to show all members
@@ -217,6 +219,8 @@ public class SithClanMembersPanel extends JPanel
         editAboutMeButton.setVisible(false);
 
         // edit about me ui panel
+        editAboutMeTextArea = new JTextArea();
+        editAboutMeCharCount = new JLabel("0/" + ABOUT_ME_LENGTH);
         editAboutMePanel = buildEditAboutMePanel();
         editAboutMePanel.setVisible(false);
 
@@ -257,6 +261,7 @@ public class SithClanMembersPanel extends JPanel
         {
             // hide members area, show about me ui
             membersAreaScrollPane.setVisible(false);
+            editAboutMeTextArea.setText("");
             editAboutMePanel.setVisible(true);
 
             // fetch existing about me
@@ -265,19 +270,9 @@ public class SithClanMembersPanel extends JPanel
                 String existingAboutMe = fetchAboutMe(playerName);
                 SwingUtilities.invokeLater(() ->
                 {
-                    // prefill area
-                    JTextArea textArea = (JTextArea) editAboutMePanel.getClientProperty("textArea");
-                    JLabel charCount = (JLabel) editAboutMePanel.getClientProperty("charCount");
-
-                    if (textArea != null)
-                    {
-                        String aboutMe = existingAboutMe == null ? "" : existingAboutMe;
-                        textArea.setText(aboutMe);
-                        if (charCount != null)
-                        {
-                            charCount.setText(aboutMe.length() + "/" + ABOUT_ME_LENGTH);
-                        }
-                    }
+                    String aboutMe = existingAboutMe == null ? "" : existingAboutMe;
+                    editAboutMeTextArea.setText(aboutMe);
+                    editAboutMeCharCount.setText(aboutMe.length() + "/" + ABOUT_ME_LENGTH);
                 });
             });
         });
@@ -580,7 +575,8 @@ public class SithClanMembersPanel extends JPanel
             {
                 if (aboutMe != null && !aboutMe.isBlank())
                 {
-                    aboutMeText.setText("<html><i>" + aboutMe + "</i></html>");
+                    String safeText = aboutMe.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+                    aboutMeText.setText("<html><i>" + safeText + "</i></html>");
                 }
             });
         });
@@ -607,24 +603,22 @@ public class SithClanMembersPanel extends JPanel
         instructions.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // text area for about me input
-        JTextArea aboutMeTextArea = new JTextArea();
-        aboutMeTextArea.setLineWrap(true);
-        aboutMeTextArea.setWrapStyleWord(true);
-        aboutMeTextArea.setRows(5);
-        aboutMeTextArea.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 100));
-        aboutMeTextArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+        editAboutMeTextArea.setLineWrap(true);
+        editAboutMeTextArea.setWrapStyleWord(true);
+        editAboutMeTextArea.setRows(5);
+        editAboutMeTextArea.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 100));
+        editAboutMeTextArea.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // scroll pane for just in case
-        JScrollPane aboutMeScrollPane = new JScrollPane(aboutMeTextArea);
+        JScrollPane aboutMeScrollPane = new JScrollPane(editAboutMeTextArea);
         aboutMeScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         aboutMeScrollPane.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 100));
 
         // character count label
-        JLabel charCount = new JLabel("0/" + ABOUT_ME_LENGTH);
-        charCount.setAlignmentX(Component.LEFT_ALIGNMENT);
+        editAboutMeCharCount.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // update character count dynamically
-        aboutMeTextArea.getDocument().addDocumentListener(new DocumentListener()
+        editAboutMeTextArea.getDocument().addDocumentListener(new DocumentListener()
         {
 
             @Override
@@ -647,16 +641,16 @@ public class SithClanMembersPanel extends JPanel
 
             private void updateCount()
             {
-                int len = aboutMeTextArea.getText().length();
+                int len = editAboutMeTextArea.getText().length();
                 if (len > ABOUT_ME_LENGTH)
                 {
                     SwingUtilities
-                            .invokeLater(() -> aboutMeTextArea
-                                    .setText(aboutMeTextArea.getText().substring(0, ABOUT_ME_LENGTH)));
+                            .invokeLater(() -> editAboutMeTextArea
+                                    .setText(editAboutMeTextArea.getText().substring(0, ABOUT_ME_LENGTH)));
                     len = ABOUT_ME_LENGTH;
                 }
                 final int finalLen = len;
-                SwingUtilities.invokeLater(() -> charCount.setText(finalLen + "/" + ABOUT_ME_LENGTH));
+                SwingUtilities.invokeLater(() -> editAboutMeCharCount.setText(finalLen + "/" + ABOUT_ME_LENGTH));
             }
         });
 
@@ -681,7 +675,7 @@ public class SithClanMembersPanel extends JPanel
         // save button action
         saveButton.addActionListener(e ->
         {
-            String text = aboutMeTextArea.getText().trim();
+            String text = editAboutMeTextArea.getText().trim();
             executor.submit(() ->
             {
                 boolean success = submitAboutMe(playerName, text);
@@ -713,15 +707,11 @@ public class SithClanMembersPanel extends JPanel
         editPanel.add(Box.createRigidArea(new Dimension(0, 6)));
         editPanel.add(aboutMeScrollPane);
         editPanel.add(Box.createRigidArea(new Dimension(0, 6)));
-        editPanel.add(charCount);
+        editPanel.add(editAboutMeCharCount);
         editPanel.add(Box.createRigidArea(new Dimension(0, 6)));
         editPanel.add(statusLabel);
         editPanel.add(Box.createRigidArea(new Dimension(0, 6)));
         editPanel.add(buttonRow);
-
-        // store references for actio listeners
-        editPanel.putClientProperty("textArea", aboutMeTextArea);
-        editPanel.putClientProperty("charCount", charCount);
 
         return editPanel;
     }
