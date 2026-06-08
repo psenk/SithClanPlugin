@@ -114,13 +114,13 @@ public class SithClanEventLogPanel extends JPanel
 
         // no event name status label
         noNameLabel = new JLabel(NO_EVENT_NAME_WARNING);
-        noNameLabel.setVisible(true);
+        noNameLabel.setVisible(false);
         noNameLabel.setForeground(ColorScheme.BRAND_ORANGE);
         noNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // no event host status label
         noHostLabel = new JLabel(NO_EVENT_HOST_WARNING);
-        noHostLabel.setVisible(true);
+        noHostLabel.setVisible(false);
         noHostLabel.setForeground(ColorScheme.BRAND_ORANGE);
         noHostLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
