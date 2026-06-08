@@ -1,6 +1,5 @@
 package sithclanplugin.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -253,6 +252,7 @@ public class SithClanSchedulePanel extends JPanel
                         new Dimension(PluginPanel.PANEL_WIDTH - 10, noEventsLabel.getPreferredSize().height));
                 noEventsLabel.setMaximumSize(new Dimension(Short.MAX_VALUE, noEventsLabel.getPreferredSize().height));
                 dailyEvents.add(noEventsLabel);
+                dailyEvents.setMaximumSize(new Dimension(Short.MAX_VALUE, dailyEvents.getPreferredSize().height));
             } else
             {
                 // iterate through all events in day
@@ -263,6 +263,7 @@ public class SithClanSchedulePanel extends JPanel
 
                     dailyEvents.add(singleEvent);
                     dailyEvents.add(Box.createRigidArea(new Dimension(0, 10)));
+                    dailyEvents.setMaximumSize(new Dimension(Short.MAX_VALUE, dailyEvents.getPreferredSize().height));
                 }
             }
         }
@@ -398,7 +399,6 @@ public class SithClanSchedulePanel extends JPanel
         dailyEvents.setLayout(new BoxLayout(dailyEvents, BoxLayout.Y_AXIS));
         dailyEvents.setAlignmentX(Component.LEFT_ALIGNMENT);
         dailyEvents.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
-        dailyEvents.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
         dailyEvents.setVisible(false);
         return dailyEvents;
     }
@@ -421,8 +421,9 @@ public class SithClanSchedulePanel extends JPanel
         // collapsed by default
         dateLabel.setIcon(rightArrowIcon);
         dateLabel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        dateLabel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
         dateLabel
-                .setMaximumSize(new Dimension(Integer.MAX_VALUE, dateLabel.getPreferredSize().height));
+                .setMaximumSize(new Dimension(Short.MAX_VALUE, dateLabel.getPreferredSize().height));
 
         // expand/collapse action
         dateLabel.addMouseListener(new MouseAdapter()
@@ -461,7 +462,7 @@ public class SithClanSchedulePanel extends JPanel
 
         // container for event and notification checkbox
         JPanel eventContainer = new JPanel();
-        eventContainer.setLayout(new BorderLayout());
+        eventContainer.setLayout(new BoxLayout(eventContainer, BoxLayout.X_AXIS));
 
         // container for one event
         JPanel singleEvent = new JPanel();
@@ -489,9 +490,6 @@ public class SithClanSchedulePanel extends JPanel
             // reschedule notifications after change
             notificationManager.scheduleNotifications(eventSchedule.getSchedule());
         });
-
-        eventContainer.add(singleEvent, BorderLayout.CENTER);
-        eventContainer.add(notificationCheckbox, BorderLayout.EAST);
 
         // event title
         JLabel eventTitle = new JLabel(wrapLabelText(eventTitleString));
@@ -544,7 +542,11 @@ public class SithClanSchedulePanel extends JPanel
         }
 
         // size constraints after children added
-        eventContainer.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        eventContainer.add(singleEvent);
+        eventContainer.add(notificationCheckbox);
+
+        singleEvent.setMaximumSize(new Dimension(Short.MAX_VALUE, singleEvent.getPreferredSize().height));
+        eventContainer.setMaximumSize(new Dimension(Short.MAX_VALUE, eventContainer.getPreferredSize().height));
 
         return eventContainer;
     }
