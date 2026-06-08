@@ -133,7 +133,7 @@ public class SithClanSchedulePanel extends JPanel
         scheduleExpiredLabel.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
         scheduleExpiredLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         scheduleExpiredLabel.setVisible(false);
-        scheduleExpiredSpace = Box.createRigidArea(new Dimension(0, 5));
+        scheduleExpiredSpace = Box.createRigidArea(new Dimension(0, 10));
         scheduleExpiredSpace.setVisible(false);
         this.add(scheduleExpiredSpace);
         this.add(Box.createRigidArea(new Dimension(0, 5)));
