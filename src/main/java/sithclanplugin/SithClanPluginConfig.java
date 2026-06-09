@@ -33,7 +33,7 @@ public interface SithClanPluginConfig extends Config
 		return "".trim();
 	}
 
-	@ConfigItem(keyName = "senateapikey", name = "Senate API Key", description = "API Key for access to Senate member plugin options", position = 5)
+	@ConfigItem(keyName = "senateApiKey", name = "Senate API Key", description = "API Key for access to Senate member plugin options", position = 5)
 	default String apiKey()
 	{
 		return "".trim();
