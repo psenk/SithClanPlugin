@@ -111,6 +111,7 @@ public class SithClanPlugin extends Plugin
 	private net.runelite.api.World quickHopTargetWorld;
 	private int displaySwitcherAttempts = 0;
 	private boolean isSenateMember = false;
+	private String playerName = null;
 
 	private static final String PLUGIN_ICON_PATH = "/icon.png";
 	private static final String PLUGIN_TOOLTIP = "Sith Clan Plugin";
@@ -237,11 +238,6 @@ public class SithClanPlugin extends Plugin
 		if (event.getGameState() == GameState.LOGGED_IN)
 		{
 			pendingClanCheck = true;
-			clientThread.invokeLater(() ->
-			{
-				String playerName = client.getLocalPlayer() != null ? client.getLocalPlayer().getName() : null;
-				SwingUtilities.invokeLater(() -> uiPanel.get().getMembersPanel().setCurrentPlayerName(playerName));
-			});
 		}
 
 		if (event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
@@ -278,7 +274,16 @@ public class SithClanPlugin extends Plugin
 					}
 				});
 			}
+		}
 
+		// get player name logic
+		if (playerName == null)
+		{
+			clientThread.invokeLater(() ->
+			{
+				playerName = client.getLocalPlayer().getName();
+				SwingUtilities.invokeLater(() -> uiPanel.get().getMembersPanel().setCurrentPlayerName(playerName));
+			});
 		}
 
 		// world hopping logic
@@ -362,7 +367,7 @@ public class SithClanPlugin extends Plugin
 
 			// create custom menu entry
 			Menu menu = client.getMenu();
-			MenuEntry menuEntry = menu.createMenuEntry(1);
+			MenuEntry menuEntry = menu.createMenuEntry(0);
 			menuEntry.setOption(SITH_LOOKUP);
 			menuEntry.setTarget(event.getTarget());
 			menuEntry.setType(MenuAction.RUNELITE);
