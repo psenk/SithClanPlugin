@@ -110,6 +110,7 @@ public class SithClanPlugin extends Plugin
 	private boolean pendingClanCheck = false;
 	private net.runelite.api.World quickHopTargetWorld;
 	private int displaySwitcherAttempts = 0;
+	private boolean isSenateMember = false;
 
 	private static final String PLUGIN_ICON_PATH = "/icon.png";
 	private static final String PLUGIN_TOOLTIP = "Sith Clan Plugin";
@@ -165,10 +166,13 @@ public class SithClanPlugin extends Plugin
 				eventSchedule.parseScheduleFromFile();
 			}
 			// validate API key of Senate members
-			boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
-			eventSchedule.setSenateMember(isSenateMember);
-			announcements.setSenateMember(isSenateMember);
-			memberRoster.setSenateMember(isSenateMember);
+			if (!config.apiKey().isBlank() || !config.apiKey().isEmpty())
+			{
+				isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
+				eventSchedule.setSenateMember(isSenateMember);
+				announcements.setSenateMember(isSenateMember);
+				memberRoster.setSenateMember(isSenateMember);
+			}
 			SwingUtilities.invokeLater(() ->
 			{
 				// display event schedule
@@ -392,14 +396,17 @@ public class SithClanPlugin extends Plugin
 		}
 
 		// enable senate button
-		if (event.getKey().equals("apiKey"))
+		if (event.getKey().equals("senateApiKey"))
 		{
-			boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
-			SwingUtilities.invokeLater(() -> uiPanel.get().getSenateButton().setVisible(isSenateMember));
+			executor.submit(() ->
+			{
+				boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
+				SwingUtilities.invokeLater(() -> uiPanel.get().getSenateButton().setVisible(isSenateMember));
+			});
 		}
 
 		// enable/disable event notification checkboxes
-		if (event.getKey().equals("eventNotifications"))
+		if (event.getKey().equals("eventAlerts"))
 		{
 			SwingUtilities.invokeLater(
 					() -> uiPanel.get().getSchedulePanel().setCheckboxesEnabled(config.eventNotifications()));
