@@ -222,7 +222,7 @@ public class SithClanSenatePanel extends JPanel
         collapsiblePanel.setLayout((new BoxLayout(collapsiblePanel, BoxLayout.Y_AXIS)));
         collapsiblePanel.add(Box.createRigidArea(new Dimension(0, 10)));
         collapsiblePanel.add(scrollPane);
-        collapsiblePanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        collapsiblePanel.add(Box.createRigidArea(new Dimension(0, 10)));
         collapsiblePanel.add(button);
         collapsiblePanel.setVisible(false);
 
