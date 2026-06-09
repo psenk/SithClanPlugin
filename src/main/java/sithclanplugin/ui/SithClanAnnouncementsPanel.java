@@ -18,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 import javax.swing.event.HyperlinkEvent;
 
 import com.google.inject.Inject;
@@ -55,8 +54,6 @@ public class SithClanAnnouncementsPanel extends JPanel
     private static final String RATE_LIMITED_WARNING = "<html><center>Announcements have been retrieved too recently. Try again in a few minutes.</center></html>";
     private static final String NO_ANNOUNCEMENTS_LABEL = "No Announcements Currently";
     private static final String ANNOUNCEMENTS_ERROR = "Error obtaining announcements.";
-    private static final Border ANNOUNCEMENT_BORDER = BorderFactory.createMatteBorder(1, 1, 1, 1,
-            ColorScheme.BORDER_COLOR);
 
     SithClanAnnouncementsPanel()
     {
@@ -102,11 +99,12 @@ public class SithClanAnnouncementsPanel extends JPanel
         // announcements list panel
         announcementsListPanel = new JPanel();
         announcementsListPanel.setLayout(new BoxLayout(announcementsListPanel, BoxLayout.Y_AXIS));
-        announcementsListPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        announcementsListPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         announcementsScrollPane = new JScrollPane(announcementsListPanel);
         announcementsScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 150));
-        announcementsScrollPane.setBorder(ANNOUNCEMENT_BORDER);
+        announcementsScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
+                ColorScheme.BORDER_COLOR));
         announcementsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
         announcementsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -181,7 +179,7 @@ public class SithClanAnnouncementsPanel extends JPanel
                 announcementsListPanel.add(noAnnouncementsLabel);
             } else
             {
-                // create each announcement
+                // create each announcement, newest announcement first
                 for (int i = announcementsList.size() - 1; i >= 0; i--)
                 {
                     JEditorPane editorPane = new JEditorPane();
@@ -189,12 +187,13 @@ public class SithClanAnnouncementsPanel extends JPanel
                     editorPane.setText(convertLinks(announcementsList.get(i).getAnnouncementText()));
                     editorPane.setEditable(false);
                     editorPane.setOpaque(false);
-                    editorPane.setBorder(ANNOUNCEMENT_BORDER);
-                    editorPane.setSize(PluginPanel.PANEL_WIDTH, Short.MAX_VALUE);
+                    editorPane.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
+                            BorderFactory.createMatteBorder(0, 0, 1, 0,
+                                    ColorScheme.BORDER_COLOR)));
                     int editorPaneHeight = editorPane.getPreferredSize().height;
-                    editorPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, editorPaneHeight));
-                    editorPane.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, editorPaneHeight));
-                    editorPane.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, editorPaneHeight));
+                    editorPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, editorPaneHeight));
+                    editorPane.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, editorPaneHeight));
+                    editorPane.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, editorPaneHeight));
 
                     // open links
                     editorPane.addHyperlinkListener(e ->
