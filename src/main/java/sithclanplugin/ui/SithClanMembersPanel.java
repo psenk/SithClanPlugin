@@ -110,9 +110,6 @@ public class SithClanMembersPanel extends JPanel
     private static final int PAGE_SIZE = 6;
     private static final int ABOUT_ME_LENGTH = 200;
     private static final Font MEMBER_NAME_FONT = new JLabel().getFont().deriveFont(Font.BOLD, 16f);
-    private static final Border MEMBER_CARD_BORDER = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR),
-            BorderFactory.createEmptyBorder(4, 1, 4, 1));
 
     // rank icons
     private static final String ICON_CHILDREN_OF_THE_WATCH = "/children_of_the_watch.png";
@@ -250,7 +247,6 @@ public class SithClanMembersPanel extends JPanel
         // panel that displays members
         membersAreaPanel = new JPanel();
         membersAreaPanel.setLayout(new BoxLayout(membersAreaPanel, BoxLayout.Y_AXIS));
-        membersAreaPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         membersAreaPanel.setVisible(true);
         membersAreaPanel.setOpaque(true);
         membersAreaPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -259,28 +255,6 @@ public class SithClanMembersPanel extends JPanel
         membersAreaScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         membersAreaScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
         membersAreaScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 600));
-
-        // edit about me button action
-        editAboutMeButton.addActionListener(e ->
-        {
-            // hide members area, show about me ui
-            membersAreaLabel.setVisible(false);
-            membersAreaScrollPane.setVisible(false);
-            editAboutMeTextArea.setText("");
-            editAboutMePanel.setVisible(true);
-
-            // fetch existing about me
-            executor.submit(() ->
-            {
-                String existingAboutMe = fetchAboutMe(playerName);
-                SwingUtilities.invokeLater(() ->
-                {
-                    String aboutMe = existingAboutMe == null ? "" : existingAboutMe;
-                    editAboutMeTextArea.setText(aboutMe);
-                    editAboutMeCharCount.setText(aboutMe.length() + "/" + ABOUT_ME_LENGTH);
-                });
-            });
-        });
 
         // members label and scroll pane
         JPanel bottomPanel = new JPanel();
@@ -339,9 +313,31 @@ public class SithClanMembersPanel extends JPanel
                     editAboutMePanel.setVisible(false);
                     membersAreaLabel.setVisible(true);
                     membersAreaScrollPane.setVisible(true);
-                    
+
                     updateRosterDateLabel(memberRoster.getDateRosterPosted());
                     displayAllMembers(memberRoster.getRoster().values());
+                });
+            });
+        });
+
+        // edit about me button action
+        editAboutMeButton.addActionListener(e ->
+        {
+            // hide members area, show about me ui
+            membersAreaLabel.setVisible(false);
+            membersAreaScrollPane.setVisible(false);
+            editAboutMeTextArea.setText("");
+            editAboutMePanel.setVisible(true);
+
+            // fetch existing about me
+            executor.submit(() ->
+            {
+                String existingAboutMe = fetchAboutMe(playerName);
+                SwingUtilities.invokeLater(() ->
+                {
+                    String aboutMe = existingAboutMe == null ? "" : existingAboutMe;
+                    editAboutMeTextArea.setText(aboutMe);
+                    editAboutMeCharCount.setText(aboutMe.length() + "/" + ABOUT_ME_LENGTH);
                 });
             });
         });
@@ -452,7 +448,9 @@ public class SithClanMembersPanel extends JPanel
         // container for all info
         JPanel singleMemberPanel = new JPanel();
         singleMemberPanel.setLayout(new BoxLayout(singleMemberPanel, BoxLayout.Y_AXIS));
-        singleMemberPanel.setBorder(MEMBER_CARD_BORDER);
+        singleMemberPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR),
+                BorderFactory.createEmptyBorder(4, 1, 4, 1)));
         singleMemberPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         singleMemberPanel.setOpaque(true);
         singleMemberPanel.setVisible(true);
@@ -793,6 +791,11 @@ public class SithClanMembersPanel extends JPanel
             SithClanMember member = memberRoster.getMemberByName(username);
             SwingUtilities.invokeLater(() ->
             {
+                // dismiss about me editor if open
+                editAboutMePanel.setVisible(false);
+                membersAreaLabel.setVisible(true);
+                membersAreaScrollPane.setVisible(true);
+                
                 // if member does not exist
                 if (member == null)
                 {
