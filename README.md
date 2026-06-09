@@ -5,35 +5,36 @@ A [RuneLite](https://runelite.net/) plugin for members of the Sith clan in Old S
 | NOTE: This plugin will only work for members of the Sith clan in-game. |
 | --- |
 
+
 ## Features
 
 ### Side Panel Interface
 
-The plugin includes a dedicated panel that connects users to each of the plugins available features using navigation buttons and dropdown interfaces. The panel is accessible via a Sith clan navigation icon on RuneLite's right edge navigation panel.
+The plugin includes a dedicated side panel that connects users to each of the it's available features using navigation buttons and dropdown interfaces. The panel is accessible via a Sith clan navigation icon on RuneLite's right edge navigation panel.
 
 ![Sidepanel](./assets/side_panel.png "Side Panel")
 
 ### Clan Announcements
 
-View clan announcements such as bingo dates, Wise Old Man links, upcoming events, etc. The refresh button will update the UI to show any new announcements.
+View announcements about ongoing clan events.  Announcements panel is collapsible by clicking on the Clan Announcements label.
 
 ![Clan Announcements](./assets/clan_announcements.png "Clan Announcements")
 
 ### Event Schedule
 
-View the clans weekly event schedule including each events specific information. Click on world links to quick hop to that events world. Checkboxes allow setting up an in-game notification before the event starts, configurable in the plugin settings.
+View the clans weekly event schedule and appropriate event information. Event lists can expand or collapse by clicking on the date label.  World links allow quick hopping to the events world. The checkboxes enable or disable an in-game notification for that event, configurable in the plugin settings.
 
 ![Event Schedule](./assets/event_schedule.png "Event Schedule")
 
 ### Member Info
 
-View clan member information including rank, upcoming promotions, clan credits, etc. The entire clan roster can also be viewed.
+View individual clan member information or entire clan roster.  Update users about me section allowing for individual flair.
 
 ![Member Info](./assets/member_info.png "Member Info")
 
 ### Post Event Log
 
-Post event logs conveniently from the plugin that will post directly to the applicable event log channel on the Sith Discord server. The format used should match the Discord Code Block option and default format for the [Clan Event Attendance](https://github.com/JoRouss/runelite-ClanEventAttendance) plugin.
+Post event logs from the plugin that will post directly to the Sith Discord server #event-log channel. The format used should match the Discord Code Block option and default format for the [Clan Event Attendance](https://github.com/JoRouss/runelite-ClanEventAttendance) plugin.
 
 ![Post Event Log](./assets/event_log.png "Post Event Log")
 
@@ -50,7 +51,7 @@ Open the RuneLite settings panel by clicking the wrench icon at the top of the r
 | Setting                       | Description                                                        | Default   |
 | ----------------------------- | ------------------------------------------------------------------ | --------- |
 | Event Alerts                  | Enables or disables notifications for upcoming clan events         | Off       |
-| Alert Time Buffer             | How many minutes before an event the notification fires (1–60)     | 15        |
+| Alert Time Buffer             | Time to receive notification before an event (in minutes) (1–60)   | 15        |
 | Clan Member Lookup            | Enables or disables option to lookup clan members via right click  | Off       |
 | Discord Event Log Webhook URL | The Discord webhook URL used to post event logs                    | _(empty)_ |
 | Senate API Key                | API key granting access to Senate member options                   | _(empty)_ |
@@ -70,7 +71,7 @@ Open the RuneLite settings panel by clicking the wrench icon at the top of the r
 1. Open the RuneLite client.
 2. Click on the wrench icon at the top of the right navigation bar. (Configuration)
 3. Click on the Plugin Hub button. (cord plug icon)
-4. Search for "Sith Clan".
+4. Search for "Sith Clan".  Plugin author will be "Kyanize".
 5. Click Install.
 
 ## Support
@@ -79,7 +80,7 @@ For bug reports, questions, and feature requests, please open an issue on the [G
 
 ## Development
 
-Information from the plugin is sent to a CloudFlare worker backend.  The public repository for this can be found [here](https://github.com/psenk/SithClanPluginAPI).
+Information from the plugin and RuneLite client is sent to a CloudFlare worker backend managed by the author.  The public repository for this can be found [here](https://github.com/psenk/SithClanPluginAPI).
 
 ## License
 
