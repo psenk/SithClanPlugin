@@ -9,8 +9,8 @@ public class SithClanPluginConstants
         public static final boolean BYPASS_CLAN_CHECK = true;
 
         // clan info
-        // name
         public static final String CLAN_NAME = "Sith";
+        public static final String CURRENT_GOLD_KEY = "Faca";
 
         // discord
         public static final String SITH_DISCORD_SERVER_ID = "741153043776667658";
@@ -34,6 +34,24 @@ public class SithClanPluginConstants
                         "Imperial Inquisitor",
                         "Grand Inquisitor",
                         "Shadow Hand"
+        };
+
+        // rank icons
+        public static final String[] RANK_ICON_PATHS =
+        {
+                        "/children_of_the_watch.png", "/sith_loyalist.png", "/tie_pilot.png", "/storm_trooper.png",
+                        "/death_trooper.png",
+                        "/sovereign_protector.png",
+                        "/sovereign_champion.png",
+                        "/sith_acolyte.png",
+                        "/sith_knight.png",
+                        "/sith_marauder.png",
+                        "/sith_lord.png",
+                        "/sith_overseer.png",
+                        "/imperial_inquisitor.png",
+                        "/grand_inquisitor.png",
+                        "/silver_key.png",
+                        "/gold_key.png"
         };
 
         // credits to promote

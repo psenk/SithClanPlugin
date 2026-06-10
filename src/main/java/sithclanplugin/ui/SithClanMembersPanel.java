@@ -30,7 +30,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -52,143 +51,107 @@ import sithclanplugin.util.SithClanPluginUtil;
 public class SithClanMembersPanel extends JPanel
 {
     @Inject
-    private ScheduledExecutorService executor;
-
-    @Inject
     private OkHttpClient httpClient;
 
     @Inject
     private Gson gson;
 
     @Inject
+    private ScheduledExecutorService executor;
+
+    @Inject
     private SithClanMemberRoster memberRoster;
 
-    private final JScrollPane membersAreaScrollPane;
+    private final Icon[] rankIcons;
+    private final JLabel rosterDateLabel;
+    private final JLabel statusLabel;
+    private final JPanel statusPanel;
     private final JTextField membersSearchTextField;
     private final JButton membersSearchButton;
     private final JButton membersShowAllButton;
+    private final JButton membersEditAboutMeButton;
+    private final JTextArea membersAboutMeTextArea;
+    private final JLabel membersAboutMeCharCount;
+    private final JPanel membersAboutMePanel;
     private final JPanel membersAreaPanel;
+    private final JScrollPane membersAreaScrollPane;
     private final JLabel membersAreaLabel;
-    private final JPanel statusPanel;
-    private final JLabel errorLabel;
-    private final JLabel rosterDateLabel;
-    private final JLabel memberDoesNotExistLabel;
-    private final JButton editAboutMeButton;
-    private final JPanel editAboutMePanel;
-    private final JTextArea editAboutMeTextArea;
-    private final JLabel editAboutMeCharCount;
-    private final Icon[] rankIcons;
+
     private String playerName = null;
     private ArrayList<SithClanMember> rosterList;
     private int pageIndex;
     private boolean isLoading;
 
-    private static final String CURRENT_GOLD_KEY = "Faca";
+    private static final int AVATAR_SIZE = 64;
+    private static final int PAGE_SIZE = 6;
+    private static final int ABOUT_ME_LENGTH = 200;
+    private static final Dimension STATUS_LABEL_DIMENSION = new Dimension(PluginPanel.PANEL_WIDTH, 20);
     private static final String MEMBERS_PANEL_TITLE = "Sith Member Info";
     private static final String MEMBERS_SEARCH_BUTTON = "Search Members";
     private static final String MEMBERS_SHOW_ALL_BUTTON = "Show All Members";
+    private static final String ABOUT_ME_BUTTON = "Edit My About Me";
     private static final String MEMBERS_AREA_LABEL = "Member(s)";
     private static final String ROSTER_UNOBTAINABLE_WARNING = "Unable to obtain roster.";
+    private static final String BLANK_SEARCH_VALUE = "Please input a value to search.";
     private static final String MEMBER_DOES_NOT_EXIST = "Member does not exist!";
-    private static final String MEMBER_RANK = "Rank: "; // trailing space intentional
-    private static final String MEMBER_PROMOTED = "Promoted On: "; // trailing space intentional
-    private static final String MEMBER_CREDITS_NEEDED = "Credits until promotion: "; // trailing space intentional
-    private static final String MEMBER_DAYS_NEEDED = "Days until promotion: "; // trailing space intentional
-    private static final String MEMBER_NONE_NEEDED = "None! Coming soon..";
-    private static final String SENATE_MEMBER = "Senate Member";
-    private static final String MEMBER_CREDITS = " Imperial Credits"; // leading space intentional
-    private static final String MEMBER_JOINED = "Joined: "; // trailing space intentional
-    private static final String MEMBER_ALT = "Alt: "; // trailing space intentional
-    private static final String MEMBER_UNKNOWN_DATA = "Unknown";
     private static final String ROSTER_DATE_PREFIX = "Roster last updated on "; // trailing space intentional
-    private static final String ABOUT_ME_BUTTON = "Edit my About Me";
     private static final String ABOUT_ME_INSTRUCTIONS = "<html><center>Edit your About Me (max 200 characters)</center></html>";
     private static final String ABOUT_ME_SAVE = "Save";
     private static final String ABOUT_ME_CANCEL = "Cancel";
     private static final String ABOUT_ME_FAILED = "Save failed.  Please try again.";
-    private static final int AVATAR_SIZE = 64;
-    private static final int PAGE_SIZE = 6;
-    private static final int ABOUT_ME_LENGTH = 200;
-    private static final Font MEMBER_NAME_FONT = new JLabel().getFont().deriveFont(Font.BOLD, 16f);
-
-    // rank icons
-    private static final String ICON_CHILDREN_OF_THE_WATCH = "/children_of_the_watch.png";
-    private static final String ICON_SITH_LOYALIST = "/sith_loyalist.png";
-    private static final String ICON_TIE_PILOT = "/tie_pilot.png";
-    private static final String ICON_SITH_TROOPER = "/storm_trooper.png";
-    private static final String ICON_DEATH_TROOPER = "/death_trooper.png";
-    private static final String ICON_SOVEREIGN_PROTECTOR = "/sovereign_protector.png";
-    private static final String ICON_SOVEREIGN_CHAMPION = "/sovereign_champion.png";
-    private static final String ICON_SITH_ACOLYTE = "/sith_acolyte.png";
-    private static final String ICON_SITH_KNIGHT = "/sith_knight.png";
-    private static final String ICON_SITH_MARAUDER = "/sith_marauder.png";
-    private static final String ICON_SITH_LORD = "/sith_lord.png";
-    private static final String ICON_SITH_OVERSEER = "/sith_overseer.png";
-    private static final String ICON_IMPERIAL_INQUISITOR = "/imperial_inquisitor.png";
-    private static final String ICON_GRAND_INQUISITOR = "/grand_inquisitor.png";
-    private static final String ICON_SILVER_KEY = "/silver_key.png";
-    private static final String ICON_GOLD_KEY = "/gold_key.png";
+    private static final String ABOUT_ME_SUCCESSFUL = "About Me saved successfully.";
+    private static final String MEMBER_RANK = "Rank: "; // trailing space intentional
+    private static final String MEMBER_CREDITS = " Imperial Credits"; // leading space intentional
+    private static final String MEMBER_PROMOTED = "Promoted On: "; // trailing space intentional
+    private static final String MEMBER_CREDITS_NEEDED = "Credits until promotion: "; // trailing space intentional
+    private static final String MEMBER_DAYS_NEEDED = "Days until promotion: "; // trailing space intentional
+    private static final String MEMBER_NONE_NEEDED = "None! Coming soon..";
+    private static final String MEMBER_JOINED = "Joined: "; // trailing space intentional
+    private static final String MEMBER_ALT = "Alt: "; // trailing space intentional
+    private static final String MEMBER_UNKNOWN = "Unknown";
+    private static final String SENATE_MEMBER = "Senate Member";
 
     SithClanMembersPanel()
     {
-        rankIcons = new Icon[]
+        // rank icons
+        rankIcons = new Icon[SithClanPluginConstants.RANK_ICON_PATHS.length];
+        for (int i = 0; i < SithClanPluginConstants.RANK_ICON_PATHS.length; i++)
         {
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_CHILDREN_OF_THE_WATCH)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_SITH_LOYALIST)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_TIE_PILOT)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_SITH_TROOPER)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_DEATH_TROOPER)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_SOVEREIGN_PROTECTOR)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_SOVEREIGN_CHAMPION)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_SITH_ACOLYTE)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_SITH_KNIGHT)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_SITH_MARAUDER)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_SITH_LORD)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_SITH_OVERSEER)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_IMPERIAL_INQUISITOR)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_GRAND_INQUISITOR)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_SILVER_KEY)),
-                new ImageIcon(ImageUtil.loadImageResource(getClass(), ICON_GOLD_KEY)) };
+            rankIcons[i] = new ImageIcon(
+                    ImageUtil.loadImageResource(getClass(), SithClanPluginConstants.RANK_ICON_PATHS[i]));
+        }
 
         this.setLayout(new BorderLayout());
 
-        // top panel title
+        // main panel title
         JLabel membersPanelLabel = new JLabel(MEMBERS_PANEL_TITLE);
         membersPanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // status label panel
+        // panel containing all status labels
         statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
-        // error status label
-        errorLabel = new JLabel(ROSTER_UNOBTAINABLE_WARNING);
-        errorLabel.setVisible(false);
-        errorLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         // current roster date
-        rosterDateLabel = new JLabel();
-        rosterDateLabel.setVisible(false);
-        rosterDateLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        rosterDateLabel = createStatusLabel(false);
 
-        memberDoesNotExistLabel = new JLabel(MEMBER_DOES_NOT_EXIST);
-        memberDoesNotExistLabel.setVisible(false);
-        memberDoesNotExistLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        memberDoesNotExistLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // error status label
+        statusLabel = createStatusLabel(true);
 
         statusPanel.add(rosterDateLabel);
-        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        statusPanel.add(memberDoesNotExistLabel);
+        statusPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        statusPanel.add(statusLabel);
 
-        // contains search area and search button
+        // panel containing search area and button
         JPanel membersSearchArea = new JPanel();
         membersSearchArea.setLayout(new BoxLayout(membersSearchArea, BoxLayout.Y_AXIS));
         membersSearchArea.setVisible(true);
         membersSearchArea.setOpaque(true);
         membersSearchArea.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // search field
         membersSearchTextField = new JTextField();
-        // highlights all text when box focused
+
+        // highlights all text when box is focused
         membersSearchTextField.addFocusListener(new FocusAdapter()
         {
             @Override
@@ -198,53 +161,47 @@ public class SithClanMembersPanel extends JPanel
             }
         });
 
-        membersSearchButton = new JButton(MEMBERS_SEARCH_BUTTON);
-        membersSearchButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        membersSearchButton
-                .setPreferredSize(new Dimension(Short.MAX_VALUE, membersSearchButton.getPreferredSize().height));
+        // search member button
+        membersSearchButton = createButton(MEMBERS_SEARCH_BUTTON);
+
         membersSearchArea.add(membersSearchTextField);
         membersSearchArea.add(Box.createRigidArea(new Dimension(0, 10)));
         membersSearchArea.add(membersSearchButton);
 
-        // button to show all members
-        membersShowAllButton = new JButton(MEMBERS_SHOW_ALL_BUTTON);
-        membersShowAllButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        membersShowAllButton
-                .setPreferredSize(new Dimension(Short.MAX_VALUE, membersShowAllButton.getPreferredSize().height));
+        // show all members button
+        membersShowAllButton = createButton(MEMBERS_SHOW_ALL_BUTTON);
 
-        // button to edit members about me
-        editAboutMeButton = new JButton(ABOUT_ME_BUTTON);
-        editAboutMeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        editAboutMeButton.setPreferredSize(new Dimension(Short.MAX_VALUE, editAboutMeButton.getPreferredSize().height));
-        editAboutMeButton.setVisible(false);
+        // edit members about me button
+        membersEditAboutMeButton = createButton(ABOUT_ME_BUTTON);
+        membersEditAboutMeButton.setVisible(false);
 
         // edit about me ui panel
-        editAboutMeTextArea = new JTextArea();
-        editAboutMeCharCount = new JLabel("0/" + ABOUT_ME_LENGTH);
-        editAboutMePanel = buildEditAboutMePanel();
-        editAboutMePanel.setVisible(false);
+        membersAboutMeTextArea = new JTextArea();
+        membersAboutMeCharCount = new JLabel("0/" + ABOUT_ME_LENGTH);
+        membersAboutMePanel = buildEditAboutMePanel();
+        membersAboutMePanel.setVisible(false);
 
         // contains search area and buttons
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.add(membersPanelLabel);
-        topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         topPanel.add(statusPanel);
-        topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         topPanel.add(membersSearchArea);
-        topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         topPanel.add(membersShowAllButton);
-        topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        topPanel.add(editAboutMeButton);
+        topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        topPanel.add(membersEditAboutMeButton);
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         this.add(topPanel, BorderLayout.NORTH);
 
-        // members title
+        // members panel title
         membersAreaLabel = new JLabel(MEMBERS_AREA_LABEL);
         membersAreaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // panel that displays members
+        // members display panel
         membersAreaPanel = new JPanel();
         membersAreaPanel.setLayout(new BoxLayout(membersAreaPanel, BoxLayout.Y_AXIS));
         membersAreaPanel.setVisible(true);
@@ -259,7 +216,7 @@ public class SithClanMembersPanel extends JPanel
         // members label and scroll pane
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
-        bottomPanel.add(editAboutMePanel);
+        bottomPanel.add(membersAboutMePanel);
         bottomPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         bottomPanel.add(membersAreaLabel);
         bottomPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -267,30 +224,43 @@ public class SithClanMembersPanel extends JPanel
 
         this.add(bottomPanel, BorderLayout.CENTER);
 
-        // get individual member
+        // get individual member action
         membersSearchButton.addActionListener(e ->
         {
             executor.submit(() ->
             {
-                // get roster if not already in memory
+                // get roster if needed
                 fetchRosterIfNeeded();
 
+                String searchValue = membersSearchTextField.getText().trim();
+
+                // if search is empty
+                if (searchValue.isBlank())
+                {
+                    SwingUtilities.invokeLater(() ->
+                    {
+                        statusLabel.setText(BLANK_SEARCH_VALUE);
+                        SithClanPluginUtil.statusTimer(statusLabel);
+                    });
+                    return;
+                }
+
                 // get specific member
-                SithClanMember member = memberRoster.getMemberByName(membersSearchTextField.getText());
+                SithClanMember member = memberRoster.getMemberByName(searchValue);
                 SwingUtilities.invokeLater(() ->
                 {
                     // dismiss about me area if open
-                    editAboutMePanel.setVisible(false);
+                    membersAboutMePanel.setVisible(false);
                     membersAreaLabel.setVisible(true);
                     membersAreaScrollPane.setVisible(true);
 
                     // if member does not exist
                     if (member == null)
                     {
-                        memberDoesNotExistLabel.setVisible(true);
+                        statusLabel.setText(MEMBER_DOES_NOT_EXIST);
+                        SithClanPluginUtil.statusTimer(statusLabel);
                     } else
                     {
-                        memberDoesNotExistLabel.setVisible(false);
                         updateRosterDateLabel(memberRoster.getDateRosterPosted());
                         displaySingleMember(member);
                     }
@@ -298,19 +268,19 @@ public class SithClanMembersPanel extends JPanel
             });
         });
 
-        // show all members
+        // show all members action
         membersShowAllButton.addActionListener(e ->
         {
             executor.submit(() ->
             {
-                // get roster if not already in memory
+                // get roster if needed
                 fetchRosterIfNeeded();
 
                 // get all members
                 SwingUtilities.invokeLater(() ->
                 {
                     // dismiss about me area if open
-                    editAboutMePanel.setVisible(false);
+                    membersAboutMePanel.setVisible(false);
                     membersAreaLabel.setVisible(true);
                     membersAreaScrollPane.setVisible(true);
 
@@ -321,13 +291,13 @@ public class SithClanMembersPanel extends JPanel
         });
 
         // edit about me button action
-        editAboutMeButton.addActionListener(e ->
+        membersEditAboutMeButton.addActionListener(e ->
         {
             // hide members area, show about me ui
             membersAreaLabel.setVisible(false);
             membersAreaScrollPane.setVisible(false);
-            editAboutMeTextArea.setText("");
-            editAboutMePanel.setVisible(true);
+            membersAboutMeTextArea.setText("");
+            membersAboutMePanel.setVisible(true);
 
             // fetch existing about me
             executor.submit(() ->
@@ -336,13 +306,13 @@ public class SithClanMembersPanel extends JPanel
                 SwingUtilities.invokeLater(() ->
                 {
                     String aboutMe = existingAboutMe == null ? "" : existingAboutMe;
-                    editAboutMeTextArea.setText(aboutMe);
-                    editAboutMeCharCount.setText(aboutMe.length() + "/" + ABOUT_ME_LENGTH);
+                    membersAboutMeTextArea.setText(aboutMe);
+                    membersAboutMeCharCount.setText(aboutMe.length() + "/" + ABOUT_ME_LENGTH);
                 });
             });
         });
 
-        // pagination for show all members
+        // pagination for showing all members
         JScrollBar membersAreaScrollBar = membersAreaScrollPane.getVerticalScrollBar();
         membersAreaScrollBar.addAdjustmentListener(e ->
         {
@@ -372,7 +342,7 @@ public class SithClanMembersPanel extends JPanel
      */
 
     /**
-     * Add single member card to display
+     * Add single member card to panel
      * 
      * @param member
      *                   SithClanMember member to display
@@ -384,6 +354,7 @@ public class SithClanMembersPanel extends JPanel
         rosterList = null;
         pageIndex = 0;
 
+        // create member card
         JPanel singleMemberPanel = buildMemberCard(member);
 
         // add for display
@@ -393,18 +364,18 @@ public class SithClanMembersPanel extends JPanel
     }
 
     /**
-     * Lazily display a list of all members in clan
+     * Lazily add all member cards to panel
      * 
-     * @param rosterCollection
-     *                             collection of clan members
+     * @param memberRoster
+     *                         Collection list of all clan members
      */
-    private void displayAllMembers(Collection<SithClanMember> rosterCollection)
+    private void displayAllMembers(Collection<SithClanMember> memberRoster)
     {
         // fresh panel
         membersAreaPanel.removeAll();
 
         // sort roster by clan rank descending
-        rosterList = new ArrayList<>(new LinkedHashSet<>(rosterCollection));
+        rosterList = new ArrayList<>(new LinkedHashSet<>(memberRoster));
         rosterList.sort(Comparator.comparingInt(SithClanMember::getMemberRank).reversed()
                 .thenComparing(SithClanMember::getMemberName));
 
@@ -414,14 +385,14 @@ public class SithClanMembersPanel extends JPanel
     }
 
     /**
-     * Load next page of member cards
+     * Load next page in member roster
      */
     private void loadNextPage()
     {
         int pageEnd = Math.min(pageIndex + PAGE_SIZE, rosterList.size());
 
         isLoading = true;
-        // create member card and display page
+        // create member cards and display page
         for (int i = pageIndex; i < pageEnd; i++)
         {
             membersAreaPanel.add(buildMemberCard(rosterList.get(i)));
@@ -437,11 +408,153 @@ public class SithClanMembersPanel extends JPanel
      */
 
     /**
+     * Create panel to edit members about me
+     * 
+     * @return JPanel edit about me ui panel
+     */
+    private JPanel buildEditAboutMePanel()
+    {
+        // create panel
+        JPanel editPanel = new JPanel();
+        editPanel.setLayout(new BoxLayout(editPanel, BoxLayout.Y_AXIS));
+
+        // default about me instructions
+        JLabel instructions = new JLabel(ABOUT_ME_INSTRUCTIONS);
+        instructions.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // about me input text area
+        membersAboutMeTextArea.setLineWrap(true);
+        membersAboutMeTextArea.setWrapStyleWord(true);
+        membersAboutMeTextArea.setRows(7);
+
+        // scroll pane for just in case
+        JScrollPane aboutMeScrollPane = new JScrollPane(membersAboutMeTextArea);
+        aboutMeScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        aboutMeScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        aboutMeScrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, 150));
+        aboutMeScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // character count label
+        JPanel charCountRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        charCountRow.setVisible(true);
+        charCountRow.setOpaque(false);
+        charCountRow
+                .setMaximumSize(new Dimension(Integer.MAX_VALUE, membersAboutMeCharCount.getPreferredSize().height));
+        charCountRow.add(membersAboutMeCharCount);
+
+        // update character count dynamically
+        membersAboutMeTextArea.getDocument().addDocumentListener(new DocumentListener()
+        {
+            @Override
+            public void insertUpdate(DocumentEvent e)
+            {
+                updateCount();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e)
+            {
+                updateCount();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e)
+            {
+                updateCount();
+            }
+
+            /**
+             * Updates character count number
+             */
+            private void updateCount()
+            {
+                // get current length
+                int len = membersAboutMeTextArea.getText().length();
+                if (len > ABOUT_ME_LENGTH)
+                {
+                    SwingUtilities
+                            .invokeLater(() -> membersAboutMeTextArea
+                                    .setText(membersAboutMeTextArea.getText().substring(0, ABOUT_ME_LENGTH)));
+                    len = ABOUT_ME_LENGTH;
+                }
+                final int finalLen = len;
+                SwingUtilities.invokeLater(() -> membersAboutMeCharCount.setText(finalLen + "/" + ABOUT_ME_LENGTH));
+            }
+        });
+
+        // status label for feedback
+        JLabel aboutMeStatusLabel = createStatusLabel(true);
+
+        // save and cancel buttons
+        JButton saveButton = new JButton(ABOUT_ME_SAVE);
+        JButton cancelButton = new JButton(ABOUT_ME_CANCEL);
+
+        // panel for button organization
+        JPanel buttonRow = new JPanel();
+        buttonRow.setLayout(new BoxLayout(buttonRow, BoxLayout.X_AXIS));
+        buttonRow.setAlignmentX(Component.CENTER_ALIGNMENT);
+        buttonRow.setOpaque(false);
+        buttonRow.add(saveButton);
+        buttonRow.add(Box.createRigidArea(new Dimension(5, 0)));
+        buttonRow.add(cancelButton);
+
+        // save button action
+        saveButton.addActionListener(e ->
+        {
+            String text = membersAboutMeTextArea.getText().trim();
+            executor.submit(() ->
+            {
+                boolean success = submitAboutMe(playerName, text);
+                SwingUtilities.invokeLater(() ->
+                {
+                    if (success)
+                    {
+                        // return to normal
+                        statusLabel.setText(ABOUT_ME_SUCCESSFUL);
+                        SithClanPluginUtil.statusTimer(statusLabel);
+
+                        membersAboutMePanel.setVisible(false);
+                        membersAreaLabel.setVisible(true);
+                        membersAreaScrollPane.setVisible(true);
+
+                    } else
+                    {
+                        aboutMeStatusLabel.setText(ABOUT_ME_FAILED);
+                        SithClanPluginUtil.statusTimer(aboutMeStatusLabel);
+                    }
+                });
+            });
+        });
+
+        // cancel button action
+        cancelButton.addActionListener(e ->
+        {
+            membersAboutMePanel.setVisible(false);
+            membersAreaLabel.setVisible(true);
+            membersAreaScrollPane.setVisible(true);
+        });
+
+        editPanel.add(instructions);
+        editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        editPanel.add(aboutMeStatusLabel);
+        editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        editPanel.add(aboutMeScrollPane);
+        editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        editPanel.add(charCountRow);
+        editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        editPanel.add(buttonRow);
+
+        editPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, editPanel.getPreferredSize().height));
+
+        return editPanel;
+    }
+
+    /**
      * Create a single member card panel for display
      * 
      * @param member
-     *                   SithClanMember member to place on card
-     * @return JPanel built member card panel
+     *                   SithClanMember member to create card for
+     * @return JPanel completed member card panel
      */
     private JPanel buildMemberCard(SithClanMember member)
     {
@@ -463,27 +576,28 @@ public class SithClanMembersPanel extends JPanel
         memberInfoPanel.setOpaque(true);
         memberInfoPanel.setVisible(true);
 
-        // avatar panel (rank icon right now)
-        JLabel avatar;
+        // rank icon
         JPanel memberAvatar = new JPanel();
         String memberName = member.getMemberName();
-        int rankInt = member.getMemberRank();
-        int creditsInt = member.getMemberCredits();
-        String promotionDate = member.getMemberDatePromoted();
+        int memberRankInt = member.getMemberRank();
+        int memberCreditsInt = member.getMemberCredits();
+        String memberLastPromotionDate = member.getMemberDatePromoted();
 
         memberAvatar.setLayout(new BorderLayout());
         memberAvatar.setAlignmentY(Component.CENTER_ALIGNMENT);
         memberAvatar.setPreferredSize(new Dimension(AVATAR_SIZE - 5, 130));
         memberAvatar.setMaximumSize(new Dimension(AVATAR_SIZE - 5, 130));
         memberAvatar.setMinimumSize(new Dimension(AVATAR_SIZE - 5, 130));
-
         memberAvatar.setOpaque(false);
-        if (rankInt == 15 && memberName.equalsIgnoreCase(CURRENT_GOLD_KEY))
+
+        JLabel avatar;
+        // gold key rank
+        if (memberRankInt == 15 && memberName.equalsIgnoreCase(SithClanPluginConstants.CURRENT_GOLD_KEY))
         {
             avatar = new JLabel(rankIcons[15]);
         } else
         {
-            avatar = new JLabel(rankIcons[rankInt - 1]);
+            avatar = new JLabel(rankIcons[memberRankInt - 1]);
         }
         avatar.setPreferredSize(new Dimension(AVATAR_SIZE, AVATAR_SIZE));
         memberAvatar.add(avatar, BorderLayout.CENTER);
@@ -497,53 +611,50 @@ public class SithClanMembersPanel extends JPanel
 
         // member name
         JLabel memberNameLabel = new JLabel(memberName);
-        memberNameLabel.setFont(MEMBER_NAME_FONT);
+        memberNameLabel.setFont(getFont().deriveFont(Font.BOLD, 16f));
         rightPanel.add(memberNameLabel);
 
-        if (rankInt <= 15 && rankInt >= 13)
+        // senate member
+        if (memberRankInt <= 15 && memberRankInt >= 13)
         {
-            JLabel leadershipLabel = new JLabel();
-            leadershipLabel.setText("<html><b>" + SENATE_MEMBER + "</b></html>");
-            rightPanel.add(leadershipLabel);
+            rightPanel.add(new JLabel("<html><b>" + SENATE_MEMBER + "</b></html>"));
         }
 
         // member rank
-        JLabel memberRank = new JLabel(MEMBER_RANK + SithClanPluginConstants.CLAN_RANKS[rankInt - 1]);
-        rightPanel.add(memberRank);
+        rightPanel.add(new JLabel(MEMBER_RANK + SithClanPluginConstants.CLAN_RANKS[memberRankInt - 1]));
 
         // member credits
-        JLabel memberCredits = new JLabel(creditsInt + MEMBER_CREDITS);
-        rightPanel.add(memberCredits);
+        rightPanel.add(new JLabel(memberCreditsInt + MEMBER_CREDITS));
 
         // member promoted date
         JLabel memberPromoted = new JLabel(MEMBER_PROMOTED
-                + (promotionDate == null ? MEMBER_UNKNOWN_DATA : promotionDate));
-
+                + (memberLastPromotionDate == null ? MEMBER_UNKNOWN : memberLastPromotionDate));
         rightPanel.add(memberPromoted);
 
         // until next promotion
-        if (rankInt <= 10)
-        { // sith marauder and below
-          // credits
-            int creditsNeeded = SithClanPluginConstants.CREDITS_TO_PROMOTE[rankInt] - creditsInt;
+        // sith marauder and below
+        if (memberRankInt <= 10)
+        {
+            // credits
+            int creditsNeeded = SithClanPluginConstants.CREDITS_TO_PROMOTE[memberRankInt] - memberCreditsInt;
             if (creditsNeeded > 0)
             {
-                JLabel creditsUntilPromotion = new JLabel(MEMBER_CREDITS_NEEDED + creditsNeeded);
-                rightPanel.add(creditsUntilPromotion);
+                rightPanel.add(new JLabel(MEMBER_CREDITS_NEEDED + creditsNeeded));
             } else
             {
-                if (rankInt >= 5 && rankInt <= 10)
-                {// between death trooper and sith marauder
+                // between death trooper and sith marauder
+                if (memberRankInt >= 5 && memberRankInt <= 10)
+                {
                     JLabel daysUntilPromotion = null;
-                    if (promotionDate == null)
+                    if (memberLastPromotionDate == null)
                     {
-                        daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + MEMBER_UNKNOWN_DATA);
+                        daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + MEMBER_UNKNOWN);
                     } else
                     {
                         long daysInRank = ChronoUnit.DAYS.between(
-                                LocalDate.parse(promotionDate, SithClanPluginConstants.SHORT_DATE_FORMATTER),
+                                LocalDate.parse(memberLastPromotionDate, SithClanPluginConstants.SHORT_DATE_FORMATTER),
                                 LocalDate.now());
-                        long daysNeeded = SithClanPluginConstants.DAYS_TO_PROMOTE[rankInt - 1] - daysInRank;
+                        long daysNeeded = SithClanPluginConstants.DAYS_TO_PROMOTE[memberRankInt - 1] - daysInRank;
                         if (daysNeeded <= 0)
                         {
                             daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + MEMBER_NONE_NEEDED);
@@ -555,22 +666,19 @@ public class SithClanMembersPanel extends JPanel
                     rightPanel.add(daysUntilPromotion);
                 } else
                 {
-                    JLabel noneNeeded = new JLabel(MEMBER_CREDITS_NEEDED + MEMBER_NONE_NEEDED);
-                    rightPanel.add(noneNeeded);
+                    rightPanel.add(new JLabel(MEMBER_CREDITS_NEEDED + MEMBER_NONE_NEEDED));
                 }
             }
         }
 
         // member date joined
-        JLabel memberJoined = new JLabel(MEMBER_JOINED + member.getMemberDateJoined());
-        rightPanel.add(memberJoined);
+        rightPanel.add(new JLabel(MEMBER_JOINED + member.getMemberDateJoined()));
 
         // member alt accounts
         String altName = member.getMemberAltName();
         if (altName != null && !altName.isBlank())
         {
-            JLabel memberAlt = new JLabel(MEMBER_ALT + altName);
-            rightPanel.add(memberAlt);
+            rightPanel.add(new JLabel(MEMBER_ALT + altName));
         }
 
         // member about me section
@@ -578,6 +686,7 @@ public class SithClanMembersPanel extends JPanel
         aboutMePanel.setOpaque(false);
         aboutMePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        // about me text display area
         JTextArea aboutMeText = new JTextArea();
         aboutMeText.setLineWrap(true);
         aboutMeText.setWrapStyleWord(true);
@@ -587,14 +696,18 @@ public class SithClanMembersPanel extends JPanel
         aboutMeText.setFont(getFont().deriveFont(Font.ITALIC));
         aboutMeText.setAlignmentX(Component.LEFT_ALIGNMENT);
         aboutMeText.setBorder(BorderFactory.createEmptyBorder(0, 4, 2, 4));
+
         aboutMePanel.add(aboutMeText, BorderLayout.CENTER);
 
+        // get members current about me
         final String nameForFetch = member.getMemberName();
         executor.submit(() ->
         {
+            // about me text
             String aboutMe = fetchAboutMe(nameForFetch);
             SwingUtilities.invokeLater(() ->
             {
+                // set text
                 if (aboutMe != null && !aboutMe.isBlank())
                 {
                     aboutMeText.setText(aboutMe);
@@ -612,147 +725,57 @@ public class SithClanMembersPanel extends JPanel
         singleMemberPanel.add(memberInfoPanel);
         singleMemberPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         singleMemberPanel.add(aboutMePanel);
-        singleMemberPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, Short.MAX_VALUE));
+        singleMemberPanel
+                .setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, singleMemberPanel.getPreferredSize().height));
 
         return singleMemberPanel;
     }
 
     /**
-     * Create panel to edit members about me
-     * 
-     * @return JPanel edit about me ui panel
+     * MISC FUNCTIONS
      */
-    private JPanel buildEditAboutMePanel()
+
+    /**
+     * Helper function to create status labels
+     * 
+     * @param isErrorLabel
+     *                         boolean if label will contain error statuses
+     * @return JLabel created status label
+     */
+    private JLabel createStatusLabel(boolean isErrorLabel)
     {
-        JPanel editPanel = new JPanel();
-        editPanel.setLayout(new BoxLayout(editPanel, BoxLayout.Y_AXIS));
+        JLabel label = new JLabel();
+        label.setVisible(true);
+        label.setHorizontalAlignment(JLabel.CENTER);
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setPreferredSize(STATUS_LABEL_DIMENSION);
+        label.setMinimumSize(STATUS_LABEL_DIMENSION);
+        label.setMaximumSize(STATUS_LABEL_DIMENSION);
 
-        JLabel instructions = new JLabel(ABOUT_ME_INSTRUCTIONS);
-        instructions.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // text area for about me input
-        editAboutMeTextArea.setLineWrap(true);
-        editAboutMeTextArea.setWrapStyleWord(true);
-        editAboutMeTextArea.setRows(7);
-
-        // scroll pane for just in case
-        JScrollPane aboutMeScrollPane = new JScrollPane(editAboutMeTextArea);
-        aboutMeScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        aboutMeScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        aboutMeScrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, 150));
-        aboutMeScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // character count label
-        JPanel charCountRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        charCountRow.setOpaque(false);
-        charCountRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, editAboutMeCharCount.getPreferredSize().height));
-        charCountRow.add(editAboutMeCharCount);
-
-        // update character count dynamically
-        editAboutMeTextArea.getDocument().addDocumentListener(new DocumentListener()
+        // label will contain error statuses
+        if (isErrorLabel)
         {
-            @Override
-            public void insertUpdate(DocumentEvent e)
-            {
-                updateCount();
-            }
+            label.setForeground(ColorScheme.BRAND_ORANGE);
+        }
 
-            @Override
-            public void removeUpdate(DocumentEvent e)
-            {
-                updateCount();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e)
-            {
-                updateCount();
-            }
-
-            private void updateCount()
-            {
-                int len = editAboutMeTextArea.getText().length();
-                if (len > ABOUT_ME_LENGTH)
-                {
-                    SwingUtilities
-                            .invokeLater(() -> editAboutMeTextArea
-                                    .setText(editAboutMeTextArea.getText().substring(0, ABOUT_ME_LENGTH)));
-                    len = ABOUT_ME_LENGTH;
-                }
-                final int finalLen = len;
-                SwingUtilities.invokeLater(() -> editAboutMeCharCount.setText(finalLen + "/" + ABOUT_ME_LENGTH));
-            }
-        });
-
-        // status label for feedback
-        JLabel statusLabel = new JLabel();
-        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        statusLabel.setVisible(false);
-
-        // save and cancel buttons
-        JButton saveButton = new JButton(ABOUT_ME_SAVE);
-        JButton cancelButton = new JButton(ABOUT_ME_CANCEL);
-
-        // panel for button organization
-        JPanel buttonRow = new JPanel();
-        buttonRow.setLayout(new BoxLayout(buttonRow, BoxLayout.X_AXIS));
-        buttonRow.setAlignmentX(Component.CENTER_ALIGNMENT);
-        buttonRow.setOpaque(false);
-        buttonRow.add(saveButton);
-        buttonRow.add(Box.createRigidArea(new Dimension(5, 0)));
-        buttonRow.add(cancelButton);
-
-        // save button action
-        saveButton.addActionListener(e ->
-        {
-            String text = editAboutMeTextArea.getText().trim();
-            executor.submit(() ->
-            {
-                boolean success = submitAboutMe(playerName, text);
-                SwingUtilities.invokeLater(() ->
-                {
-                    if (success)
-                    {
-                        // return to normal
-                        editAboutMePanel.setVisible(false);
-                        membersAreaLabel.setVisible(true);
-                        membersAreaScrollPane.setVisible(true);
-                    } else
-                    {
-                        statusLabel.setText(ABOUT_ME_FAILED);
-                        statusLabel.setVisible(true);
-                        SithClanPluginUtil.statusTimer(statusLabel);
-                    }
-                });
-            });
-        });
-
-        // cancel button action
-        cancelButton.addActionListener(e ->
-        {
-            editAboutMePanel.setVisible(false);
-            membersAreaLabel.setVisible(true);
-            membersAreaScrollPane.setVisible(true);
-        });
-
-        editPanel.add(instructions);
-        editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        editPanel.add(statusLabel);
-        editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        editPanel.add(aboutMeScrollPane);
-        editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        editPanel.add(charCountRow);
-        editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        editPanel.add(buttonRow);
-
-        editPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, editPanel.getPreferredSize().height));
-
-        return editPanel;
+        return label;
     }
 
     /**
-     * MISC FUNCTIONS
+     * Helper method to create buttons
+     * 
+     * @param buttonText
+     *                       String text to go on button
+     * @return JButton created button
      */
+    private JButton createButton(String buttonText)
+    {
+        JButton button = new JButton(buttonText);
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button
+                .setPreferredSize(new Dimension(Short.MAX_VALUE, button.getPreferredSize().height));
+        return button;
+    }
 
     /**
      * Convert roster date into user local time
@@ -764,14 +787,13 @@ public class SithClanMembersPanel extends JPanel
     {
         if (time == null)
         {
-            rosterDateLabel.setVisible(false);
+            rosterDateLabel.setText("");
             return;
         }
         ZonedDateTime timeStamp = time
                 .withZoneSameInstant(ZoneId.systemDefault());
         rosterDateLabel
                 .setText(ROSTER_DATE_PREFIX + timeStamp.format(SithClanPluginConstants.DATE_FORMATTER));
-        rosterDateLabel.setVisible(true);
     }
 
     /**
@@ -784,7 +806,7 @@ public class SithClanMembersPanel extends JPanel
     {
         executor.submit(() ->
         {
-            // get roster if not already in memory
+            // get roster if needed
             fetchRosterIfNeeded();
 
             // get specific member
@@ -792,18 +814,18 @@ public class SithClanMembersPanel extends JPanel
             SwingUtilities.invokeLater(() ->
             {
                 // dismiss about me editor if open
-                editAboutMePanel.setVisible(false);
+                membersAboutMePanel.setVisible(false);
                 membersAreaLabel.setVisible(true);
                 membersAreaScrollPane.setVisible(true);
-                
+
                 // if member does not exist
                 if (member == null)
                 {
-                    memberDoesNotExistLabel.setVisible(true);
+                    statusLabel.setText(MEMBER_DOES_NOT_EXIST);
+                    SithClanPluginUtil.statusTimer(statusLabel);
                 } else
                 {
                     membersSearchTextField.setText(username);
-                    memberDoesNotExistLabel.setVisible(false);
                     updateRosterDateLabel(memberRoster.getDateRosterPosted());
                     displaySingleMember(member);
                 }
@@ -824,8 +846,8 @@ public class SithClanMembersPanel extends JPanel
             {
                 SwingUtilities.invokeLater(() ->
                 {
-                    errorLabel.setVisible(true);
-                    SithClanPluginUtil.statusTimer(errorLabel);
+                    statusLabel.setText(ROSTER_UNOBTAINABLE_WARNING);
+                    SithClanPluginUtil.statusTimer(statusLabel);
                 });
                 return;
             }
@@ -834,6 +856,7 @@ public class SithClanMembersPanel extends JPanel
 
     /**
      * Set currently logged in players name
+     * TODO: FIX BEFORE LAUNCHING
      * 
      * @param name
      *                 String player username
@@ -842,7 +865,7 @@ public class SithClanMembersPanel extends JPanel
     {
         // this.playerName = name;
         this.playerName = "Kyanize";
-        SwingUtilities.invokeLater(() -> editAboutMeButton.setVisible(name != null));
+        SwingUtilities.invokeLater(() -> membersEditAboutMeButton.setVisible(name != null));
     }
 
     /**
@@ -881,7 +904,7 @@ public class SithClanMembersPanel extends JPanel
      *                        String member username
      * @param aboutMeText
      *                        String member about me info
-     * @return boolean if response submitted or not
+     * @return boolean if response submitted successfully
      */
     private boolean submitAboutMe(String memberName, String aboutMeText)
     {
