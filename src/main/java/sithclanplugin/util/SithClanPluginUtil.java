@@ -11,6 +11,7 @@ import javax.swing.Timer;
 import com.google.gson.JsonObject;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.ui.ColorScheme;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -90,7 +91,6 @@ public class SithClanPluginUtil
      */
     public static String sendPutRequest(OkHttpClient client, String apiKey, String data, String uri)
     {
-
         // build HTTP PUT request
         Request request = new Request.Builder()
                 .url(uri)
@@ -115,7 +115,6 @@ public class SithClanPluginUtil
      */
     public static String sendDeleteRequest(OkHttpClient client, String apiKey, String uri)
     {
-
         // build HTTP DELETE request
         Request request = new Request.Builder()
                 .url(uri)
@@ -148,7 +147,7 @@ public class SithClanPluginUtil
                 return null;
             }
             String body = responseBody.string();
-            log.debug("Request to {} succeeded ({} bytes)", request.url(), body.length());
+            log.info("Request to {} succeeded ({} bytes)", request.url(), body.length());
             return body;
         } catch (Exception e)
         {
@@ -192,8 +191,6 @@ public class SithClanPluginUtil
      */
     public static boolean validateApiKey(OkHttpClient client, SithClanPluginConfig config)
     {
-        log.info("Validating API key..");
-
         // create HTTP GET request
         Request request = new Request.Builder()
                 .url(SithClanPluginConstants.VALIDATE_URI)
@@ -276,10 +273,10 @@ public class SithClanPluginUtil
     }
 
     /**
-     * Creates timer to set status label as not visible
+     * Creates timer to clear status label text
      * 
      * @param label
-     *                  JLabel status label to hide after timer
+     *                  JLabel status label to clear after timer
      */
     public static void statusTimer(JLabel label)
     {
@@ -288,7 +285,8 @@ public class SithClanPluginUtil
             @Override
             public void actionPerformed(ActionEvent event)
             {
-                label.setVisible(false);
+                label.setText("");
+                label.setForeground(ColorScheme.TEXT_COLOR);
             }
         });
 

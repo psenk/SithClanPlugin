@@ -45,19 +45,18 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     @Inject
     private SithClanAnnouncements announcements;
 
-    private final JPanel announcementsListPanel;
-    private final JTextArea newAnnouncementTextArea;
-    private final JScrollPane announcementsScrollPane;
     private final JPanel statusPanel;
-    private final JLabel postedLabel;
-    private final JLabel updatedLabel;
-    private final JLabel deletedLabel;
-    private final JLabel errorLabel;
+    private final JLabel statusLabel;
+    private final JPanel announcementsListPanel;
+    private final JScrollPane announcementsScrollPane;
+    private final JTextArea newAnnouncementTextArea;
 
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
     private static final String ANNOUNCEMENTS_LABEL = "Update Announcements";
     private static final String ADD_NEW_ANNOUNCEMENT = "Add New";
+    private static final Border ANNOUNCEMENT_BORDER = BorderFactory.createMatteBorder(1, 1, 1, 1,
+            ColorScheme.BORDER_COLOR);
     private static final String NEW_ANNOUNCEMENT_DEFAULT_TEXT = "Type Announcement Here";
     private static final String POST_ANNOUNCEMENT_BUTTON = "Post";
     private static final String CANCEL_ANNOUNCEMENT_BUTTON = "Cancel";
@@ -68,8 +67,6 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     private static final String ANNOUNCEMENT_UPDATED = "Announcement Updated";
     private static final String ANNOUNCEMENT_DELETED = "Announcement Deleted";
     private static final String ANNOUNCEMENT_ERROR = "Announcement Error";
-    private static final Border ANNOUNCEMENT_BORDER = BorderFactory.createMatteBorder(1, 1, 1, 1,
-            ColorScheme.BORDER_COLOR);
 
     SithClanAnnouncementsPanelSenate()
     {
@@ -89,31 +86,15 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
-        // announcement posted status
-        postedLabel = new JLabel(ANNOUNCEMENT_POSTED);
-        postedLabel.setVisible(false);
-        postedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // status message label
+        statusLabel = new JLabel();
+        statusLabel.setVisible(true);
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        statusLabel.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
 
-        // announcement updated status
-        updatedLabel = new JLabel(ANNOUNCEMENT_UPDATED);
-        updatedLabel.setVisible(false);
-        updatedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // announcement deleted status
-        deletedLabel = new JLabel(ANNOUNCEMENT_DELETED);
-        deletedLabel.setVisible(false);
-        deletedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // announcement error status
-        errorLabel = new JLabel(ANNOUNCEMENT_ERROR);
-        errorLabel.setVisible(false);
-        errorLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        statusPanel.add(postedLabel);
-        statusPanel.add(updatedLabel);
-        statusPanel.add(deletedLabel);
-        statusPanel.add(errorLabel);
+        statusPanel.add(statusLabel);
         statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // announcements interactive label
@@ -326,14 +307,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                 int status = announcements.parseAnnouncementForDelete(announcement.getAnnouncementId());
                 SwingUtilities.invokeLater(() ->
                 {
-                    if (status == SithClanPluginConstants.STATUS_OK)
-                    {
-                        deletedLabel.setVisible(true);
-                        SithClanPluginUtil.statusTimer(deletedLabel);
-                    } else
-                    {
-                        handleAnnouncementStatus(status);
-                    }
+                    handleAnnouncementStatus(status);
                     displayAnnouncements(announcements.getAnnouncementsList());
                 });
             });
@@ -396,20 +370,26 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         switch (statusCode)
         {
             case SithClanPluginConstants.STATUS_RESOURCE_CREATED:
-                postedLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(postedLabel);
+                statusLabel.setText(ANNOUNCEMENT_POSTED);
+                SithClanPluginUtil.statusTimer(statusLabel);
+                break;
+            case SithClanPluginConstants.STATUS_RESOURCE_DELETED:
+                statusLabel.setText(ANNOUNCEMENT_DELETED);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
             case SithClanPluginConstants.STATUS_OK:
-                updatedLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(updatedLabel);
+                statusLabel.setText(ANNOUNCEMENT_UPDATED);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
             case SithClanPluginConstants.STATUS_BAD_INPUT:
-                errorLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(errorLabel);
+                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                statusLabel.setText(ANNOUNCEMENT_ERROR);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
             case SithClanPluginConstants.STATUS_NOT_FOUND:
-                errorLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(errorLabel);
+                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                statusLabel.setText(ANNOUNCEMENT_ERROR);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
             default:
                 break;

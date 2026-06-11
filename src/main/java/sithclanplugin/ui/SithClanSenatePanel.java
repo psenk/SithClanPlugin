@@ -43,31 +43,27 @@ public class SithClanSenatePanel extends JPanel
 
     @SuppressWarnings("unused")
     private final SithClanAnnouncementsPanelSenate announcementsPanelSenate;
+    private final JPanel statusPanel;
+    private final JLabel statusLabel;
     private final JTextArea senatePostScheduleTextArea;
     private final JTextArea senatePostRosterTextArea;
-    private final JPanel statusPanel;
-    private final JLabel successLabel;
-    private final JLabel uploadingLabel;
-    private final JLabel badInputLabel;
-    private final JLabel errorLabel;
 
-    private static final String SENATE_OPTIONS_LABEL = "Senate Options";
-    private static final String UPDATE_SCHEDULE_LABEL = "Post Event Schedule";
-    private static final String UPDATE_ROSTER_LABEL = "Post Member Roster";
-    private static final String UPDATE_BUTTON = "Update";
-    private static final String EVENT_TEXT_AREA_DEFAULT = "Post Event Schedule Here";
-    private static final String ROSTER_TEXT_AREA_DEFAULT = "Post Member Roster Here";
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
+    private static final String SENATE_OPTIONS_LABEL = "Senate Options";
+    private static final String UPDATE_BUTTON = "Update";
+    private static final String UPDATE_SCHEDULE_LABEL = "Post Event Schedule";
+    private static final String EVENT_TEXT_AREA_DEFAULT = "Post Event Schedule Here";
+    private static final String UPDATE_ROSTER_LABEL = "Post Member Roster";
+    private static final String ROSTER_TEXT_AREA_DEFAULT = "Post Member Roster Here";
+    private static final String UPLOADING = "Uploading...";
     private static final String SUCCESSFUL_POST = "Posted successfully.";
     private static final String BAD_INPUT_WARNING = "There is a problem with your input.";
     private static final String ERROR_WARNING = "Unable to post.";
-    private static final String UPLOADING = "Uploading...";
 
     @Inject
     SithClanSenatePanel(SithClanAnnouncementsPanelSenate announcementsPanelSenate)
     {
-
         this.announcementsPanelSenate = announcementsPanelSenate;
 
         final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
@@ -86,33 +82,15 @@ public class SithClanSenatePanel extends JPanel
         statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
-        // post successful status label
-        successLabel = new JLabel(SUCCESSFUL_POST);
-        successLabel.setVisible(false);
-        successLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // status message label
+        statusLabel = new JLabel();
+        statusLabel.setVisible(true);
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        statusLabel.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
 
-        // uploading schedule/roster
-        uploadingLabel = new JLabel(UPLOADING);
-        uploadingLabel.setVisible(false);
-        uploadingLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        uploadingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // bad input status label
-        badInputLabel = new JLabel(BAD_INPUT_WARNING);
-        badInputLabel.setVisible(false);
-        badInputLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        badInputLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // error status label
-        errorLabel = new JLabel(ERROR_WARNING);
-        errorLabel.setVisible(false);
-        errorLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        statusPanel.add(successLabel);
-        statusPanel.add(uploadingLabel);
-        statusPanel.add(badInputLabel);
-        statusPanel.add(errorLabel);
+        statusPanel.add(statusLabel);
         statusPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         this.add(statusPanel);
 
@@ -128,12 +106,14 @@ public class SithClanSenatePanel extends JPanel
         // post event schedule action
         senatePostScheduleButton.addActionListener(e ->
         {
+            statusLabel.setText(UPLOADING);
             executor.submit(() ->
             {
-                uploadingLabel.setVisible(true);
                 int status = eventSchedule.parseScheduleForPost(senatePostScheduleTextArea.getText());
-                SwingUtilities.invokeLater(
-                        () -> handlePostStatus(status, senatePostScheduleTextArea, EVENT_TEXT_AREA_DEFAULT));
+                SwingUtilities.invokeLater(() ->
+                {
+                    handlePostStatus(status, senatePostScheduleTextArea, EVENT_TEXT_AREA_DEFAULT);
+                });
             });
         });
 
@@ -151,12 +131,14 @@ public class SithClanSenatePanel extends JPanel
         // post member roster action
         senatePostRosterButton.addActionListener(e ->
         {
+            statusLabel.setText(UPLOADING);
             executor.submit(() ->
             {
-                uploadingLabel.setVisible(true);
                 int status = memberRoster.parseRosterForPost(senatePostRosterTextArea.getText());
-                SwingUtilities.invokeLater(
-                        () -> handlePostStatus(status, senatePostRosterTextArea, ROSTER_TEXT_AREA_DEFAULT));
+                SwingUtilities.invokeLater(() ->
+                {
+                    handlePostStatus(status, senatePostRosterTextArea, ROSTER_TEXT_AREA_DEFAULT);
+                });
             });
         });
 
@@ -262,22 +244,24 @@ public class SithClanSenatePanel extends JPanel
         switch (statusCode)
         {
             case SithClanPluginConstants.STATUS_OK:
-                uploadingLabel.setVisible(false);
-                successLabel.setVisible(true);
+                statusLabel.setText(SUCCESSFUL_POST);
                 textArea.setText(defaultText);
-                SithClanPluginUtil.statusTimer(successLabel);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
             case SithClanPluginConstants.STATUS_BAD_INPUT:
-                uploadingLabel.setVisible(false);
-                badInputLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(badInputLabel);
+                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                statusLabel.setText(BAD_INPUT_WARNING);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
             case SithClanPluginConstants.STATUS_NOT_FOUND:
-                uploadingLabel.setVisible(false);
-                errorLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(errorLabel);
+                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                statusLabel.setText(ERROR_WARNING);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
             default:
+                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                statusLabel.setText(ERROR_WARNING);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
         }
     }

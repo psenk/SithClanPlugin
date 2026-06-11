@@ -1,7 +1,10 @@
 package sithclanplugin.util;
 
+import java.awt.Dimension;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+
+import net.runelite.client.ui.PluginPanel;
 
 public class SithClanPluginConstants
 {
@@ -89,6 +92,7 @@ public class SithClanPluginConstants
         // status codes
         public static final int STATUS_OK = 200;
         public static final int STATUS_RESOURCE_CREATED = 201;
+        public static final int STATUS_RESOURCE_DELETED = 204;
         public static final int STATUS_BAD_INPUT = 400;
         public static final int STATUS_NOT_FOUND = 404;
         public static final int STATUS_RATE_LIMITED = 429;
@@ -117,4 +121,8 @@ public class SithClanPluginConstants
         public static final DateTimeFormatter SHORT_DATE_FORMATTER = DateTimeFormatter.ofPattern(SHORT_DATE_FORMAT);
         public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(TIME_FORMAT);
         public static final ZoneId EST_ZONE = ZoneId.of("America/New_York");
+
+        // misc
+        public static final Dimension STATUS_LABEL_DIMENSION = new Dimension(PluginPanel.PANEL_WIDTH, 20);
+
 }

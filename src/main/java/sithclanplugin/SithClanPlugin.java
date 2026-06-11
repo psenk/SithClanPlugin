@@ -80,13 +80,22 @@ public class SithClanPlugin extends Plugin
 	private OkHttpClient httpClient;
 
 	@Inject
-	private ScheduledExecutorService executor;
-
-	@Inject
 	private Gson gson;
 
 	@Inject
+	private ScheduledExecutorService executor;
+
+	@Inject
 	private SithClanPluginConfig config;
+
+	@Inject
+	private SithClanAnnouncements announcements;
+
+	@Inject
+	private SithClanEventSchedule eventSchedule;
+
+	@Inject
+	private SithClanMemberRoster memberRoster;
 
 	@Inject
 	private SithClanPluginFileManager fileManager;
@@ -95,23 +104,14 @@ public class SithClanPlugin extends Plugin
 	private SithClanPluginNotificationManager notificationManager;
 
 	@Inject
-	private SithClanEventSchedule eventSchedule;
-
-	@Inject
-	private SithClanAnnouncements announcements;
-
-	@Inject
-	private SithClanMemberRoster memberRoster;
-
-	@Inject
 	private Provider<SithClanPluginPanel> uiPanel;
 
 	private NavigationButton uiNavigationButton;
+	private boolean isSenateMember = false;
 	private boolean pendingClanCheck = false;
+	private String playerName = null;
 	private net.runelite.api.World quickHopTargetWorld;
 	private int displaySwitcherAttempts = 0;
-	private boolean isSenateMember = false;
-	private String playerName = null;
 
 	private static final String PLUGIN_ICON_PATH = "/icon.png";
 	private static final String PLUGIN_TOOLTIP = "Sith Clan Plugin";
@@ -152,7 +152,6 @@ public class SithClanPlugin extends Plugin
 		// bypass check for testing
 		if (SithClanPluginConstants.BYPASS_CLAN_CHECK)
 		{
-			pendingClanCheck = false;
 			SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
 		}
 
@@ -167,7 +166,7 @@ public class SithClanPlugin extends Plugin
 				eventSchedule.parseScheduleFromFile();
 			}
 			// validate API key of Senate members
-			if (!config.apiKey().isBlank() || !config.apiKey().isEmpty())
+			if (!config.apiKey().isBlank())
 			{
 				isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
 				eventSchedule.setSenateMember(isSenateMember);

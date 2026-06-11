@@ -22,20 +22,21 @@ import net.runelite.client.ui.PluginPanel;
 @Singleton
 public class SithClanPluginPanel extends PluginPanel
 {
-    @Getter
-    private final SithClanAnnouncementsPanel announcementsPanel;
 
     @Getter
     private final SithClanSchedulePanel schedulePanel;
 
     @Getter
+    private final SithClanSenatePanel senatePanel;
+
+    @Getter
     private final SithClanMembersPanel membersPanel;
 
     @Getter
-    private final SithClanEventLogPanel eventLogPanel;
+    private final SithClanAnnouncementsPanel announcementsPanel;
 
     @Getter
-    private final SithClanSenatePanel senatePanel;
+    private final SithClanEventLogPanel eventLogPanel;
 
     @Getter
     private final JButton senateButton;
@@ -44,26 +45,26 @@ public class SithClanPluginPanel extends PluginPanel
     private final CardLayout outerCardLayout = new CardLayout(); // swaps between main panel and not allowed panels
     private final JPanel outerCardPanel = new JPanel(outerCardLayout);
     private final JPanel cardPanel;
-    private final JPanel navPanel;
     private final JPanel buttonPanel;
+    private final JPanel navPanel;
     private final JPanel notLoggedInPanel;
     private final JPanel notClanMemberPanel;
 
-    private static final String PLUGIN_LABEL = "Sith Clan Plugin";
-    private static final String PLUGIN_NAVIGATION_LABEL = "Plugin Navigation";
-    private static final String SCHEDULE_BUTTON = "Event Schedule";
-    private static final String MEMBERS_BUTTON = "Member Info";
-    private static final String EVENT_LOG_BUTTON = "Post Event Log";
-    private static final String SENATE_BUTTON = "Senate Options";
-    private static final String MAIN_CARD = "main";
-    private static final String NOT_LOGGED_IN_CARD = "notLoggedIn";
-    private static final String NOT_CLAN_MEMBER_CARD = "notClanMember";
     private static final String SCHEDULE_CARD = "schedule";
     private static final String MEMBERS_CARD = "members";
     private static final String EVENT_LOG_CARD = "log";
     private static final String SENATE_CARD = "senate";
+    private static final String SCHEDULE_BUTTON = "Event Schedule";
+    private static final String MEMBERS_BUTTON = "Member Info";
+    private static final String EVENT_LOG_BUTTON = "Post Event Log";
+    private static final String SENATE_BUTTON = "Senate Options";
+    private static final String PLUGIN_LABEL = "Sith Clan Plugin";
+    private static final String PLUGIN_NAVIGATION_LABEL = "Plugin Navigation";
     private static final String NOT_LOGGED_IN_MESSAGE = "<html><center>Please log in and turn on clan chat to use this plugin.</center></html>";
-    private static final String NON_MEMBER_MESSAGE = "<html><center>Sorry, this plugin is for members of the Sith clan only.  Message Kyanize in-game or kyanize. in Discord for joining info!</center></html>";
+    private static final String NON_MEMBER_MESSAGE = "<html><center>Sorry, this plugin is for members of the Sith clan only. Message Kyanize in-game or kyanize. in Discord for joining info!</center></html>";
+    private static final String NOT_LOGGED_IN_CARD = "notLoggedIn";
+    private static final String NOT_CLAN_MEMBER_CARD = "notClanMember";
+    private static final String MAIN_CARD = "main";
 
     @Inject
     SithClanPluginPanel(SithClanSchedulePanel schedulePanel,
@@ -201,7 +202,6 @@ public class SithClanPluginPanel extends PluginPanel
     public void showMainPanel()
     {
         navPanel.setVisible(true);
-        buttonPanel.setVisible(true);
         outerCardLayout.show(outerCardPanel, MAIN_CARD);
         revalidate();
         repaint();
@@ -213,7 +213,6 @@ public class SithClanPluginPanel extends PluginPanel
     public void userNotInClan()
     {
         navPanel.setVisible(false);
-        buttonPanel.setVisible(false);
         outerCardLayout.show(outerCardPanel, NOT_CLAN_MEMBER_CARD);
         revalidate();
         repaint();

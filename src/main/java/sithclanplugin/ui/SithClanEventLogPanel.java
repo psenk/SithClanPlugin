@@ -37,36 +37,30 @@ public class SithClanEventLogPanel extends JPanel
     private ScheduledExecutorService executor;
 
     @Inject
-    private SithClanMemberRoster memberRoster;
-
-    @Inject
     private SithClanPluginConfig config;
 
-    private final JTextArea eventLogTextArea;
+    @Inject
+    private SithClanMemberRoster memberRoster;
+
     private final JPanel statusPanel;
-    private final JLabel successLabel;
-    private final JLabel failureLabel;
-    private final JLabel noWebhookLabel;
-    private final JLabel invalidWebhookLabel;
-    private final JLabel rosterErrorLabel;
-    private final JLabel noNameLabel;
-    private final JLabel noHostLabel;
+    private final JLabel statusLabel;
+    private final JTextArea eventLogTextArea;
 
     private static final String PANEL_LABEL = "Post Event Log";
-    private static final String SUBMIT_BUTTON = "Submit";
     private static final String TEXT_AREA_DEFAULT = "Post Event Log Here";
-    private static final String EVENT_NAME_PREFIX = "Event name: "; // trailing space intentional
-    private static final String EVENT_HOST_PREFIX = "Hosted by: "; // trailing space intentional
-    private static final String TABLE_HEADER = "Name         | Time   | Late"; // spaces intentional
+    private static final String SUBMIT_BUTTON = "Submit";
     private static final String NO_WEBHOOK_URL_WARNING = "No Discord webhook URL set in config";
-    private static final String NO_EVENT_NAME_WARNING = "Event name missing";
-    private static final String NO_EVENT_HOST_WARNING = "Event host missing";
-    private static final String NON_MEMBER_WARNING = "The following names were not found in the clan roster:\n";
-    private static final String ROSTER_ERROR_WARNING = "Unable to load member roster.";
-    private static final String POST_SUCCESS = "Event log posted to Discord";
-    private static final String POST_FAILURE = "Failed to post event log to Discord";
     private static final String DISCORD_WEBHOOK_PREFIX = "https://discord.com/";
     private static final String INVALID_WEBHOOK_URL = "Invalid Discord webhook URL";
+    private static final String POST_SUCCESS = "Event log posted to Discord";
+    private static final String POST_FAILURE = "Failed to post event log to Discord";
+    private static final String EVENT_NAME_PREFIX = "Event name: "; // trailing space intentional
+    private static final String EVENT_HOST_PREFIX = "Hosted by: "; // trailing space intentional
+    private static final String NO_EVENT_NAME_WARNING = "Event name missing";
+    private static final String NO_EVENT_HOST_WARNING = "Event host missing";
+    private static final String ROSTER_ERROR_WARNING = "Unable to load member roster.";
+    private static final String TABLE_HEADER = "Name         | Time   | Late"; // spaces intentional
+    private static final String NON_MEMBER_WARNING = "The following names were not found in the clan roster:\n";
     private static final int DISCORD_MAX_LENGTH = 2000;
 
     SithClanEventLogPanel()
@@ -83,54 +77,15 @@ public class SithClanEventLogPanel extends JPanel
         statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
-        // success status label
-        successLabel = new JLabel(POST_SUCCESS);
-        successLabel.setVisible(false);
-        successLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // status message label
+        statusLabel = new JLabel();
+        statusLabel.setVisible(true);
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        statusLabel.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
 
-        // failure status label
-        failureLabel = new JLabel(POST_FAILURE);
-        failureLabel.setVisible(false);
-        failureLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        failureLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // no webhook status label
-        noWebhookLabel = new JLabel(NO_WEBHOOK_URL_WARNING);
-        noWebhookLabel.setVisible(false);
-        noWebhookLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        noWebhookLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // invalid webhook status label
-        invalidWebhookLabel = new JLabel(INVALID_WEBHOOK_URL);
-        invalidWebhookLabel.setVisible(false);
-        invalidWebhookLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        invalidWebhookLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // roster error status label
-        rosterErrorLabel = new JLabel(ROSTER_ERROR_WARNING);
-        rosterErrorLabel.setVisible(false);
-        rosterErrorLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        rosterErrorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // no event name status label
-        noNameLabel = new JLabel(NO_EVENT_NAME_WARNING);
-        noNameLabel.setVisible(false);
-        noNameLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        noNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // no event host status label
-        noHostLabel = new JLabel(NO_EVENT_HOST_WARNING);
-        noHostLabel.setVisible(false);
-        noHostLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        noHostLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        statusPanel.add(successLabel);
-        statusPanel.add(failureLabel);
-        statusPanel.add(noWebhookLabel);
-        statusPanel.add(invalidWebhookLabel);
-        statusPanel.add(rosterErrorLabel);
-        statusPanel.add(noNameLabel);
-        statusPanel.add(noHostLabel);
+        statusPanel.add(statusLabel);
         this.add(statusPanel);
         this.add(Box.createRigidArea(new Dimension(0, 5)));
 
@@ -183,22 +138,14 @@ public class SithClanEventLogPanel extends JPanel
         String webhookUrl = config.eventLogWebhook();
         if (webhookUrl == null || webhookUrl.isBlank())
         {
-            SwingUtilities.invokeLater(() ->
-            {
-                noWebhookLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(noWebhookLabel);
-            });
+            SwingUtilities.invokeLater(() -> showError(NO_WEBHOOK_URL_WARNING));
             return;
         }
 
         // validate webhook URL
         if (!webhookUrl.startsWith(DISCORD_WEBHOOK_PREFIX))
         {
-            SwingUtilities.invokeLater(() ->
-            {
-                invalidWebhookLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(invalidWebhookLabel);
-            });
+            SwingUtilities.invokeLater(() -> showError(INVALID_WEBHOOK_URL));
             return;
         }
 
@@ -224,18 +171,14 @@ public class SithClanEventLogPanel extends JPanel
             String response = SithClanPluginUtil.sendEventLogToDiscord(httpClient, webhookUrl, message);
             if (response == null)
             {
-                SwingUtilities.invokeLater(() ->
-                {
-                    failureLabel.setVisible(true);
-                    SithClanPluginUtil.statusTimer(failureLabel);
-                });
+                SwingUtilities.invokeLater(() -> showError(POST_FAILURE));
                 return;
             }
         }
         SwingUtilities.invokeLater(() ->
         {
-            successLabel.setVisible(true);
-            SithClanPluginUtil.statusTimer(successLabel);
+            statusLabel.setText(POST_SUCCESS);
+            SithClanPluginUtil.statusTimer(statusLabel);
         });
     }
 
@@ -265,22 +208,14 @@ public class SithClanEventLogPanel extends JPanel
         // verify event name
         if (eventName.isBlank())
         {
-            SwingUtilities.invokeLater(() ->
-            {
-                noNameLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(noNameLabel);
-            });
+            SwingUtilities.invokeLater(() -> showError(NO_EVENT_NAME_WARNING));
             return false;
         }
 
         // verify event host
         if (eventHost.isBlank())
         {
-            SwingUtilities.invokeLater(() ->
-            {
-                noHostLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(noHostLabel);
-            });
+            SwingUtilities.invokeLater(() -> showError(NO_EVENT_HOST_WARNING));
             return false;
         }
         return true;
@@ -301,11 +236,7 @@ public class SithClanEventLogPanel extends JPanel
             int status = memberRoster.parseRosterFromGet();
             if (status != SithClanPluginConstants.STATUS_OK)
             {
-                SwingUtilities.invokeLater(() ->
-                {
-                    rosterErrorLabel.setVisible(true);
-                    SithClanPluginUtil.statusTimer(rosterErrorLabel);
-                });
+                SwingUtilities.invokeLater(() -> showError(ROSTER_ERROR_WARNING));
                 return false;
             }
         }
@@ -464,5 +395,22 @@ public class SithClanEventLogPanel extends JPanel
         message.append("\n\n**Sent from Sith Clan Plugin, message ").append(messageNumber).append(" of ")
                 .append(totalMessages).append("**");
         return message.toString();
+    }
+
+    /**
+     * MISC FUNCTIONS
+     */
+
+    /**
+     * Helper function to update status label with error message
+     * 
+     * @param message
+     *                    String error message to show
+     */
+    private void showError(String message)
+    {
+        statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+        statusLabel.setText(message);
+        SithClanPluginUtil.statusTimer(statusLabel);
     }
 }

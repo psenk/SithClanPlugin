@@ -85,7 +85,6 @@ public class SithClanMembersPanel extends JPanel
     private static final int AVATAR_SIZE = 64;
     private static final int PAGE_SIZE = 6;
     private static final int ABOUT_ME_LENGTH = 200;
-    private static final Dimension STATUS_LABEL_DIMENSION = new Dimension(PluginPanel.PANEL_WIDTH, 20);
     private static final String MEMBERS_PANEL_TITLE = "Sith Member Info";
     private static final String MEMBERS_SEARCH_BUTTON = "Search Members";
     private static final String MEMBERS_SHOW_ALL_BUTTON = "Show All Members";
@@ -134,7 +133,7 @@ public class SithClanMembersPanel extends JPanel
         // current roster date
         rosterDateLabel = createStatusLabel(false);
 
-        // error status label
+        // status message label
         statusLabel = createStatusLabel(true);
 
         statusPanel.add(rosterDateLabel);
@@ -748,9 +747,9 @@ public class SithClanMembersPanel extends JPanel
         label.setVisible(true);
         label.setHorizontalAlignment(JLabel.CENTER);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        label.setPreferredSize(STATUS_LABEL_DIMENSION);
-        label.setMinimumSize(STATUS_LABEL_DIMENSION);
-        label.setMaximumSize(STATUS_LABEL_DIMENSION);
+        label.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        label.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        label.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
 
         // label will contain error statuses
         if (isErrorLabel)

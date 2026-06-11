@@ -50,7 +50,6 @@ import sithclanplugin.util.SithClanPluginUtil;
 @Singleton
 public class SithClanSchedulePanel extends JPanel
 {
-
     @Inject
     private ScheduledExecutorService executor;
 
@@ -61,37 +60,35 @@ public class SithClanSchedulePanel extends JPanel
     private SithClanPluginConfig config;
 
     @Inject
+    private SithClanEventSchedule eventSchedule;
+
+    @Inject
     private SithClanPluginFileManager fileManager;
 
     @Inject
     private SithClanPluginNotificationManager notificationManager;
 
-    @Inject
-    private SithClanEventSchedule eventSchedule;
-
-    private final JLabel scheduleExpiredLabel;
-    private final JLabel nextEventLabel;
-    private final Component scheduleExpiredSpace;
-    private final JPanel scheduleContainer;
     private final Icon rightArrowIcon;
     private final Icon downArrowIcon;
     private final JPanel statusPanel;
-    private final JLabel rateLimitedLabel;
-    private final JLabel errorLabel;
+    private final JLabel statusLabel;
+    private final JLabel scheduleExpiredLabel;
+    private final Component scheduleExpiredSpace;
+    private final JPanel scheduleContainer;
+    private final JLabel nextEventLabel;
     private ScheduledFuture<?> nextEventRefreshTask;
 
-    private static final String EVENT_SCHEDULE = "Event Schedule";
-    private static final String SCHEDULE_EXPIRED_WARNING = "<html><center>Schedule is expired! Please refresh.<br />If still expired, contact a Senate member.</center></html>";
-    private static final String REFRESH_SCHEDULE_BUTTON = "Refresh Schedule";
     private static final String ARROW_RIGHT_IMG_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_IMG_PATH = "/arrow_down.png";
-    private static final String RATE_LIMITED_WARNING = "<html><center>The schedule has been retrieved too recently.  Try again in a few minutes.</center></html>";
-    private static final String SCHEDULE_ERROR = "<html><center>Unable to obtain schedule.</center></html>";
+    private static final String EVENT_SCHEDULE = "Event Schedule";
+    private static final String SCHEDULE_EXPIRED_WARNING = "Schedule is expired! Please refresh. If still expired, contact a Senate member.";
+    private static final String NEXT_EVENT = "Next Event";
+    private static final String REFRESH_SCHEDULE_BUTTON = "Refresh Schedule";
+    private static final String RATE_LIMITED_WARNING = "The schedule has been retrieved too recently. Try again in a few minutes.";
+    private static final String SCHEDULE_ERROR = "Unable to obtain schedule.";
+    private static final String NO_EVENTS_SCHEDULED_TODAY = "No events scheduled today.";
     private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
-    private static final String NO_NEXT_EVENT = "Next Event: None";
-    private static final String NEXT_EVENT = "Next Event";
-    private static final String NO_EVENTS_SCHEDULED_TODAY = "No events scheduled today.";
     private static final String NO_UPCOMING_EVENTS = "No upcoming events";
 
     SithClanSchedulePanel()
@@ -110,20 +107,15 @@ public class SithClanSchedulePanel extends JPanel
         statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
-        // rate limited status
-        rateLimitedLabel = new JLabel(RATE_LIMITED_WARNING);
-        rateLimitedLabel.setVisible(false);
-        rateLimitedLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        rateLimitedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // status message label
+        statusLabel = new JLabel();
+        statusLabel.setVisible(true);
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        statusLabel.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
 
-        // announcement error status
-        errorLabel = new JLabel(SCHEDULE_ERROR);
-        errorLabel.setVisible(false);
-        errorLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        statusPanel.add(rateLimitedLabel);
-        statusPanel.add(errorLabel);
+        statusPanel.add(statusLabel);
         statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         this.add(statusPanel);
 
@@ -147,7 +139,7 @@ public class SithClanSchedulePanel extends JPanel
         this.add(topPanel);
 
         // next event panel
-        nextEventLabel = new JLabel(NO_NEXT_EVENT);
+        nextEventLabel = new JLabel();
         nextEventLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         nextEventLabel.setForeground(ColorScheme.BRAND_ORANGE);
         nextEventLabel.setVisible(false);
@@ -242,7 +234,7 @@ public class SithClanSchedulePanel extends JPanel
                     .compareTo(LocalTime.parse(e2.getEventTime(), SithClanPluginConstants.TIME_FORMATTER)));
 
             // if there are no scheduled events this day
-            if (events.isEmpty() || events == null)
+            if (events.isEmpty())
             {
                 JLabel noEventsLabel = new JLabel(NO_EVENTS_SCHEDULED_TODAY);
                 noEventsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -619,7 +611,7 @@ public class SithClanSchedulePanel extends JPanel
                     plugin.hopTo(Integer.parseInt(worldId));
                 } catch (Exception ex)
                 {
-                    log.error("Exception while creating Discord link: {}", ex.getMessage(), ex);
+                    log.error("Exception while creating world link: {}", ex.getMessage(), ex);
                 }
             }
         });
@@ -665,12 +657,14 @@ public class SithClanSchedulePanel extends JPanel
         switch (status)
         {
             case SithClanPluginConstants.STATUS_RATE_LIMITED:
-                rateLimitedLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(rateLimitedLabel);
+                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                statusLabel.setText(RATE_LIMITED_WARNING);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
             case SithClanPluginConstants.STATUS_NOT_FOUND:
-                errorLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(errorLabel);
+                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                statusLabel.setText(SCHEDULE_ERROR);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
             default:
                 break;

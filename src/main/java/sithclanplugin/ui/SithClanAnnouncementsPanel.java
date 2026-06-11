@@ -36,23 +36,22 @@ import sithclanplugin.util.SithClanPluginUtil;
 public class SithClanAnnouncementsPanel extends JPanel
 {
     @Inject
-    private SithClanAnnouncements announcements;
-
-    @Inject
     private ScheduledExecutorService executor;
 
+    @Inject
+    private SithClanAnnouncements announcements;
+
+    private final JPanel statusPanel;
+    private final JLabel statusLabel;
     private final JPanel announcementsListPanel;
     private final JScrollPane announcementsScrollPane;
-    private final JPanel statusPanel;
-    private final JLabel rateLimitedLabel;
-    private final JLabel errorLabel;
 
     private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
     private static final String ARROW_DOWN_PATH = "/arrow_down.png";
     private static final String ANNOUNCEMENTS_LABEL = "Clan Announcements";
     private static final String REFRESH_ANNOUNCEMENTS = "Refresh Announcements";
-    private static final String RATE_LIMITED_WARNING = "<html><center>Announcements have been retrieved too recently. Try again in a few minutes.</center></html>";
     private static final String NO_ANNOUNCEMENTS_LABEL = "No Announcements Currently";
+    private static final String RATE_LIMITED_WARNING = "Announcements have been retrieved too recently. Try again in a few minutes.";
     private static final String ANNOUNCEMENTS_ERROR = "Error obtaining announcements.";
 
     SithClanAnnouncementsPanel()
@@ -74,26 +73,20 @@ public class SithClanAnnouncementsPanel extends JPanel
         // collapsible panel
         JPanel collapsiblePanel = new JPanel();
         collapsiblePanel.setLayout(new BoxLayout(collapsiblePanel, BoxLayout.Y_AXIS));
-        collapsiblePanel.setVisible(true);
 
         // status label panel
         statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
-        // rate limited status
-        rateLimitedLabel = new JLabel(RATE_LIMITED_WARNING);
-        rateLimitedLabel.setVisible(false);
-        rateLimitedLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        rateLimitedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // status message label
+        statusLabel = new JLabel();
+        statusLabel.setVisible(true);
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        statusLabel.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
 
-        // announcement error status
-        errorLabel = new JLabel(ANNOUNCEMENTS_ERROR);
-        errorLabel.setVisible(false);
-        errorLabel.setForeground(ColorScheme.BRAND_ORANGE);
-        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        statusPanel.add(rateLimitedLabel);
-        statusPanel.add(errorLabel);
+        statusPanel.add(statusLabel);
         statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // announcements list panel
@@ -132,7 +125,6 @@ public class SithClanAnnouncementsPanel extends JPanel
             public void mouseClicked(MouseEvent e)
             {
                 boolean isVisible = !collapsiblePanel.isVisible();
-                collapsiblePanel.setVisible(isVisible);
                 announcementsPanelLabel.setIcon(isVisible ? downArrowIcon : rightArrowIcon);
                 revalidate();
                 repaint();
@@ -229,12 +221,14 @@ public class SithClanAnnouncementsPanel extends JPanel
         switch (statusCode)
         {
             case SithClanPluginConstants.STATUS_RATE_LIMITED:
-                rateLimitedLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(rateLimitedLabel);
+                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                statusLabel.setText(RATE_LIMITED_WARNING);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
             case SithClanPluginConstants.STATUS_NOT_FOUND:
-                errorLabel.setVisible(true);
-                SithClanPluginUtil.statusTimer(errorLabel);
+                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                statusLabel.setText(ANNOUNCEMENTS_ERROR);
+                SithClanPluginUtil.statusTimer(statusLabel);
                 break;
             default:
                 break;
