@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.HyperlinkEvent;
 
+import com.google.common.html.HtmlEscapers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -227,7 +228,7 @@ public class SithClanAnnouncementsPanel extends JPanel
         String urlPattern = "(https?://\\S+)";
 
         // replace characters
-        String escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+        String escaped = HtmlEscapers.htmlEscaper().escape(text);
         String withBreaks = escaped.replace("\n", "<br>");
 
         // add HTML tags
