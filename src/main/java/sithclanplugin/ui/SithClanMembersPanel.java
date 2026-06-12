@@ -932,6 +932,7 @@ public class SithClanMembersPanel extends JPanel
         if (response == null)
         {
             aboutMeCache = new HashMap<>();
+            return;
         }
 
         // parse JSON into member name and about me map
