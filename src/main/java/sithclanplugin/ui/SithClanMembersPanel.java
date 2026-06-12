@@ -14,7 +14,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.swing.BorderFactory;
@@ -34,10 +36,12 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import net.runelite.client.plugins.Plugin;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
@@ -81,6 +85,7 @@ public class SithClanMembersPanel extends JPanel
     private ArrayList<SithClanMember> rosterList;
     private int pageIndex;
     private boolean isLoading;
+    private Map<String, String> aboutMeCache = null;
 
     private static final int AVATAR_SIZE = 64;
     private static final int PAGE_SIZE = 6;
@@ -272,8 +277,9 @@ public class SithClanMembersPanel extends JPanel
         {
             executor.submit(() ->
             {
-                // get roster if needed
+                // get roster and about mes if needed
                 fetchRosterIfNeeded();
+                fetchAboutMeCacheIfNeeded();
 
                 // get all members
                 SwingUtilities.invokeLater(() ->
@@ -700,25 +706,16 @@ public class SithClanMembersPanel extends JPanel
 
         // get members current about me
         final String nameForFetch = member.getMemberName();
-        executor.submit(() ->
+        if (aboutMeCache != null)
         {
-            // about me text
-            String aboutMe = fetchAboutMe(nameForFetch);
-            SwingUtilities.invokeLater(() ->
+            String aboutMe = aboutMeCache.get(nameForFetch.toLowerCase());
+            if (aboutMe != null && !aboutMe.isBlank())
             {
-                // set text
-                if (aboutMe != null && !aboutMe.isBlank())
-                {
-                    aboutMeText.setText(aboutMe);
-                    singleMemberPanel.revalidate();
-                    singleMemberPanel.repaint();
-                    singleMemberPanel.setMaximumSize(
-                            new Dimension(PluginPanel.PANEL_WIDTH, singleMemberPanel.getPreferredSize().height));
-                    singleMemberPanel.revalidate();
-                    singleMemberPanel.repaint();
-                }
-            });
-        });
+                aboutMeText.setText(aboutMe);
+                singleMemberPanel.setMaximumSize(
+                        new Dimension(PluginPanel.PANEL_WIDTH, singleMemberPanel.getPreferredSize().height));
+            }
+        }
 
         memberInfoPanel.add(rightPanel);
         singleMemberPanel.add(memberInfoPanel);
@@ -877,7 +874,7 @@ public class SithClanMembersPanel extends JPanel
     private String fetchAboutMe(String memberName)
     {
         // send get request
-        String uri = SithClanPluginConstants.MEMBER_ABOUT_ME_URI + memberName;
+        String uri = SithClanPluginConstants.MEMBER_SINGLE_ABOUT_ME_URI + memberName;
         String response = SithClanPluginUtil.sendGetRequest(httpClient, uri);
         if (response == null)
         {
@@ -907,7 +904,7 @@ public class SithClanMembersPanel extends JPanel
      */
     private boolean submitAboutMe(String memberName, String aboutMeText)
     {
-        String uri = SithClanPluginConstants.MEMBER_ABOUT_ME_URI + memberName;
+        String uri = SithClanPluginConstants.MEMBER_SINGLE_ABOUT_ME_URI + memberName;
 
         JsonObject body = new JsonObject();
         body.addProperty("aboutMe", aboutMeText);
@@ -916,5 +913,33 @@ public class SithClanMembersPanel extends JPanel
 
         String response = SithClanPluginUtil.sendPutRequest(httpClient, "", jsonBody, uri);
         return response != null;
+    }
+
+    /**
+     * Fetches about me map from database containing all members
+     */
+    private void fetchAboutMeCacheIfNeeded()
+    {
+        // cache already loaded
+        if (aboutMeCache != null)
+        {
+            return;
+        }
+
+        // send HTTP GET request
+        String response = SithClanPluginUtil.sendGetRequest(httpClient,
+                SithClanPluginConstants.MEMBER_ALL_ABOUT_ME_URI);
+        if (response == null)
+        {
+            aboutMeCache = new HashMap<>();
+        }
+
+        // parse JSON into member name and about me map
+        JsonObject json = gson.fromJson(response, JsonObject.class);
+        aboutMeCache = new HashMap<>();
+        for (Map.Entry<String, JsonElement> entry : json.entrySet())
+        {
+            aboutMeCache.put(entry.getKey(), entry.getValue().getAsString());
+        }
     }
 }

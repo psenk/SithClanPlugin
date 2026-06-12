@@ -42,7 +42,10 @@ public class SithClanPluginConstants
         // rank icons
         public static final String[] RANK_ICON_PATHS =
         {
-                        "/children_of_the_watch.png", "/sith_loyalist.png", "/tie_pilot.png", "/storm_trooper.png",
+                        "/children_of_the_watch.png",
+                        "/sith_loyalist.png",
+                        "/tie_pilot.png",
+                        "/storm_trooper.png",
                         "/death_trooper.png",
                         "/sovereign_protector.png",
                         "/sovereign_champion.png",
@@ -107,7 +110,8 @@ public class SithClanPluginConstants
         public static final String STARTUP_URI = URI_PREFIX + "/api/startup";
         public static final String EVENT_SCHEDULE_URI = URI_PREFIX + "/api/eventschedule";
         public static final String MEMBER_ROSTER_URI = URI_PREFIX + "/api/memberroster";
-        public static final String MEMBER_ABOUT_ME_URI = URI_PREFIX + "/api/aboutme/";
+        public static final String MEMBER_ALL_ABOUT_ME_URI = URI_PREFIX + "/api/aboutme";
+        public static final String MEMBER_SINGLE_ABOUT_ME_URI = URI_PREFIX + "/api/aboutme/";
         public static final String ANNOUNCEMENTS_URI = URI_PREFIX + "/api/announcements";
         public static final String ANNOUNCEMENTS_EDIT_URI = URI_PREFIX + "/api/announcements/edit/";
         public static final String ANNOUNCEMENTS_DELETE_URI = URI_PREFIX + "/api/announcements/delete/";
