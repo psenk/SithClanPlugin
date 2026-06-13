@@ -41,7 +41,6 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import net.runelite.client.plugins.Plugin;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
@@ -250,7 +249,7 @@ public class SithClanMembersPanel extends JPanel
                 }
 
                 // get specific member
-                SithClanMember member = memberRoster.getMemberByName(searchValue);
+                ArrayList<SithClanMember> members = memberRoster.getMembersBySubstring(searchValue.toLowerCase());
                 SwingUtilities.invokeLater(() ->
                 {
                     // dismiss about me area if open
@@ -259,14 +258,18 @@ public class SithClanMembersPanel extends JPanel
                     membersAreaScrollPane.setVisible(true);
 
                     // if member does not exist
-                    if (member == null)
+                    if (members.isEmpty())
                     {
                         statusLabel.setText(MEMBER_DOES_NOT_EXIST);
                         SithClanPluginUtil.statusTimer(statusLabel);
+                    } else if (members.size() == 1)
+                    {
+                        updateRosterDateLabel(memberRoster.getDateRosterPosted());
+                        displaySingleMember(members.get(0));
                     } else
                     {
                         updateRosterDateLabel(memberRoster.getDateRosterPosted());
-                        displaySingleMember(member);
+                        displayAllMembers(members);
                     }
                 });
             });

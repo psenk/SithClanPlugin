@@ -2,8 +2,10 @@ package sithclanplugin.members;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -236,5 +238,28 @@ public class SithClanMemberRoster
     public SithClanMember getMemberByName(String memberName)
     {
         return roster.get(memberName.toLowerCase());
+    }
+
+    /**
+     * Returns list of members based on given substring
+     * 
+     * @param substring
+     *                      String substring to search for
+     * @return ArrayList<SithClanMember> list of members that contain substring
+     */
+    public ArrayList<SithClanMember> getMembersBySubstring(String substring)
+    {
+        LinkedHashSet<SithClanMember> seen = new LinkedHashSet<>();
+
+        for (SithClanMember member : roster.values())
+        {
+            if (member.getMemberName().toLowerCase().contains(substring)
+                    || (member.getMemberAltName() != null
+                            && member.getMemberAltName().toLowerCase().contains(substring)))
+            {
+                seen.add(member);
+            }
+        }
+        return new ArrayList<>(seen);
     }
 }
