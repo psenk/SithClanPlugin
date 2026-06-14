@@ -153,6 +153,7 @@ public class SithClanPlugin extends Plugin
 		if (SithClanPluginConstants.BYPASS_CLAN_CHECK)
 		{
 			SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
+			log.error("WE HAVE SHOWN THE MAIN PANEL");
 		}
 
 		// startup loading
@@ -343,51 +344,47 @@ public class SithClanPlugin extends Plugin
 			return;
 		}
 
-		if ((event.getType() != MenuAction.CC_OP.getId() && event.getType() != MenuAction.CC_OP_LOW_PRIORITY.getId()))
-		{
-			// get event metadata
-			final String option = event.getOption();
-			final int componentId = event.getActionParam1();
-			final int groupId = WidgetUtil.componentToInterface(componentId);
+		// get event metadata
+		final String option = event.getOption();
+		final int componentId = event.getActionParam1();
+		final int groupId = WidgetUtil.componentToInterface(componentId);
 
-			// checks to determine if menu being created in appropriate user areas (friends
-			// list, clan chat, etc.)
-			if (groupId == InterfaceID.FRIENDS && option.equals("Delete")
-					|| groupId == InterfaceID.CHATCHANNEL_CURRENT
-							&& (option.equals("Add ignore") || option.equals("Remove friend"))
-					|| groupId == InterfaceID.CHATBOX && (option.equals("Add ignore") || option.equals("Message"))
-					|| groupId == InterfaceID.IGNORE && option.equals("Delete")
-					|| (componentId == InterfaceID.ClansSidepanel.PLAYERLIST
-							|| componentId == InterfaceID.ClansGuestSidepanel.PLAYERLIST)
-							&& (option.equals("Add ignore") || option.equals("Remove friend"))
-					|| groupId == InterfaceID.PM_CHAT && (option.equals("Add ignore") || option.equals("Message"))
-					|| groupId == InterfaceID.GIM_SIDEPANEL && (option.equals("Add friend")
-							|| option.equals("Remove friend") || option.equals("Remove ignore")))
+		// checks to determine if menu being created in appropriate user areas (friends
+		// list, clan chat, etc.)
+		if (groupId == InterfaceID.FRIENDS && option.equals("Delete")
+				|| groupId == InterfaceID.CHATCHANNEL_CURRENT
+						&& (option.equals("Add ignore") || option.equals("Remove friend"))
+				|| groupId == InterfaceID.CHATBOX && (option.equals("Add ignore") || option.equals("Message"))
+				|| groupId == InterfaceID.IGNORE && option.equals("Delete")
+				|| (componentId == InterfaceID.ClansSidepanel.PLAYERLIST
+						|| componentId == InterfaceID.ClansGuestSidepanel.PLAYERLIST)
+						&& (option.equals("Add ignore") || option.equals("Remove friend"))
+				|| groupId == InterfaceID.PM_CHAT && (option.equals("Add ignore") || option.equals("Message"))
+				|| groupId == InterfaceID.GIM_SIDEPANEL && (option.equals("Add friend")
+						|| option.equals("Remove friend") || option.equals("Remove ignore")))
+		{
+			// create custom menu entry
+			Menu menu = client.getMenu();
+			MenuEntry menuEntry = menu.createMenuEntry(1);
+			menuEntry.setOption(SITH_LOOKUP);
+			menuEntry.setTarget(event.getTarget());
+			menuEntry.setType(MenuAction.RUNELITE);
+			menuEntry.setIdentifier(event.getIdentifier());
+			menuEntry.onClick(e ->
 			{
-				// create custom menu entry
-				Menu menu = client.getMenu();
-				MenuEntry menuEntry = menu.createMenuEntry(1);
-				menuEntry.setOption(SITH_LOOKUP);
-				menuEntry.setTarget(event.getTarget());
-				menuEntry.setType(MenuAction.RUNELITE);
-				menuEntry.setIdentifier(event.getIdentifier());
-				menuEntry.onClick(e ->
+				String username = Text.removeTags(e.getTarget()).replace("\u00A0", " ");
+				SwingUtilities.invokeLater(() ->
 				{
-					String username = Text.removeTags(e.getTarget()).replace("\u00A0", " ");
-					SwingUtilities.invokeLater(() ->
-					{
-						clientToolbar.openPanel(uiNavigationButton);
-						uiPanel.get().navigateToMemberCard();
-						uiPanel.get().getMembersPanel().searchMemberFromMenu(username);
-					});
+					clientToolbar.openPanel(uiNavigationButton);
+					uiPanel.get().navigateToMemberCard();
+					uiPanel.get().getMembersPanel().searchMemberFromMenu(username);
 				});
-			}
+			});
 		}
 
 		if (event.getOption().equals(SITH_LOOKUP) && event.getType() == MenuAction.RUNELITE_PLAYER.getId())
 		{
-			MenuEntry menuEntry = client.getMenu().getMenuEntries()[client.getMenu().getMenuEntries().length - 1];
-			menuEntry.onClick(e ->
+			event.getMenuEntry().onClick(e ->
 			{
 				String username = Text.removeTags(e.getTarget()).replace("\u00A0", " ");
 				SwingUtilities.invokeLater(() ->
@@ -430,6 +427,18 @@ public class SithClanPlugin extends Plugin
 		{
 			SwingUtilities.invokeLater(
 					() -> uiPanel.get().getSchedulePanel().setCheckboxesEnabled(config.eventNotifications()));
+		}
+
+		// enable/disable sith lookup menu option
+		if (event.getKey().equals("memberLookupMenu"))
+		{
+			if (config.memberLookup())
+			{
+				menuManager.addPlayerMenuItem(SITH_LOOKUP);
+			} else
+			{
+				menuManager.removePlayerMenuItem(SITH_LOOKUP);
+			}
 		}
 	}
 
