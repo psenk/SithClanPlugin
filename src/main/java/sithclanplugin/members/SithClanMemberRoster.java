@@ -262,4 +262,13 @@ public class SithClanMemberRoster
         }
         return new ArrayList<>(seen);
     }
+
+    /**
+     * Clears roster
+     */
+    public void clearRoster()
+    {
+        roster = new HashMap<>();
+        dateRosterPosted = null;
+    }
 }

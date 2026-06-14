@@ -232,8 +232,9 @@ public class SithClanMembersPanel extends JPanel
         {
             executor.submit(() ->
             {
-                // get roster if needed
+                // get roster and about me if needed
                 fetchRosterIfNeeded();
+                fetchAboutMeCacheIfNeeded();
 
                 String searchValue = membersSearchTextField.getText().trim();
 
@@ -280,7 +281,9 @@ public class SithClanMembersPanel extends JPanel
         {
             executor.submit(() ->
             {
-                // get roster and about mes if needed
+                // fetch new roster and about me cache
+                memberRoster.clearRoster();
+                aboutMeCache = null;
                 fetchRosterIfNeeded();
                 fetchAboutMeCacheIfNeeded();
 
@@ -517,9 +520,12 @@ public class SithClanMembersPanel extends JPanel
                 {
                     if (success)
                     {
+                        // fetches fresh data
+                        aboutMeCache = null;
+
                         // return to normal
-                        statusLabel.setText(ABOUT_ME_SUCCESSFUL);
-                        SithClanPluginUtil.statusTimer(statusLabel);
+                        aboutMeStatusLabel.setText(ABOUT_ME_SUCCESSFUL);
+                        SithClanPluginUtil.statusTimer(aboutMeStatusLabel);
 
                         membersAboutMePanel.setVisible(false);
                         membersAreaLabel.setVisible(true);
