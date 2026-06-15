@@ -289,6 +289,7 @@ public class SithClanMembersPanel extends JPanel
                     if (members.isEmpty())
                     {
                         statusLabel.setText(MEMBER_DOES_NOT_EXIST);
+                        statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                         SithClanUtil.statusTimer(statusLabel);
                     } else if (members.size() == 1)
                     {
@@ -848,6 +849,7 @@ public class SithClanMembersPanel extends JPanel
                 if (member == null)
                 {
                     statusLabel.setText(MEMBER_DOES_NOT_EXIST);
+                    statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                     SithClanUtil.statusTimer(statusLabel);
                 } else
                 {
