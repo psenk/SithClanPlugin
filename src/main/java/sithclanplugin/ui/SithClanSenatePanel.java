@@ -26,8 +26,10 @@ import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
 import sithclanplugin.members.SithClanMemberRoster;
-import sithclanplugin.util.SithClanPluginConstants;
-import sithclanplugin.util.SithClanPluginUtil;
+import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanUtil;
+
+// refactored june 15
 
 @Singleton
 public class SithClanSenatePanel extends JPanel
@@ -48,8 +50,6 @@ public class SithClanSenatePanel extends JPanel
     private final JTextArea senatePostScheduleTextArea;
     private final JTextArea senatePostRosterTextArea;
 
-    private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
-    private static final String ARROW_DOWN_PATH = "/arrow_down.png";
     private static final String SENATE_OPTIONS_LABEL = "Senate Options";
     private static final String UPDATE_BUTTON = "Update";
     private static final String UPDATE_SCHEDULE_LABEL = "Post Event Schedule";
@@ -66,11 +66,11 @@ public class SithClanSenatePanel extends JPanel
     {
         this.announcementsPanelSenate = announcementsPanelSenate;
 
-        final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
-        final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
+        final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_RIGHT_PATH));
+        final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_DOWN_PATH));
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        this.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
         // title panel label at top
         JLabel senatePanelLabel = new JLabel(SENATE_OPTIONS_LABEL);
@@ -83,12 +83,7 @@ public class SithClanSenatePanel extends JPanel
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
         // status message label
-        statusLabel = new JLabel();
-        statusLabel.setVisible(true);
-        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        statusLabel.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel = SithClanUtil.createStatusLabel();
 
         statusPanel.add(statusLabel);
         statusPanel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -243,25 +238,25 @@ public class SithClanSenatePanel extends JPanel
     {
         switch (statusCode)
         {
-            case SithClanPluginConstants.STATUS_OK:
+            case SithClanConstants.STATUS_OK:
                 statusLabel.setText(SUCCESSFUL_POST);
                 textArea.setText(defaultText);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
-            case SithClanPluginConstants.STATUS_BAD_INPUT:
+            case SithClanConstants.STATUS_BAD_INPUT:
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(BAD_INPUT_WARNING);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
-            case SithClanPluginConstants.STATUS_NOT_FOUND:
+            case SithClanConstants.STATUS_NOT_FOUND:
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(ERROR_WARNING);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
             default:
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(ERROR_WARNING);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
         }
     }

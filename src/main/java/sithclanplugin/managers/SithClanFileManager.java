@@ -15,11 +15,11 @@ import com.google.inject.Singleton;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.RuneLite;
-import sithclanplugin.util.SithClanPluginConstants;
+import sithclanplugin.util.SithClanConstants;
 
 @Slf4j
 @Singleton
-public class SithClanPluginFileManager
+public class SithClanFileManager
 {
     @Inject
     private Gson gson;
@@ -29,11 +29,11 @@ public class SithClanPluginFileManager
     private final File storedSubscriptionsFile;
     private ArrayList<String> cachedSubscriptions = null;
 
-    public SithClanPluginFileManager()
+    public SithClanFileManager()
     {
-        this.localDirectory = new File(RuneLite.RUNELITE_DIR, SithClanPluginConstants.LOCAL_DIRECTORY_NAME);
-        this.storedScheduleFile = new File(localDirectory, SithClanPluginConstants.STORED_SCHEDULE_NAME);
-        this.storedSubscriptionsFile = new File(localDirectory, SithClanPluginConstants.STORED_SUBSCRIPTIONS_NAME);
+        this.localDirectory = new File(RuneLite.RUNELITE_DIR, SithClanConstants.LOCAL_DIRECTORY_NAME);
+        this.storedScheduleFile = new File(localDirectory, SithClanConstants.STORED_SCHEDULE_NAME);
+        this.storedSubscriptionsFile = new File(localDirectory, SithClanConstants.STORED_SUBSCRIPTIONS_NAME);
     }
 
     /**

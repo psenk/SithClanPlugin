@@ -14,11 +14,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
-import sithclanplugin.SithClanPluginConfig;
-import sithclanplugin.managers.SithClanPluginFileManager;
-import sithclanplugin.managers.SithClanPluginNotificationManager;
-import sithclanplugin.util.SithClanPluginConstants;
-import sithclanplugin.util.SithClanPluginUtil;
+import sithclanplugin.SithClanConfig;
+import sithclanplugin.managers.SithClanFileManager;
+import sithclanplugin.managers.SithClanNotificationManager;
+import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanUtil;
 
 /**
  * Event Schedule Object
@@ -36,13 +36,13 @@ public class SithClanEventSchedule
     private Gson gson;
 
     @Inject
-    private SithClanPluginConfig config;
+    private SithClanConfig config;
 
     @Inject
-    private SithClanPluginFileManager fileManager;
+    private SithClanFileManager fileManager;
 
     @Inject
-    private SithClanPluginNotificationManager notificationManager;
+    private SithClanNotificationManager notificationManager;
 
     @Setter
     private boolean isSenateMember = false;
@@ -69,7 +69,7 @@ public class SithClanEventSchedule
      */
     private String getEventSchedule()
     {
-        return SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.EVENT_SCHEDULE_URI);
+        return SithClanUtil.sendGetRequest(httpClient, SithClanConstants.EVENT_SCHEDULE_URI);
     }
 
     /**
@@ -81,8 +81,8 @@ public class SithClanEventSchedule
      */
     private String postEventSchedule(String jsonData)
     {
-        return SithClanPluginUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
-                SithClanPluginConstants.EVENT_SCHEDULE_URI);
+        return SithClanUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
+                SithClanConstants.EVENT_SCHEDULE_URI);
     }
 
     /**
@@ -100,11 +100,11 @@ public class SithClanEventSchedule
     public int parseScheduleFromGet()
     {
         // rate limiting
-        if (SithClanPluginUtil.isRateLimited(lastTimeScheduleFetched, SCHEDULE_FETCH_COOLDOWN_MINUTES,
+        if (SithClanUtil.isRateLimited(lastTimeScheduleFetched, SCHEDULE_FETCH_COOLDOWN_MINUTES,
                 isSenateMember))
         {
             log.debug("Schedule fetch skipped: rate limited");
-            return SithClanPluginConstants.STATUS_RATE_LIMITED;
+            return SithClanConstants.STATUS_RATE_LIMITED;
         }
 
         log.info("Fetching schedule from server..");
@@ -112,7 +112,7 @@ public class SithClanEventSchedule
         String jsonSchedule = getEventSchedule();
         if (jsonSchedule == null)
         {
-            return SithClanPluginConstants.STATUS_NOT_FOUND;
+            return SithClanConstants.STATUS_NOT_FOUND;
         }
         // convert schedule to JSON
         this.schedule = deserializeSchedule(jsonSchedule);
@@ -125,7 +125,7 @@ public class SithClanEventSchedule
         this.lastTimeScheduleFetched = ZonedDateTime.now();
         // schedule event notifications
         notificationManager.scheduleNotifications(schedule);
-        return SithClanPluginConstants.STATUS_OK;
+        return SithClanConstants.STATUS_OK;
     }
 
     /**
@@ -142,7 +142,7 @@ public class SithClanEventSchedule
         if (scheduleInput.isBlank())
         {
             log.warn("Schedule post failed: no input");
-            return SithClanPluginConstants.STATUS_BAD_INPUT;
+            return SithClanConstants.STATUS_BAD_INPUT;
         }
         log.info("Uploading schedule to server..");
         // split input into list of strings
@@ -152,7 +152,7 @@ public class SithClanEventSchedule
         if (newSchedule == null || newSchedule.isEmpty())
         {
             log.warn("Schedule conversion failed.");
-            return SithClanPluginConstants.STATUS_BAD_INPUT;
+            return SithClanConstants.STATUS_BAD_INPUT;
         }
         // store schedule as JSON object
         String data = gson.toJson(newSchedule);
@@ -161,7 +161,7 @@ public class SithClanEventSchedule
         String response = postEventSchedule(data);
         if (response == null)
         {
-            return SithClanPluginConstants.STATUS_NOT_FOUND;
+            return SithClanConstants.STATUS_NOT_FOUND;
         }
         this.schedule = newSchedule;
         // save schedule
@@ -169,7 +169,7 @@ public class SithClanEventSchedule
         // schedule event notifications
         notificationManager.scheduleNotifications(schedule);
         log.info("Schedule uploaded successfully.");
-        return SithClanPluginConstants.STATUS_OK;
+        return SithClanConstants.STATUS_OK;
     }
 
     /**
@@ -186,7 +186,7 @@ public class SithClanEventSchedule
             if (jsonSchedule == null || jsonSchedule.isBlank())
             {
                 log.warn("Schedule loading from file failed: no file input");
-                return SithClanPluginConstants.STATUS_BAD_INPUT;
+                return SithClanConstants.STATUS_BAD_INPUT;
             }
             log.info("Reading schedule from file..");
             // convert schedule to JSON
@@ -194,11 +194,11 @@ public class SithClanEventSchedule
             // schedule event notifications
             notificationManager.scheduleNotifications(schedule);
             log.info("Schedule loaded from file successfully.");
-            return SithClanPluginConstants.STATUS_OK;
+            return SithClanConstants.STATUS_OK;
         } catch (Exception e)
         {
             log.error("Exception during loading local schedule file: {}", e.getMessage(), e);
-            return SithClanPluginConstants.STATUS_NOT_FOUND;
+            return SithClanConstants.STATUS_NOT_FOUND;
         }
     }
 

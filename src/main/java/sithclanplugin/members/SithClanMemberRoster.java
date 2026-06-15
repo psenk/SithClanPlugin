@@ -15,10 +15,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
-import sithclanplugin.SithClanPluginConfig;
+import sithclanplugin.SithClanConfig;
 import sithclanplugin.dto.RosterResponse;
-import sithclanplugin.util.SithClanPluginConstants;
-import sithclanplugin.util.SithClanPluginUtil;
+import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanUtil;
 
 /**
  * Member Roster Object
@@ -36,7 +36,7 @@ public class SithClanMemberRoster
     private Gson gson;
 
     @Inject
-    private SithClanPluginConfig config;
+    private SithClanConfig config;
 
     @Setter
     private boolean isSenateMember;
@@ -61,7 +61,7 @@ public class SithClanMemberRoster
      */
     private String getMemberRoster()
     {
-        return SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.MEMBER_ROSTER_URI);
+        return SithClanUtil.sendGetRequest(httpClient, SithClanConstants.MEMBER_ROSTER_URI);
     }
 
     /**
@@ -73,8 +73,8 @@ public class SithClanMemberRoster
      */
     private String postMemberRoster(String jsonData)
     {
-        return SithClanPluginUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
-                SithClanPluginConstants.MEMBER_ROSTER_URI);
+        return SithClanUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
+                SithClanConstants.MEMBER_ROSTER_URI);
     }
 
     /**
@@ -94,12 +94,12 @@ public class SithClanMemberRoster
         String jsonRoster = getMemberRoster();
         if (jsonRoster == null)
         {
-            return SithClanPluginConstants.STATUS_NOT_FOUND;
+            return SithClanConstants.STATUS_NOT_FOUND;
         }
         // convert roster to JSON
         this.roster = deserializeRoster(jsonRoster);
         log.info("Roster loaded successfully");
-        return SithClanPluginConstants.STATUS_OK;
+        return SithClanConstants.STATUS_OK;
     }
 
     /**
@@ -114,7 +114,7 @@ public class SithClanMemberRoster
         if (rosterInput.isBlank())
         {
             log.warn("Roster post failed: no input");
-            return SithClanPluginConstants.STATUS_BAD_INPUT;
+            return SithClanConstants.STATUS_BAD_INPUT;
         }
         log.info("Posting member roster to server..");
         // split input into list of strings
@@ -127,13 +127,13 @@ public class SithClanMemberRoster
         } catch (Exception e)
         {
             log.warn("Roster conversion failed.");
-            return SithClanPluginConstants.STATUS_BAD_INPUT;
+            return SithClanConstants.STATUS_BAD_INPUT;
         }
 
         if (newRoster == null || newRoster.isEmpty())
         {
             log.warn("Roster conversion failed.");
-            return SithClanPluginConstants.STATUS_BAD_INPUT;
+            return SithClanConstants.STATUS_BAD_INPUT;
         }
 
         // convert roster to array for worker
@@ -146,13 +146,13 @@ public class SithClanMemberRoster
         String response = postMemberRoster(data);
         if (response == null)
         {
-            return SithClanPluginConstants.STATUS_NOT_FOUND;
+            return SithClanConstants.STATUS_NOT_FOUND;
         }
         // save roster
         this.roster = newRoster;
         this.dateRosterPosted = ZonedDateTime.now();
         log.info("Member roster posted successfully.");
-        return SithClanPluginConstants.STATUS_OK;
+        return SithClanConstants.STATUS_OK;
     }
 
     /**

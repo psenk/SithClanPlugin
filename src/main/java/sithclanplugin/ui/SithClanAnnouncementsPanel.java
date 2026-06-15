@@ -30,8 +30,8 @@ import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
 import sithclanplugin.announcements.SithClanAnnouncement;
 import sithclanplugin.announcements.SithClanAnnouncements;
-import sithclanplugin.util.SithClanPluginConstants;
-import sithclanplugin.util.SithClanPluginUtil;
+import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanUtil;
 
 @Singleton
 public class SithClanAnnouncementsPanel extends JPanel
@@ -47,8 +47,6 @@ public class SithClanAnnouncementsPanel extends JPanel
     private final JPanel announcementsListPanel;
     private final JScrollPane announcementsScrollPane;
 
-    private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
-    private static final String ARROW_DOWN_PATH = "/arrow_down.png";
     private static final String ANNOUNCEMENTS_LABEL = "Clan Announcements";
     private static final String REFRESH_ANNOUNCEMENTS = "Refresh Announcements";
     private static final String NO_ANNOUNCEMENTS_LABEL = "No Announcements Currently";
@@ -57,8 +55,10 @@ public class SithClanAnnouncementsPanel extends JPanel
 
     SithClanAnnouncementsPanel()
     {
-        final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
-        final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
+        final Icon rightArrowIcon = new ImageIcon(
+                ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_RIGHT_PATH));
+        final Icon downArrowIcon = new ImageIcon(
+                ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_DOWN_PATH));
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -80,12 +80,7 @@ public class SithClanAnnouncementsPanel extends JPanel
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
         // status message label
-        statusLabel = new JLabel();
-        statusLabel.setVisible(true);
-        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        statusLabel.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel = SithClanUtil.createStatusLabel();
 
         statusPanel.add(statusLabel);
         statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -221,15 +216,15 @@ public class SithClanAnnouncementsPanel extends JPanel
     {
         switch (statusCode)
         {
-            case SithClanPluginConstants.STATUS_RATE_LIMITED:
+            case SithClanConstants.STATUS_RATE_LIMITED:
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(RATE_LIMITED_WARNING);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
-            case SithClanPluginConstants.STATUS_NOT_FOUND:
+            case SithClanConstants.STATUS_NOT_FOUND:
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(ANNOUNCEMENTS_ERROR);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
             default:
                 break;

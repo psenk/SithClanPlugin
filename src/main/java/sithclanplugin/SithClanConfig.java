@@ -6,7 +6,7 @@ import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.Range;
 
 @ConfigGroup("sithclanplugin")
-public interface SithClanPluginConfig extends Config
+public interface SithClanConfig extends Config
 {
 	@ConfigItem(keyName = "eventAlerts", name = "Event Alerts", description = "Enables or disables notifications for upcoming clan events.", position = 1)
 	default boolean eventNotifications()

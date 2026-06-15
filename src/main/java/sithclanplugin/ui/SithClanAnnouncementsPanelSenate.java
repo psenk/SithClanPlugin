@@ -31,14 +31,13 @@ import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 import sithclanplugin.announcements.SithClanAnnouncement;
 import sithclanplugin.announcements.SithClanAnnouncements;
-import sithclanplugin.util.SithClanPluginConstants;
-import sithclanplugin.util.SithClanPluginUtil;
+import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanUtil;
 
 @Slf4j
 @Singleton
 public class SithClanAnnouncementsPanelSenate extends JPanel
 {
-
     @Inject
     private ScheduledExecutorService executor;
 
@@ -51,8 +50,6 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     private final JScrollPane announcementsScrollPane;
     private final JTextArea newAnnouncementTextArea;
 
-    private static final String ARROW_RIGHT_PATH = "/arrow_right.png";
-    private static final String ARROW_DOWN_PATH = "/arrow_down.png";
     private static final String ANNOUNCEMENTS_LABEL = "Update Announcements";
     private static final String ADD_NEW_ANNOUNCEMENT = "Add New";
     private static final Border ANNOUNCEMENT_BORDER = BorderFactory.createMatteBorder(1, 1, 1, 1,
@@ -70,8 +67,10 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
 
     SithClanAnnouncementsPanelSenate()
     {
-        final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_PATH));
-        final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_PATH));
+        final Icon rightArrowIcon = new ImageIcon(
+                ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_RIGHT_PATH));
+        final Icon downArrowIcon = new ImageIcon(
+                ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_DOWN_PATH));
 
         // this panel
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -87,12 +86,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
         // status message label
-        statusLabel = new JLabel();
-        statusLabel.setVisible(true);
-        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        statusLabel.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel = SithClanUtil.createStatusLabel();
 
         statusPanel.add(statusLabel);
         statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -286,7 +280,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                             announcementTextArea.getText());
                     SwingUtilities.invokeLater(() ->
                     {
-                        if (status == SithClanPluginConstants.STATUS_OK)
+                        if (status == SithClanConstants.STATUS_OK)
                         {
                             // reset button state, lock text area
                             announcementTextArea.setEditable(false);
@@ -369,27 +363,27 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     {
         switch (statusCode)
         {
-            case SithClanPluginConstants.STATUS_RESOURCE_CREATED:
+            case SithClanConstants.STATUS_RESOURCE_CREATED:
                 statusLabel.setText(ANNOUNCEMENT_POSTED);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
-            case SithClanPluginConstants.STATUS_RESOURCE_DELETED:
+            case SithClanConstants.STATUS_RESOURCE_DELETED:
                 statusLabel.setText(ANNOUNCEMENT_DELETED);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
-            case SithClanPluginConstants.STATUS_OK:
+            case SithClanConstants.STATUS_OK:
                 statusLabel.setText(ANNOUNCEMENT_UPDATED);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
-            case SithClanPluginConstants.STATUS_BAD_INPUT:
+            case SithClanConstants.STATUS_BAD_INPUT:
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(ANNOUNCEMENT_ERROR);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
-            case SithClanPluginConstants.STATUS_NOT_FOUND:
+            case SithClanConstants.STATUS_NOT_FOUND:
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(ANNOUNCEMENT_ERROR);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
             default:
                 break;

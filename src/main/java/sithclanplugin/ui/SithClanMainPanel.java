@@ -20,7 +20,7 @@ import lombok.Getter;
 import net.runelite.client.ui.PluginPanel;
 
 @Singleton
-public class SithClanPluginPanel extends PluginPanel
+public class SithClanMainPanel extends PluginPanel
 {
 
     @Getter
@@ -67,7 +67,7 @@ public class SithClanPluginPanel extends PluginPanel
     private static final String MAIN_CARD = "main";
 
     @Inject
-    SithClanPluginPanel(SithClanSchedulePanel schedulePanel,
+    SithClanMainPanel(SithClanSchedulePanel schedulePanel,
             SithClanSenatePanel senatePanel, SithClanMembersPanel membersPanel,
             SithClanAnnouncementsPanel announcementsPanel, SithClanEventLogPanel eventLogPanel)
     {

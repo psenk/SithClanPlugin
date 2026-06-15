@@ -41,15 +41,16 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 import okhttp3.OkHttpClient;
 import sithclanplugin.members.SithClanMember;
 import sithclanplugin.members.SithClanMemberRoster;
-import sithclanplugin.util.SithClanPluginConstants;
-import sithclanplugin.util.SithClanPluginUtil;
+import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanUtil;
+
+// reformatted june 15
 
 @Singleton
 public class SithClanMembersPanel extends JPanel
@@ -118,11 +119,11 @@ public class SithClanMembersPanel extends JPanel
     SithClanMembersPanel()
     {
         // rank icons
-        rankIcons = new Icon[SithClanPluginConstants.RANK_ICON_PATHS.length];
-        for (int i = 0; i < SithClanPluginConstants.RANK_ICON_PATHS.length; i++)
+        rankIcons = new Icon[SithClanConstants.RANK_ICON_PATHS.length];
+        for (int i = 0; i < SithClanConstants.RANK_ICON_PATHS.length; i++)
         {
             rankIcons[i] = new ImageIcon(
-                    ImageUtil.loadImageResource(getClass(), SithClanPluginConstants.RANK_ICON_PATHS[i]));
+                    ImageUtil.loadImageResource(getClass(), SithClanConstants.RANK_ICON_PATHS[i]));
         }
 
         this.setLayout(new BorderLayout());
@@ -245,7 +246,7 @@ public class SithClanMembersPanel extends JPanel
                     SwingUtilities.invokeLater(() ->
                     {
                         statusLabel.setText(BLANK_SEARCH_VALUE);
-                        SithClanPluginUtil.statusTimer(statusLabel);
+                        SithClanUtil.statusTimer(statusLabel);
                     });
                     return;
                 }
@@ -263,7 +264,7 @@ public class SithClanMembersPanel extends JPanel
                     if (members.isEmpty())
                     {
                         statusLabel.setText(MEMBER_DOES_NOT_EXIST);
-                        SithClanPluginUtil.statusTimer(statusLabel);
+                        SithClanUtil.statusTimer(statusLabel);
                     } else if (members.size() == 1)
                     {
                         updateRosterDateLabel(memberRoster.getDateRosterPosted());
@@ -523,7 +524,7 @@ public class SithClanMembersPanel extends JPanel
 
                         // return to normal
                         statusLabel.setText(ABOUT_ME_SUCCESSFUL);
-                        SithClanPluginUtil.statusTimer(statusLabel);
+                        SithClanUtil.statusTimer(statusLabel);
 
                         membersAboutMePanel.setVisible(false);
                         membersAreaLabel.setVisible(true);
@@ -532,7 +533,7 @@ public class SithClanMembersPanel extends JPanel
                     } else
                     {
                         statusLabel.setText(ABOUT_ME_FAILED);
-                        SithClanPluginUtil.statusTimer(statusLabel);
+                        SithClanUtil.statusTimer(statusLabel);
                     }
                 });
             });
@@ -602,7 +603,7 @@ public class SithClanMembersPanel extends JPanel
 
         JLabel avatar;
         // gold key rank
-        if (memberRankInt == 15 && memberName.equalsIgnoreCase(SithClanPluginConstants.CURRENT_GOLD_KEY))
+        if (memberRankInt == 15 && memberName.equalsIgnoreCase(SithClanConstants.CURRENT_GOLD_KEY))
         {
             avatar = new JLabel(rankIcons[15]);
         } else
@@ -631,7 +632,7 @@ public class SithClanMembersPanel extends JPanel
         }
 
         // member rank
-        rightPanel.add(new JLabel(MEMBER_RANK + SithClanPluginConstants.CLAN_RANKS[memberRankInt - 1]));
+        rightPanel.add(new JLabel(MEMBER_RANK + SithClanConstants.CLAN_RANKS[memberRankInt - 1]));
 
         // member credits
         rightPanel.add(new JLabel(memberCreditsInt + MEMBER_CREDITS));
@@ -646,7 +647,7 @@ public class SithClanMembersPanel extends JPanel
         if (memberRankInt <= 10)
         {
             // credits
-            int creditsNeeded = SithClanPluginConstants.CREDITS_TO_PROMOTE[memberRankInt] - memberCreditsInt;
+            int creditsNeeded = SithClanConstants.CREDITS_TO_PROMOTE[memberRankInt] - memberCreditsInt;
             if (creditsNeeded > 0)
             {
                 rightPanel.add(new JLabel(MEMBER_CREDITS_NEEDED + creditsNeeded));
@@ -662,9 +663,9 @@ public class SithClanMembersPanel extends JPanel
                     } else
                     {
                         long daysInRank = ChronoUnit.DAYS.between(
-                                LocalDate.parse(memberLastPromotionDate, SithClanPluginConstants.SHORT_DATE_FORMATTER),
+                                LocalDate.parse(memberLastPromotionDate, SithClanConstants.SHORT_DATE_FORMATTER),
                                 LocalDate.now());
-                        long daysNeeded = SithClanPluginConstants.DAYS_TO_PROMOTE[memberRankInt - 1] - daysInRank;
+                        long daysNeeded = SithClanConstants.DAYS_TO_PROMOTE[memberRankInt - 1] - daysInRank;
                         if (daysNeeded <= 0)
                         {
                             daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + MEMBER_NONE_NEEDED);
@@ -747,9 +748,9 @@ public class SithClanMembersPanel extends JPanel
         label.setVisible(true);
         label.setHorizontalAlignment(JLabel.CENTER);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        label.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        label.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        label.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        label.setPreferredSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        label.setMinimumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        label.setMaximumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
 
         // label will contain error statuses
         if (isErrorLabel)
@@ -792,7 +793,7 @@ public class SithClanMembersPanel extends JPanel
         ZonedDateTime timeStamp = time
                 .withZoneSameInstant(ZoneId.systemDefault());
         rosterDateLabel
-                .setText(ROSTER_DATE_PREFIX + timeStamp.format(SithClanPluginConstants.DATE_FORMATTER));
+                .setText(ROSTER_DATE_PREFIX + timeStamp.format(SithClanConstants.DATE_FORMATTER));
     }
 
     /**
@@ -822,7 +823,7 @@ public class SithClanMembersPanel extends JPanel
                 if (member == null)
                 {
                     statusLabel.setText(MEMBER_DOES_NOT_EXIST);
-                    SithClanPluginUtil.statusTimer(statusLabel);
+                    SithClanUtil.statusTimer(statusLabel);
                 } else
                 {
                     membersSearchTextField.setText(username);
@@ -842,12 +843,12 @@ public class SithClanMembersPanel extends JPanel
         {
             int status = memberRoster.parseRosterFromGet();
 
-            if (status == SithClanPluginConstants.STATUS_NOT_FOUND)
+            if (status == SithClanConstants.STATUS_NOT_FOUND)
             {
                 SwingUtilities.invokeLater(() ->
                 {
                     statusLabel.setText(ROSTER_UNOBTAINABLE_WARNING);
-                    SithClanPluginUtil.statusTimer(statusLabel);
+                    SithClanUtil.statusTimer(statusLabel);
                 });
                 return;
             }
@@ -878,8 +879,8 @@ public class SithClanMembersPanel extends JPanel
     private String fetchAboutMe(String memberName)
     {
         // send get request
-        String uri = SithClanPluginConstants.MEMBER_SINGLE_ABOUT_ME_URI + memberName;
-        String response = SithClanPluginUtil.sendGetRequest(httpClient, uri);
+        String uri = SithClanConstants.MEMBER_SINGLE_ABOUT_ME_URI + memberName;
+        String response = SithClanUtil.sendGetRequest(httpClient, uri);
         if (response == null)
         {
             return null;
@@ -908,14 +909,14 @@ public class SithClanMembersPanel extends JPanel
      */
     private boolean submitAboutMe(String memberName, String aboutMeText)
     {
-        String uri = SithClanPluginConstants.MEMBER_SINGLE_ABOUT_ME_URI + memberName;
+        String uri = SithClanConstants.MEMBER_SINGLE_ABOUT_ME_URI + memberName;
 
         JsonObject body = new JsonObject();
         body.addProperty("aboutMe", aboutMeText);
         body.addProperty("submittedName", memberName);
         String jsonBody = body.toString();
 
-        String response = SithClanPluginUtil.sendPutRequest(httpClient, "", jsonBody, uri);
+        String response = SithClanUtil.sendPutRequest(httpClient, "", jsonBody, uri);
         return response != null;
     }
 
@@ -931,8 +932,8 @@ public class SithClanMembersPanel extends JPanel
         }
 
         // send HTTP GET request
-        String response = SithClanPluginUtil.sendGetRequest(httpClient,
-                SithClanPluginConstants.MEMBER_ALL_ABOUT_ME_URI);
+        String response = SithClanUtil.sendGetRequest(httpClient,
+                SithClanConstants.MEMBER_ALL_ABOUT_ME_URI);
         if (response == null)
         {
             aboutMeCache = new HashMap<>();

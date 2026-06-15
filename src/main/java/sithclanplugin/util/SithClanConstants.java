@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 
 import net.runelite.client.ui.PluginPanel;
 
-public class SithClanPluginConstants
+public class SithClanConstants
 {
         // testing
         public static final boolean BYPASS_CLAN_CHECK = true;
@@ -128,5 +128,7 @@ public class SithClanPluginConstants
 
         // misc
         public static final Dimension STATUS_LABEL_DIMENSION = new Dimension(PluginPanel.PANEL_WIDTH, 20);
+        public static final String ARROW_RIGHT_PATH = "/arrow_right.png";
+        public static final String ARROW_DOWN_PATH = "/arrow_left.png";
 
 }

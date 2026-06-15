@@ -19,15 +19,15 @@ import com.google.inject.Singleton;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.Notifier;
-import sithclanplugin.SithClanPluginConfig;
+import sithclanplugin.SithClanConfig;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
-import sithclanplugin.util.SithClanPluginConstants;
-import sithclanplugin.util.SithClanPluginUtil;
+import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanUtil;
 
 @Slf4j
 @Singleton
-public class SithClanPluginNotificationManager
+public class SithClanNotificationManager
 {
     @Inject
     private ScheduledExecutorService executor;
@@ -36,10 +36,10 @@ public class SithClanPluginNotificationManager
     private Notifier notifier;
 
     @Inject
-    private SithClanPluginFileManager fileManager;
+    private SithClanFileManager fileManager;
 
     @Inject
-    private SithClanPluginConfig config;
+    private SithClanConfig config;
 
     private final Map<String, ScheduledFuture<?>> scheduledNotifications = new HashMap<>();
 
@@ -66,7 +66,7 @@ public class SithClanPluginNotificationManager
         {
             for (SithClanEvent event : day.getEvents())
             {
-                incomingEvents.add(SithClanPluginUtil.removeEmojis(event.getEventTitle()));
+                incomingEvents.add(SithClanUtil.removeEmojis(event.getEventTitle()));
             }
         }
 
@@ -85,7 +85,7 @@ public class SithClanPluginNotificationManager
             String currentDay = day.getDate();
             for (SithClanEvent event : day.getEvents())
             {
-                String eventTitle = SithClanPluginUtil.removeEmojis(event.getEventTitle());
+                String eventTitle = SithClanUtil.removeEmojis(event.getEventTitle());
 
                 // skip if already scheduled
                 if (scheduledNotifications.containsKey(eventTitle))
@@ -104,9 +104,9 @@ public class SithClanPluginNotificationManager
                 {
                     // convert to users local time
                     ZonedDateTime estTime = ZonedDateTime.of(
-                            LocalDate.parse(currentDay, SithClanPluginConstants.DATE_FORMATTER),
-                            LocalTime.parse(currentTime, SithClanPluginConstants.TIME_FORMATTER),
-                            SithClanPluginConstants.EST_ZONE);
+                            LocalDate.parse(currentDay, SithClanConstants.DATE_FORMATTER),
+                            LocalTime.parse(currentTime, SithClanConstants.TIME_FORMATTER),
+                            SithClanConstants.EST_ZONE);
                     ZonedDateTime localDateTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
 
                     // checks if event has already passed

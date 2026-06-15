@@ -22,10 +22,10 @@ import com.google.inject.Singleton;
 
 import net.runelite.client.ui.ColorScheme;
 import okhttp3.OkHttpClient;
-import sithclanplugin.SithClanPluginConfig;
+import sithclanplugin.SithClanConfig;
 import sithclanplugin.members.SithClanMemberRoster;
-import sithclanplugin.util.SithClanPluginConstants;
-import sithclanplugin.util.SithClanPluginUtil;
+import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanUtil;
 
 @Singleton
 public class SithClanEventLogPanel extends JPanel
@@ -37,7 +37,7 @@ public class SithClanEventLogPanel extends JPanel
     private ScheduledExecutorService executor;
 
     @Inject
-    private SithClanPluginConfig config;
+    private SithClanConfig config;
 
     @Inject
     private SithClanMemberRoster memberRoster;
@@ -81,9 +81,9 @@ public class SithClanEventLogPanel extends JPanel
         statusLabel = new JLabel();
         statusLabel.setVisible(true);
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        statusLabel.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setPreferredSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMinimumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMaximumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
 
         statusPanel.add(statusLabel);
         this.add(statusPanel);
@@ -168,7 +168,7 @@ public class SithClanEventLogPanel extends JPanel
         for (String message : messages)
         {
             // post to Discord
-            String response = SithClanPluginUtil.sendEventLogToDiscord(httpClient, webhookUrl, message);
+            String response = SithClanUtil.sendEventLogToDiscord(httpClient, webhookUrl, message);
             if (response == null)
             {
                 SwingUtilities.invokeLater(() -> showError(POST_FAILURE));
@@ -178,7 +178,7 @@ public class SithClanEventLogPanel extends JPanel
         SwingUtilities.invokeLater(() ->
         {
             statusLabel.setText(POST_SUCCESS);
-            SithClanPluginUtil.statusTimer(statusLabel);
+            SithClanUtil.statusTimer(statusLabel);
         });
     }
 
@@ -234,7 +234,7 @@ public class SithClanEventLogPanel extends JPanel
         if (memberRoster.getRoster().isEmpty())
         {
             int status = memberRoster.parseRosterFromGet();
-            if (status != SithClanPluginConstants.STATUS_OK)
+            if (status != SithClanConstants.STATUS_OK)
             {
                 SwingUtilities.invokeLater(() -> showError(ROSTER_ERROR_WARNING));
                 return false;
@@ -411,6 +411,6 @@ public class SithClanEventLogPanel extends JPanel
     {
         statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
         statusLabel.setText(message);
-        SithClanPluginUtil.statusTimer(statusLabel);
+        SithClanUtil.statusTimer(statusLabel);
     }
 }

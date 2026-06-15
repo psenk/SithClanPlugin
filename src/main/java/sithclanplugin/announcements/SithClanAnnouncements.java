@@ -15,9 +15,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
-import sithclanplugin.SithClanPluginConfig;
-import sithclanplugin.util.SithClanPluginConstants;
-import sithclanplugin.util.SithClanPluginUtil;
+import sithclanplugin.SithClanConfig;
+import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanUtil;
 
 @Slf4j
 @Getter
@@ -25,7 +25,7 @@ import sithclanplugin.util.SithClanPluginUtil;
 public class SithClanAnnouncements
 {
     @Inject
-    private SithClanPluginConfig config;
+    private SithClanConfig config;
 
     @Inject
     private OkHttpClient httpClient;
@@ -61,7 +61,7 @@ public class SithClanAnnouncements
      */
     private String getAnnouncements()
     {
-        return SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.ANNOUNCEMENTS_URI);
+        return SithClanUtil.sendGetRequest(httpClient, SithClanConstants.ANNOUNCEMENTS_URI);
     }
 
     /**
@@ -73,8 +73,8 @@ public class SithClanAnnouncements
      */
     private String postAnnouncement(String jsonData)
     {
-        return SithClanPluginUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
-                SithClanPluginConstants.ANNOUNCEMENTS_URI);
+        return SithClanUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
+                SithClanConstants.ANNOUNCEMENTS_URI);
     }
 
     /**
@@ -88,8 +88,8 @@ public class SithClanAnnouncements
      */
     private String putAnnouncement(String jsonData, int announcementId)
     {
-        String uri = SithClanPluginConstants.ANNOUNCEMENTS_URI + "/" + announcementId;
-        return SithClanPluginUtil.sendPutRequest(httpClient, config.apiKey(), jsonData,
+        String uri = SithClanConstants.ANNOUNCEMENTS_URI + "/" + announcementId;
+        return SithClanUtil.sendPutRequest(httpClient, config.apiKey(), jsonData,
                 uri);
     }
 
@@ -102,8 +102,8 @@ public class SithClanAnnouncements
      */
     private String deleteAnnouncement(int announcementId)
     {
-        String uri = SithClanPluginConstants.ANNOUNCEMENTS_URI + "/" + announcementId;
-        return SithClanPluginUtil.sendDeleteRequest(httpClient, config.apiKey(), uri);
+        String uri = SithClanConstants.ANNOUNCEMENTS_URI + "/" + announcementId;
+        return SithClanUtil.sendDeleteRequest(httpClient, config.apiKey(), uri);
     }
 
     /**
@@ -119,11 +119,11 @@ public class SithClanAnnouncements
     public int parseAnnouncementsFromGet()
     {
         // rate limiting
-        if (SithClanPluginUtil.isRateLimited(lastTimeAnnouncementsFetched, ANNOUNCEMENTS_FETCH_COOLDOWN_MINUTES,
+        if (SithClanUtil.isRateLimited(lastTimeAnnouncementsFetched, ANNOUNCEMENTS_FETCH_COOLDOWN_MINUTES,
                 isSenateMember))
         {
             log.debug("Announcements fetch skipped: rate limited");
-            return SithClanPluginConstants.STATUS_RATE_LIMITED;
+            return SithClanConstants.STATUS_RATE_LIMITED;
         }
 
         log.info("Fetching announcements from server..");
@@ -131,7 +131,7 @@ public class SithClanAnnouncements
         String jsonAnnouncements = getAnnouncements();
         if (jsonAnnouncements == null)
         {
-            return SithClanPluginConstants.STATUS_NOT_FOUND;
+            return SithClanConstants.STATUS_NOT_FOUND;
         }
         // convert announcements to JSON
         this.announcementsList = deserializeAnnouncements(jsonAnnouncements);
@@ -139,7 +139,7 @@ public class SithClanAnnouncements
                 announcementsList.isEmpty() ? 0 : announcementsList.size());
         // refresh rate limiting timestamp
         this.lastTimeAnnouncementsFetched = ZonedDateTime.now();
-        return SithClanPluginConstants.STATUS_OK;
+        return SithClanConstants.STATUS_OK;
     }
 
     /**
@@ -154,7 +154,7 @@ public class SithClanAnnouncements
         if (announcementInput.isBlank())
         {
             log.warn("Announcement post failed: no input");
-            return SithClanPluginConstants.STATUS_BAD_INPUT;
+            return SithClanConstants.STATUS_BAD_INPUT;
         }
 
         log.info("Posting announcement to server..");
@@ -163,7 +163,7 @@ public class SithClanAnnouncements
         if (announcement == null)
         {
             log.warn("Announcement conversion failed in POST.");
-            return SithClanPluginConstants.STATUS_BAD_INPUT;
+            return SithClanConstants.STATUS_BAD_INPUT;
         }
 
         // store announcement as JSON object
@@ -173,7 +173,7 @@ public class SithClanAnnouncements
         String response = postAnnouncement(data);
         if (response == null)
         {
-            return SithClanPluginConstants.STATUS_NOT_FOUND;
+            return SithClanConstants.STATUS_NOT_FOUND;
         }
         // save to cache
         String newAnnouncements = getAnnouncements();
@@ -182,7 +182,7 @@ public class SithClanAnnouncements
             this.announcementsList = deserializeAnnouncements(newAnnouncements);
         }
         log.info("Announcement posted successfully.");
-        return SithClanPluginConstants.STATUS_RESOURCE_CREATED;
+        return SithClanConstants.STATUS_RESOURCE_CREATED;
     }
 
     /**
@@ -199,7 +199,7 @@ public class SithClanAnnouncements
         if (announcementInput.isBlank() || id <= 0)
         {
             log.warn("Announcement put failed: no input");
-            return SithClanPluginConstants.STATUS_BAD_INPUT;
+            return SithClanConstants.STATUS_BAD_INPUT;
         }
 
         log.info("Sending announcement edit to server..");
@@ -208,7 +208,7 @@ public class SithClanAnnouncements
         if (announcement == null)
         {
             log.warn("Announcement conversion failed in PUT.");
-            return SithClanPluginConstants.STATUS_BAD_INPUT;
+            return SithClanConstants.STATUS_BAD_INPUT;
         }
 
         // store announcement as JSON object
@@ -218,13 +218,13 @@ public class SithClanAnnouncements
         String response = putAnnouncement(data, id);
         if (response == null)
         {
-            return SithClanPluginConstants.STATUS_NOT_FOUND;
+            return SithClanConstants.STATUS_NOT_FOUND;
         }
         // replace announcement in cache
         announcementsList.remove(getAnnouncementById(id));
         announcementsList.add(announcement);
         log.info("Announcement editted successfully.");
-        return SithClanPluginConstants.STATUS_OK;
+        return SithClanConstants.STATUS_OK;
     }
 
     /**
@@ -239,14 +239,14 @@ public class SithClanAnnouncements
         if (id <= 0)
         {
             log.warn("Announcement deletion failed: bad ID number.");
-            return SithClanPluginConstants.STATUS_BAD_INPUT;
+            return SithClanConstants.STATUS_BAD_INPUT;
         }
 
         log.info("Sending announcement deletion to server..");
         String response = deleteAnnouncement(id);
         if (response == null)
         {
-            return SithClanPluginConstants.STATUS_NOT_FOUND;
+            return SithClanConstants.STATUS_NOT_FOUND;
         }
         // remove from cache
         try
@@ -257,7 +257,7 @@ public class SithClanAnnouncements
             log.error("NoSuchElementException during announcement deletion: {}", e.getMessage());
         }
         log.info("Announcement deleted successfully.");
-        return SithClanPluginConstants.STATUS_OK;
+        return SithClanConstants.STATUS_OK;
     }
 
     /**

@@ -38,14 +38,14 @@ import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
 import sithclanplugin.SithClanPlugin;
-import sithclanplugin.SithClanPluginConfig;
+import sithclanplugin.SithClanConfig;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
-import sithclanplugin.managers.SithClanPluginFileManager;
-import sithclanplugin.managers.SithClanPluginNotificationManager;
-import sithclanplugin.util.SithClanPluginConstants;
-import sithclanplugin.util.SithClanPluginUtil;
+import sithclanplugin.managers.SithClanFileManager;
+import sithclanplugin.managers.SithClanNotificationManager;
+import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanUtil;
 
 @Slf4j
 @Singleton
@@ -58,16 +58,16 @@ public class SithClanSchedulePanel extends JPanel
     private SithClanPlugin plugin;
 
     @Inject
-    private SithClanPluginConfig config;
+    private SithClanConfig config;
 
     @Inject
     private SithClanEventSchedule eventSchedule;
 
     @Inject
-    private SithClanPluginFileManager fileManager;
+    private SithClanFileManager fileManager;
 
     @Inject
-    private SithClanPluginNotificationManager notificationManager;
+    private SithClanNotificationManager notificationManager;
 
     private final Icon rightArrowIcon;
     private final Icon downArrowIcon;
@@ -112,9 +112,9 @@ public class SithClanSchedulePanel extends JPanel
         statusLabel = new JLabel();
         statusLabel.setVisible(true);
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        statusLabel.setPreferredSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMinimumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMaximumSize(SithClanPluginConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setPreferredSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMinimumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMaximumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
 
         statusPanel.add(statusLabel);
         statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -231,8 +231,8 @@ public class SithClanSchedulePanel extends JPanel
             // add blank list if no events on day
             ArrayList<SithClanEvent> rawEvents = day.getEvents();
             ArrayList<SithClanEvent> events = (rawEvents != null) ? new ArrayList<>(rawEvents) : new ArrayList<>();
-            events.sort((e1, e2) -> LocalTime.parse(e1.getEventTime(), SithClanPluginConstants.TIME_FORMATTER)
-                    .compareTo(LocalTime.parse(e2.getEventTime(), SithClanPluginConstants.TIME_FORMATTER)));
+            events.sort((e1, e2) -> LocalTime.parse(e1.getEventTime(), SithClanConstants.TIME_FORMATTER)
+                    .compareTo(LocalTime.parse(e2.getEventTime(), SithClanConstants.TIME_FORMATTER)));
 
             // if there are no scheduled events this day
             if (events.isEmpty())
@@ -293,9 +293,9 @@ public class SithClanSchedulePanel extends JPanel
                 try
                 {
                     ZonedDateTime estTime = ZonedDateTime.of(
-                            LocalDate.parse(day.getDate(), SithClanPluginConstants.DATE_FORMATTER),
-                            LocalTime.parse(event.getEventTime(), SithClanPluginConstants.TIME_FORMATTER),
-                            SithClanPluginConstants.EST_ZONE);
+                            LocalDate.parse(day.getDate(), SithClanConstants.DATE_FORMATTER),
+                            LocalTime.parse(event.getEventTime(), SithClanConstants.TIME_FORMATTER),
+                            SithClanConstants.EST_ZONE);
                     ZonedDateTime localTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
 
                     // check event hasn't happened yet
@@ -304,7 +304,7 @@ public class SithClanSchedulePanel extends JPanel
                         if (nextEventTime == null || localTime.isBefore(nextEventTime))
                         {
                             nextEventTime = localTime;
-                            nextEventName = SithClanPluginUtil.removeEmojis(event.getEventTitle());
+                            nextEventName = SithClanUtil.removeEmojis(event.getEventTitle());
                         }
                     }
                 } catch (Exception e)
@@ -337,7 +337,7 @@ public class SithClanSchedulePanel extends JPanel
             countdown = "in " + minutes + "m";
         }
 
-        String timeString = nextEventTime.format(SithClanPluginConstants.TIME_FORMATTER);
+        String timeString = nextEventTime.format(SithClanConstants.TIME_FORMATTER);
 
         nextEventLabel.setText("<html><b>" + HtmlEscapers.htmlEscaper().escape(nextEventName) + "</b><br />"
                 + timeString + " (" + countdown + ")</html>");
@@ -452,7 +452,7 @@ public class SithClanSchedulePanel extends JPanel
      */
     private JPanel createEvent(SithClanEvent event, String day)
     {
-        String eventTitleString = SithClanPluginUtil.removeEmojis(event.getEventTitle());
+        String eventTitleString = SithClanUtil.removeEmojis(event.getEventTitle());
 
         // container for event and notification checkbox
         JPanel eventContainer = new JPanel();
@@ -492,11 +492,11 @@ public class SithClanSchedulePanel extends JPanel
 
         // event time, converted to user local time
         ZonedDateTime estTime = ZonedDateTime.of(
-                LocalDate.parse(day, SithClanPluginConstants.DATE_FORMATTER),
-                LocalTime.parse(event.getEventTime(), SithClanPluginConstants.TIME_FORMATTER),
-                SithClanPluginConstants.EST_ZONE);
+                LocalDate.parse(day, SithClanConstants.DATE_FORMATTER),
+                LocalTime.parse(event.getEventTime(), SithClanConstants.TIME_FORMATTER),
+                SithClanConstants.EST_ZONE);
         ZonedDateTime localTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
-        JLabel eventTime = new JLabel(localTime.format(SithClanPluginConstants.TIME_FORMATTER));
+        JLabel eventTime = new JLabel(localTime.format(SithClanConstants.TIME_FORMATTER));
         eventTime.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventTime);
 
@@ -504,7 +504,7 @@ public class SithClanSchedulePanel extends JPanel
         if (event.getEventHost() != null && !event.getEventHost().isBlank())
         {
             JLabel eventHost = new JLabel(
-                    wrapLabelText("Hosted by: " + SithClanPluginUtil.removeEmojis(event.getEventHost())));
+                    wrapLabelText("Hosted by: " + SithClanUtil.removeEmojis(event.getEventHost())));
             eventHost.setAlignmentX(Component.LEFT_ALIGNMENT);
             singleEvent.add(eventHost);
         }
@@ -515,7 +515,7 @@ public class SithClanSchedulePanel extends JPanel
             for (String info : event.getEventMiscInfo())
             {
                 // creating link to travel to clan discord channels
-                JLabel eventInfo = createDiscordLink(SithClanPluginUtil.removeEmojis(info));
+                JLabel eventInfo = createDiscordLink(SithClanUtil.removeEmojis(info));
                 eventInfo.setAlignmentX(Component.LEFT_ALIGNMENT);
                 singleEvent.add(eventInfo);
             }
@@ -561,7 +561,7 @@ public class SithClanSchedulePanel extends JPanel
         {
             String channelId = matcher.group(1);
             // create Discord channel URL
-            String channelUrl = SithClanPluginConstants.DISCORD_CHANNEL_URI + channelId;
+            String channelUrl = SithClanConstants.DISCORD_CHANNEL_URI + channelId;
             // creating link
             String escaped = HtmlEscapers.htmlEscaper().escape(text);
             String withLink = escaped.replaceAll("&lt;#\\d+&gt;", "<a href=''>Discord Channel</a>");
@@ -638,7 +638,7 @@ public class SithClanSchedulePanel extends JPanel
         {
             return;
         }
-        LocalDate finalDate = LocalDate.parse(inputDay, SithClanPluginConstants.DATE_FORMATTER);
+        LocalDate finalDate = LocalDate.parse(inputDay, SithClanConstants.DATE_FORMATTER);
         if (finalDate.isBefore(LocalDate.now()))
         {
             scheduleExpiredLabel.setVisible(true);
@@ -660,15 +660,15 @@ public class SithClanSchedulePanel extends JPanel
     {
         switch (status)
         {
-            case SithClanPluginConstants.STATUS_RATE_LIMITED:
+            case SithClanConstants.STATUS_RATE_LIMITED:
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(RATE_LIMITED_WARNING);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
-            case SithClanPluginConstants.STATUS_NOT_FOUND:
+            case SithClanConstants.STATUS_NOT_FOUND:
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(SCHEDULE_ERROR);
-                SithClanPluginUtil.statusTimer(statusLabel);
+                SithClanUtil.statusTimer(statusLabel);
                 break;
             default:
                 break;

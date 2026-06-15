@@ -47,12 +47,12 @@ import okhttp3.OkHttpClient;
 import sithclanplugin.announcements.SithClanAnnouncements;
 import sithclanplugin.dto.StartupResponse;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
-import sithclanplugin.managers.SithClanPluginFileManager;
-import sithclanplugin.managers.SithClanPluginNotificationManager;
+import sithclanplugin.managers.SithClanFileManager;
+import sithclanplugin.managers.SithClanNotificationManager;
 import sithclanplugin.members.SithClanMemberRoster;
-import sithclanplugin.ui.SithClanPluginPanel;
-import sithclanplugin.util.SithClanPluginConstants;
-import sithclanplugin.util.SithClanPluginUtil;
+import sithclanplugin.ui.SithClanMainPanel;
+import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanUtil;
 
 @Slf4j
 @PluginDescriptor(name = "Sith Clan Plugin", description = "Enable the Sith Clan Plugin")
@@ -86,7 +86,7 @@ public class SithClanPlugin extends Plugin
 	private ScheduledExecutorService executor;
 
 	@Inject
-	private SithClanPluginConfig config;
+	private SithClanConfig config;
 
 	@Inject
 	private SithClanAnnouncements announcements;
@@ -98,13 +98,13 @@ public class SithClanPlugin extends Plugin
 	private SithClanMemberRoster memberRoster;
 
 	@Inject
-	private SithClanPluginFileManager fileManager;
+	private SithClanFileManager fileManager;
 
 	@Inject
-	private SithClanPluginNotificationManager notificationManager;
+	private SithClanNotificationManager notificationManager;
 
 	@Inject
-	private Provider<SithClanPluginPanel> uiPanel;
+	private Provider<SithClanMainPanel> uiPanel;
 
 	private NavigationButton uiNavigationButton;
 	private boolean isSenateMember = false;
@@ -150,7 +150,7 @@ public class SithClanPlugin extends Plugin
 		fileManager.initializeFiles();
 
 		// bypass check for testing
-		if (SithClanPluginConstants.BYPASS_CLAN_CHECK)
+		if (SithClanConstants.BYPASS_CLAN_CHECK)
 		{
 			SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
 			log.error("WE HAVE SHOWN THE MAIN PANEL");
@@ -162,14 +162,14 @@ public class SithClanPlugin extends Plugin
 			// get startup info and parse
 			int status = parseStartupInfo();
 			// if fails, load from local file
-			if (status != SithClanPluginConstants.STATUS_OK)
+			if (status != SithClanConstants.STATUS_OK)
 			{
 				eventSchedule.parseScheduleFromFile();
 			}
 			// validate API key of Senate members
 			if (!config.apiKey().isBlank())
 			{
-				isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
+				isSenateMember = SithClanUtil.validateApiKey(httpClient, config);
 				eventSchedule.setSenateMember(isSenateMember);
 				announcements.setSenateMember(isSenateMember);
 				memberRoster.setSenateMember(isSenateMember);
@@ -417,7 +417,7 @@ public class SithClanPlugin extends Plugin
 		{
 			executor.submit(() ->
 			{
-				boolean isSenateMember = SithClanPluginUtil.validateApiKey(httpClient, config);
+				boolean isSenateMember = SithClanUtil.validateApiKey(httpClient, config);
 				SwingUtilities.invokeLater(() -> uiPanel.get().getSenateButton().setVisible(isSenateMember));
 			});
 		}
@@ -450,9 +450,9 @@ public class SithClanPlugin extends Plugin
 	 * @return ConfigManager plugin configuration
 	 */
 	@Provides
-	SithClanPluginConfig provideConfig(ConfigManager configManager)
+	SithClanConfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(SithClanPluginConfig.class);
+		return configManager.getConfig(SithClanConfig.class);
 	}
 
 	/**
@@ -550,7 +550,7 @@ public class SithClanPlugin extends Plugin
 			return false;
 		}
 
-		return clanSettings.getName().equalsIgnoreCase(SithClanPluginConstants.CLAN_NAME);
+		return clanSettings.getName().equalsIgnoreCase(SithClanConstants.CLAN_NAME);
 	}
 
 	/**
@@ -561,11 +561,11 @@ public class SithClanPlugin extends Plugin
 	private int parseStartupInfo()
 	{
 		log.info("Fetching startup info from server..");
-		String jsonStartupInfo = SithClanPluginUtil.sendGetRequest(httpClient, SithClanPluginConstants.STARTUP_URI);
+		String jsonStartupInfo = SithClanUtil.sendGetRequest(httpClient, SithClanConstants.STARTUP_URI);
 		if (jsonStartupInfo == null)
 		{
 			log.error("Failed to fetch startup info -- server returned null");
-			return SithClanPluginConstants.STATUS_NOT_FOUND;
+			return SithClanConstants.STATUS_NOT_FOUND;
 		}
 		log.info("Startup info retrieved successfully, deserializing..");
 		StartupResponse startupResponse = gson.fromJson(jsonStartupInfo, StartupResponse.class);
@@ -573,6 +573,6 @@ public class SithClanPlugin extends Plugin
 		eventSchedule.loadStartupSchedule(startupResponse.getStartupSchedule(), scheduleJson);
 		announcements.loadStartupAnnouncements(startupResponse.getStartupAnnouncements());
 		log.info("Startup info loaded successfully.");
-		return SithClanPluginConstants.STATUS_OK;
+		return SithClanConstants.STATUS_OK;
 	}
 }

@@ -1,5 +1,6 @@
 package sithclanplugin.util;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.ZonedDateTime;
@@ -18,10 +19,10 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import sithclanplugin.SithClanPluginConfig;
+import sithclanplugin.SithClanConfig;
 
 @Slf4j
-public class SithClanPluginUtil
+public class SithClanUtil
 {
     private static OkHttpClient cachedTimeoutClient = null;
 
@@ -189,11 +190,11 @@ public class SithClanPluginUtil
      * 
      * @return boolean is API key valid
      */
-    public static boolean validateApiKey(OkHttpClient client, SithClanPluginConfig config)
+    public static boolean validateApiKey(OkHttpClient client, SithClanConfig config)
     {
         // create HTTP GET request
         Request request = new Request.Builder()
-                .url(SithClanPluginConstants.VALIDATE_URI)
+                .url(SithClanConstants.VALIDATE_URI)
                 .header("Authorization", "Bearer " + config.apiKey())
                 .get()
                 .build();
@@ -292,5 +293,21 @@ public class SithClanPluginUtil
 
         timer.setRepeats(false);
         timer.start();
+    }
+
+    /**
+     * Helper function to create status message label
+     * 
+     * @return JLabel created status label
+     */
+    public static JLabel createStatusLabel()
+    {
+        JLabel statusLabel = new JLabel();
+        statusLabel.setVisible(true);
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        statusLabel.setPreferredSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMinimumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMaximumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        return statusLabel;
     }
 }
