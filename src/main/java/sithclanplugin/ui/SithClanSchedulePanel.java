@@ -62,8 +62,8 @@ import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
-import sithclanplugin.SithClanPlugin;
 import sithclanplugin.SithClanConfig;
+import sithclanplugin.SithClanPlugin;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
@@ -71,6 +71,8 @@ import sithclanplugin.managers.SithClanFileManager;
 import sithclanplugin.managers.SithClanNotificationManager;
 import sithclanplugin.util.SithClanConstants;
 import sithclanplugin.util.SithClanUtil;
+
+// refactored on june 15
 
 @Slf4j
 @Singleton
@@ -99,13 +101,10 @@ public class SithClanSchedulePanel extends JPanel
     private final JPanel statusPanel;
     private final JLabel statusLabel;
     private final JLabel scheduleExpiredLabel;
-    private final Component scheduleExpiredSpace;
     private final JPanel scheduleContainer;
     private final JLabel nextEventLabel;
     private ScheduledFuture<?> nextEventRefreshTask;
 
-    private static final String ARROW_RIGHT_IMG_PATH = "/arrow_right.png";
-    private static final String ARROW_DOWN_IMG_PATH = "/arrow_down.png";
     private static final String EVENT_SCHEDULE = "Event Schedule";
     private static final String SCHEDULE_EXPIRED_WARNING = "Schedule is expired! Please refresh. If still expired, contact a Senate member.";
     private static final String NEXT_EVENT = "Next Event";
@@ -115,13 +114,13 @@ public class SithClanSchedulePanel extends JPanel
     private static final String NO_EVENTS_SCHEDULED_TODAY = "No events scheduled today.";
     private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
-    private static final String NO_UPCOMING_EVENTS = "No upcoming events";
+    private static final String NO_UPCOMING_EVENTS = "No upcoming events.";
 
     SithClanSchedulePanel()
     {
         // load collapse/expand arrow imgs
-        rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_RIGHT_IMG_PATH));
-        downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), ARROW_DOWN_IMG_PATH));
+        rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_RIGHT_PATH));
+        downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_DOWN_PATH));
         // main panel layout
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -134,12 +133,7 @@ public class SithClanSchedulePanel extends JPanel
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
         // status message label
-        statusLabel = new JLabel();
-        statusLabel.setVisible(true);
-        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        statusLabel.setPreferredSize(SithClanConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMinimumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMaximumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        statusLabel = SithClanUtil.createStatusLabel();
 
         statusPanel.add(statusLabel);
         statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -150,10 +144,6 @@ public class SithClanSchedulePanel extends JPanel
         scheduleExpiredLabel.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
         scheduleExpiredLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         scheduleExpiredLabel.setVisible(false);
-        scheduleExpiredSpace = Box.createRigidArea(new Dimension(0, 10));
-        scheduleExpiredSpace.setVisible(false);
-        this.add(scheduleExpiredSpace);
-        this.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // organization, contains panel title and expiration warning
         JPanel topPanel = new JPanel();
@@ -161,7 +151,6 @@ public class SithClanSchedulePanel extends JPanel
         topPanel.add(schedulePanelLabel);
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         topPanel.add(scheduleExpiredLabel);
-
         this.add(topPanel);
 
         // next event panel
@@ -231,6 +220,7 @@ public class SithClanSchedulePanel extends JPanel
         // if there is no schedule
         if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty())
         {
+            log.debug("No schedule available to display");
             scheduleContainer.setVisible(false);
             scheduleContainer.revalidate();
             scheduleContainer.repaint();
@@ -285,6 +275,7 @@ public class SithClanSchedulePanel extends JPanel
                 }
             }
         }
+
         // check if schedule is expired
         checkScheduleExpired(currentDay);
 
@@ -300,6 +291,7 @@ public class SithClanSchedulePanel extends JPanel
      */
     public void updateNextEventDisplay()
     {
+        // if there is no schedule
         if (eventSchedule.getSchedule() == null || eventSchedule.getSchedule().isEmpty())
         {
             nextEventLabel.setVisible(false);
@@ -515,15 +507,21 @@ public class SithClanSchedulePanel extends JPanel
         eventTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventTitle);
 
-        // event time, converted to user local time
-        ZonedDateTime estTime = ZonedDateTime.of(
-                LocalDate.parse(day, SithClanConstants.DATE_FORMATTER),
-                LocalTime.parse(event.getEventTime(), SithClanConstants.TIME_FORMATTER),
-                SithClanConstants.EST_ZONE);
-        ZonedDateTime localTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
-        JLabel eventTime = new JLabel(localTime.format(SithClanConstants.TIME_FORMATTER));
-        eventTime.setAlignmentX(Component.LEFT_ALIGNMENT);
-        singleEvent.add(eventTime);
+        try
+        {
+            // event time, converted to user local time
+            ZonedDateTime estTime = ZonedDateTime.of(
+                    LocalDate.parse(day, SithClanConstants.DATE_FORMATTER),
+                    LocalTime.parse(event.getEventTime(), SithClanConstants.TIME_FORMATTER),
+                    SithClanConstants.EST_ZONE);
+            ZonedDateTime localTime = estTime.withZoneSameInstant(ZoneId.systemDefault());
+            JLabel eventTime = new JLabel(localTime.format(SithClanConstants.TIME_FORMATTER));
+            eventTime.setAlignmentX(Component.LEFT_ALIGNMENT);
+            singleEvent.add(eventTime);
+        } catch (Exception e)
+        {
+            log.error("Exception while creating event panel: {}", e.getMessage(), e);
+        }
 
         // event host (optional info)
         if (event.getEventHost() != null && !event.getEventHost().isBlank())
@@ -666,12 +664,11 @@ public class SithClanSchedulePanel extends JPanel
         LocalDate finalDate = LocalDate.parse(inputDay, SithClanConstants.DATE_FORMATTER);
         if (finalDate.isBefore(LocalDate.now()))
         {
+            log.warn("Event schedule is expired, last date was: {}", inputDay);
             scheduleExpiredLabel.setVisible(true);
-            scheduleExpiredSpace.setVisible(true);
         } else
         {
             scheduleExpiredLabel.setVisible(false);
-            scheduleExpiredSpace.setVisible(false);
         }
     }
 
@@ -686,11 +683,13 @@ public class SithClanSchedulePanel extends JPanel
         switch (status)
         {
             case SithClanConstants.STATUS_RATE_LIMITED:
+                log.warn("Schedule fetch rate limited");
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(RATE_LIMITED_WARNING);
                 SithClanUtil.statusTimer(statusLabel);
                 break;
             case SithClanConstants.STATUS_NOT_FOUND:
+                log.error("Schedule fetch failed with status: {}", status);
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(SCHEDULE_ERROR);
                 SithClanUtil.statusTimer(statusLabel);
@@ -705,6 +704,7 @@ public class SithClanSchedulePanel extends JPanel
      */
     public void startNextEventRefresh()
     {
+        log.debug("Starting next event refresh task");
         nextEventRefreshTask = executor.scheduleAtFixedRate(
                 () -> SwingUtilities.invokeLater(this::updateNextEventDisplay),
                 1, 1, TimeUnit.MINUTES);
@@ -717,12 +717,13 @@ public class SithClanSchedulePanel extends JPanel
     {
         if (nextEventRefreshTask != null)
         {
+            log.debug("Stopping next event refresh task");
             nextEventRefreshTask.cancel(false);
         }
     }
 
     /**
-     * Wraps String in HTML tags
+     * Wraps escaped String in HTML tags
      * 
      * @param text
      *                 String text to wrap

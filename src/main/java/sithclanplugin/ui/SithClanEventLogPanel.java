@@ -103,12 +103,7 @@ public class SithClanEventLogPanel extends JPanel
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
 
         // status message label
-        statusLabel = new JLabel();
-        statusLabel.setVisible(true);
-        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        statusLabel.setPreferredSize(SithClanConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMinimumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMaximumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        statusLabel = SithClanUtil.createStatusLabel();
 
         statusPanel.add(statusLabel);
         this.add(statusPanel);

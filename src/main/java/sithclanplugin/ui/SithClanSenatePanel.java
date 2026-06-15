@@ -47,6 +47,7 @@ import javax.swing.SwingUtilities;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
@@ -56,6 +57,7 @@ import sithclanplugin.util.SithClanUtil;
 
 // refactored june 15
 
+@Slf4j
 @Singleton
 public class SithClanSenatePanel extends JPanel
 {
@@ -190,7 +192,6 @@ public class SithClanSenatePanel extends JPanel
     private JPanel createCollapsiblePanel(String labelText, String defaultText, JTextArea textArea,
             JButton button, Icon rightIcon, Icon downIcon)
     {
-
         // main panel container
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
@@ -266,21 +267,20 @@ public class SithClanSenatePanel extends JPanel
         switch (statusCode)
         {
             case SithClanConstants.STATUS_OK:
+                log.debug("Post completed successfully");
                 statusLabel.setText(SUCCESSFUL_POST);
                 textArea.setText(defaultText);
                 SithClanUtil.statusTimer(statusLabel);
                 break;
             case SithClanConstants.STATUS_BAD_INPUT:
+                log.warn("Post rejected due to bad input");
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(BAD_INPUT_WARNING);
                 SithClanUtil.statusTimer(statusLabel);
                 break;
             case SithClanConstants.STATUS_NOT_FOUND:
-                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
-                statusLabel.setText(ERROR_WARNING);
-                SithClanUtil.statusTimer(statusLabel);
-                break;
             default:
+                log.error("Post failed with status code: {}", statusCode);
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(ERROR_WARNING);
                 SithClanUtil.statusTimer(statusLabel);
