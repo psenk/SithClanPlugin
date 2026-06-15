@@ -41,6 +41,7 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
@@ -102,7 +103,7 @@ public class SithClanMembersPanel extends JPanel
     private static final String ABOUT_ME_SAVE = "Save";
     private static final String ABOUT_ME_CANCEL = "Cancel";
     private static final String ABOUT_ME_FAILED = "Save failed.  Please try again.";
-    private static final String ABOUT_ME_SUCCESSFUL = "About Me saved successfully.";
+    private static final String ABOUT_ME_SUCCESSFUL = "About me saved successfully.";
     private static final String MEMBER_RANK = "Rank: "; // trailing space intentional
     private static final String MEMBER_CREDITS = " Imperial Credits"; // leading space intentional
     private static final String MEMBER_PROMOTED = "Promoted On: "; // trailing space intentional
@@ -493,9 +494,6 @@ public class SithClanMembersPanel extends JPanel
             }
         });
 
-        // status label for feedback
-        JLabel aboutMeStatusLabel = createStatusLabel(true);
-
         // save and cancel buttons
         JButton saveButton = new JButton(ABOUT_ME_SAVE);
         JButton cancelButton = new JButton(ABOUT_ME_CANCEL);
@@ -524,8 +522,8 @@ public class SithClanMembersPanel extends JPanel
                         aboutMeCache = null;
 
                         // return to normal
-                        aboutMeStatusLabel.setText(ABOUT_ME_SUCCESSFUL);
-                        SithClanPluginUtil.statusTimer(aboutMeStatusLabel);
+                        statusLabel.setText(ABOUT_ME_SUCCESSFUL);
+                        SithClanPluginUtil.statusTimer(statusLabel);
 
                         membersAboutMePanel.setVisible(false);
                         membersAreaLabel.setVisible(true);
@@ -533,8 +531,8 @@ public class SithClanMembersPanel extends JPanel
 
                     } else
                     {
-                        aboutMeStatusLabel.setText(ABOUT_ME_FAILED);
-                        SithClanPluginUtil.statusTimer(aboutMeStatusLabel);
+                        statusLabel.setText(ABOUT_ME_FAILED);
+                        SithClanPluginUtil.statusTimer(statusLabel);
                     }
                 });
             });
@@ -549,8 +547,6 @@ public class SithClanMembersPanel extends JPanel
         });
 
         editPanel.add(instructions);
-        editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        editPanel.add(aboutMeStatusLabel);
         editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         editPanel.add(aboutMeScrollPane);
         editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -721,8 +717,6 @@ public class SithClanMembersPanel extends JPanel
             if (aboutMe != null && !aboutMe.isBlank())
             {
                 aboutMeText.setText(aboutMe);
-                singleMemberPanel.setMaximumSize(
-                        new Dimension(PluginPanel.PANEL_WIDTH, singleMemberPanel.getPreferredSize().height));
             }
         }
 
@@ -813,6 +807,7 @@ public class SithClanMembersPanel extends JPanel
         {
             // get roster if needed
             fetchRosterIfNeeded();
+            fetchAboutMeCacheIfNeeded();
 
             // get specific member
             SithClanMember member = memberRoster.getMemberByName(username);
