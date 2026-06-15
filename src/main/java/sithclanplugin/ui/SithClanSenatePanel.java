@@ -66,8 +66,10 @@ public class SithClanSenatePanel extends JPanel
     {
         this.announcementsPanelSenate = announcementsPanelSenate;
 
-        final Icon rightArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_RIGHT_PATH));
-        final Icon downArrowIcon = new ImageIcon(ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_DOWN_PATH));
+        final Icon rightArrowIcon = new ImageIcon(
+                ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_RIGHT_PATH));
+        final Icon downArrowIcon = new ImageIcon(
+                ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_DOWN_PATH));
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
@@ -192,7 +194,7 @@ public class SithClanSenatePanel extends JPanel
         panelLabel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         panelLabel.setOpaque(true);
         panelLabel
-                .setMaximumSize(new Dimension(Integer.MAX_VALUE, panelLabel.getPreferredSize().height));
+                .setMaximumSize(new Dimension(Short.MAX_VALUE, panelLabel.getPreferredSize().height));
 
         // setup main panel
         JPanel collapsiblePanel = new JPanel();

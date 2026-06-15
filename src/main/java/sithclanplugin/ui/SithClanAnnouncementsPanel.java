@@ -69,7 +69,7 @@ public class SithClanAnnouncementsPanel extends JPanel
         announcementsPanelLabel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         announcementsPanelLabel.setOpaque(true);
         announcementsPanelLabel
-                .setMaximumSize(new Dimension(Integer.MAX_VALUE, announcementsPanelLabel.getPreferredSize().height));
+                .setMaximumSize(new Dimension(Short.MAX_VALUE, announcementsPanelLabel.getPreferredSize().height));
 
         // collapsible panel
         JPanel collapsiblePanel = new JPanel();

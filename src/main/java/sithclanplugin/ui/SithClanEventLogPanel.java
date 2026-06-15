@@ -105,7 +105,7 @@ public class SithClanEventLogPanel extends JPanel
 
         JScrollPane scrollPane = new JScrollPane(eventLogTextArea);
         scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
-        scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, scrollPane.getPreferredSize().height));
+        scrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, scrollPane.getPreferredSize().height));
         this.add(scrollPane);
 
         // submit button

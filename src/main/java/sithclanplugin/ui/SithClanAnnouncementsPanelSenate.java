@@ -74,12 +74,12 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
 
         // this panel
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        this.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
         // main panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        mainPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
         // status label panel
         statusPanel = new JPanel();
@@ -98,7 +98,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         announcementsPanelLabel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         announcementsPanelLabel.setOpaque(true);
         announcementsPanelLabel
-                .setMaximumSize(new Dimension(Integer.MAX_VALUE, announcementsPanelLabel.getPreferredSize().height));
+                .setMaximumSize(new Dimension(Short.MAX_VALUE, announcementsPanelLabel.getPreferredSize().height));
 
         // top buttons
         JPanel topButtonPanel = new JPanel();

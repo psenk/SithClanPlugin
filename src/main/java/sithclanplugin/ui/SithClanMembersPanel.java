@@ -452,7 +452,7 @@ public class SithClanMembersPanel extends JPanel
         charCountRow.setVisible(true);
         charCountRow.setOpaque(false);
         charCountRow
-                .setMaximumSize(new Dimension(Integer.MAX_VALUE, membersAboutMeCharCount.getPreferredSize().height));
+                .setMaximumSize(new Dimension(Short.MAX_VALUE, membersAboutMeCharCount.getPreferredSize().height));
         charCountRow.add(membersAboutMeCharCount);
 
         // update character count dynamically
