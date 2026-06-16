@@ -1,0 +1,27 @@
+FORMATTING:
+
+Injects Order:
+1. RuneLite Injects
+- Client
+- ClientThread
+- ClientToolbar
+- MenuManager
+- WorldService
+- ChatMessageManager
+- OkHttpClient
+- Gson
+- ScheduledExecutorService
+
+2. Plugin Specific Injects
+- SithClanPlugin
+- SithClanPluginConfig
+- SithClanAnnouncements
+- SithClanEventSchedule
+- SithClanMemberRoster
+- SithClanPluginFileManager
+- SithClanPluginNotificationManager
+
+NOTES:
+- undo clan bypass
+- undo static member name in SithClanMembersPanel
+- push API update
