@@ -6,6 +6,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -20,6 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 
+import com.google.common.html.HtmlEscapers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -244,15 +247,25 @@ public class SithClanAnnouncementsPanel extends JPanel
      */
     private String convertLinks(String text)
     {
-        // detect urls
         String urlPattern = "(https?://\\S+)";
+        String[] parts = text.split(urlPattern, -1);
+        Matcher matcher = Pattern.compile(urlPattern).matcher(text);
 
-        // replace characters
-        String escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-        String withBreaks = escaped.replace("\n", "<br>");
-
-        // add HTML tags
-        String withLinks = withBreaks.replaceAll(urlPattern, "<a href='$1'>$1</a>");
-        return "<html>" + withLinks + "</html>";
+        StringBuilder result = new StringBuilder("<html>");
+        int i = 0;
+        for (String part : parts)
+        {
+            // escape and add the non-URL text segment
+            result.append(HtmlEscapers.htmlEscaper().escape(part).replace("\n", "<br>"));
+            // if there's a matching URL for this gap, append it as a link
+            if (matcher.find())
+            {
+                String url = matcher.group();
+                result.append("<a href='").append(url).append("'>").append(url).append("</a>");
+            }
+            i++;
+        }
+        result.append("</html>");
+        return result.toString();
     }
 }
