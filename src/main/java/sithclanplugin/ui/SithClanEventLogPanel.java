@@ -27,8 +27,6 @@ package sithclanplugin.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -42,16 +40,24 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import sithclanplugin.SithClanConfig;
 import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.util.SithClanConstants;
 import sithclanplugin.util.SithClanUtil;
 
+// refactored june 16
+
+@Slf4j
 @Singleton
 public class SithClanEventLogPanel extends JPanel
 {
@@ -74,11 +80,11 @@ public class SithClanEventLogPanel extends JPanel
     private static final String PANEL_LABEL = "Post Event Log";
     private static final String TEXT_AREA_DEFAULT = "Post Event Log Here";
     private static final String SUBMIT_BUTTON = "Submit";
-    private static final String NO_WEBHOOK_URL_WARNING = "No Discord webhook URL set in config";
+    private static final String NO_WEBHOOK_URL_WARNING = "No Discord webhook URL set in config.";
     private static final String DISCORD_WEBHOOK_PREFIX = "https://discord.com/";
-    private static final String INVALID_WEBHOOK_URL = "Invalid Discord webhook URL";
-    private static final String POST_SUCCESS = "Event log posted to Discord";
-    private static final String POST_FAILURE = "Failed to post event log to Discord";
+    private static final String INVALID_WEBHOOK_URL = "Invalid Discord webhook URL.";
+    private static final String POST_SUCCESS = "Event log posted to Discord.";
+    private static final String POST_FAILURE = "Failed to post event log to Discord.";
     private static final String EVENT_NAME_PREFIX = "Event name: "; // trailing space intentional
     private static final String EVENT_HOST_PREFIX = "Hosted by: "; // trailing space intentional
     private static final String NO_EVENT_NAME_WARNING = "Event name missing";
@@ -93,45 +99,32 @@ public class SithClanEventLogPanel extends JPanel
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // panel title
-        JLabel panelLabel = new JLabel(PANEL_LABEL);
-        panelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        this.add(panelLabel);
+        JLabel eventLogPanelLabel = new JLabel(PANEL_LABEL);
+        eventLogPanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        this.add(eventLogPanelLabel);
         this.add(Box.createRigidArea(new Dimension(0, 5)));
 
-        // status label panel
-        statusPanel = new JPanel();
-        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
-
-        // status message label
+        // status label panel and label
         statusLabel = SithClanUtil.createStatusLabel();
-
-        statusPanel.add(statusLabel);
+        statusPanel = SithClanUtil.createStatusPanel(statusLabel);
         this.add(statusPanel);
-        this.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // text area to paste log
         eventLogTextArea = new JTextArea(TEXT_AREA_DEFAULT);
         eventLogTextArea.setRows(20);
-
-        // highlights all text when box focused
-        eventLogTextArea.addFocusListener(new FocusAdapter()
-        {
-            @Override
-            public void focusGained(FocusEvent e)
-            {
-                eventLogTextArea.selectAll();
-            }
-        });
 
         JScrollPane scrollPane = new JScrollPane(eventLogTextArea);
         scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         scrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, scrollPane.getPreferredSize().height));
         this.add(scrollPane);
 
+        // highlights all text when box focused
+        SithClanUtil.attachSelectAllOnFocus(eventLogTextArea);
+
         // submit button
         JButton submitButton = new JButton(SUBMIT_BUTTON);
         submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        submitButton.setMaximumSize(new Dimension(Short.MAX_VALUE, submitButton.getPreferredSize().height));
+
         this.add(Box.createRigidArea(new Dimension(0, 10)));
         this.add(submitButton);
 
@@ -147,7 +140,7 @@ public class SithClanEventLogPanel extends JPanel
      */
 
     /**
-     * Validate event log, check for event name, host, clan membership
+     * Check for event name, host, clan membership in log
      * 
      * @param eventLog
      *                     String raw event log input
@@ -158,6 +151,7 @@ public class SithClanEventLogPanel extends JPanel
         String webhookUrl = config.eventLogWebhook();
         if (webhookUrl == null || webhookUrl.isBlank())
         {
+            log.warn("Event log submission failed: no webhook URL configured.");
             SwingUtilities.invokeLater(() -> showError(NO_WEBHOOK_URL_WARNING));
             return;
         }
@@ -165,6 +159,7 @@ public class SithClanEventLogPanel extends JPanel
         // validate webhook URL
         if (!webhookUrl.startsWith(DISCORD_WEBHOOK_PREFIX))
         {
+            log.warn("Event log submission failed: invalid webhook URL '{}'", webhookUrl);
             SwingUtilities.invokeLater(() -> showError(INVALID_WEBHOOK_URL));
             return;
         }
@@ -188,13 +183,14 @@ public class SithClanEventLogPanel extends JPanel
         for (String message : messages)
         {
             // post to Discord
-            String response = SithClanUtil.sendEventLogToDiscord(httpClient, webhookUrl, message);
+            String response = sendEventLogToDiscord(message);
             if (response == null)
             {
                 SwingUtilities.invokeLater(() -> showError(POST_FAILURE));
                 return;
             }
         }
+        log.info("Event log posted to Discord successfully ({} message(s)).", messages.size());
         SwingUtilities.invokeLater(() ->
         {
             statusLabel.setText(POST_SUCCESS);
@@ -206,28 +202,36 @@ public class SithClanEventLogPanel extends JPanel
      * Validate event name and event host
      * 
      * @param eventLog
-     *                     raw event log as array
+     *                     String[] raw event log
      * @return boolean is header correct
      */
     private boolean validateHeader(String[] eventLog)
     {
         String eventName = "";
         String eventHost = "";
+
         for (String line : eventLog)
         {
+            if (!eventName.isBlank() && !eventHost.isBlank())
+            {
+                break;
+            }
             if (line.startsWith(EVENT_NAME_PREFIX))
             {
                 eventName = line.substring(EVENT_NAME_PREFIX.length()).trim();
+                continue;
             }
             if (line.startsWith(EVENT_HOST_PREFIX))
             {
                 eventHost = line.substring(EVENT_HOST_PREFIX.length()).trim();
+                continue;
             }
         }
 
         // verify event name
         if (eventName.isBlank())
         {
+            log.warn("Event log validation failed: missing event name.");
             SwingUtilities.invokeLater(() -> showError(NO_EVENT_NAME_WARNING));
             return false;
         }
@@ -235,9 +239,11 @@ public class SithClanEventLogPanel extends JPanel
         // verify event host
         if (eventHost.isBlank())
         {
+            log.warn("Event log validation failed: missing event host.");
             SwingUtilities.invokeLater(() -> showError(NO_EVENT_HOST_WARNING));
             return false;
         }
+
         return true;
     }
 
@@ -245,7 +251,7 @@ public class SithClanEventLogPanel extends JPanel
      * Validate members in clan
      * 
      * @param eventLog
-     *                     raw event log as array
+     *                     String[] raw event log
      * @return boolean are all members in clan
      */
     private boolean validateMembers(String[] eventLog)
@@ -254,6 +260,7 @@ public class SithClanEventLogPanel extends JPanel
         if (memberRoster.getRoster().isEmpty())
         {
             int status = memberRoster.parseRosterFromGet();
+
             if (status != SithClanConstants.STATUS_OK)
             {
                 SwingUtilities.invokeLater(() -> showError(ROSTER_ERROR_WARNING));
@@ -293,10 +300,12 @@ public class SithClanEventLogPanel extends JPanel
         // report non-members
         if (!nonMembers.isEmpty())
         {
+            log.warn("Event log validation failed: non-members found: {}", nonMembers);
             String warningMessage = NON_MEMBER_WARNING + String.join("\n", nonMembers);
             SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, warningMessage));
             return false;
         }
+
         return true;
     }
 
@@ -318,7 +327,7 @@ public class SithClanEventLogPanel extends JPanel
         if (eventLog.length() <= DISCORD_MAX_LENGTH)
         {
             ArrayList<String> singleMessage = new ArrayList<>();
-            singleMessage.add(eventLog + "\n*Sent from Sith Clan Plugin, message 1 of 1*");
+            singleMessage.add(eventLog + "\n\n*Sent from Sith Clan RuneLite Plugin, message 1 of 1*");
             return singleMessage;
         }
 
@@ -386,7 +395,7 @@ public class SithClanEventLogPanel extends JPanel
      * Reconstruct event log from header and member list
      * 
      * @param header
-     *                          String raw event log header
+     *                          String event log header
      * @param tableHeader
      *                          String column header and separator
      * @param memberLines
@@ -412,14 +421,42 @@ public class SithClanEventLogPanel extends JPanel
         }
         message.append("```\n");
         message.append(footer);
-        message.append("\n\n**Sent from Sith Clan Plugin, message ").append(messageNumber).append(" of ")
-                .append(totalMessages).append("**");
+        message.append("\n\n*Sent from Sith Clan RuneLite Plugin, message ").append(messageNumber).append(" of ")
+                .append(totalMessages).append("*");
         return message.toString();
     }
 
     /**
      * MISC FUNCTIONS
      */
+
+    /**
+     * Create and send HTTP POST request to Discord webhook
+     * 
+     * @param message
+     *                    String content to post
+     * @return String HTTP Response body
+     */
+    private String sendEventLogToDiscord(String message)
+    {
+        // create JSON string
+        JsonObject body = new JsonObject();
+        body.addProperty("content", message);
+        String jsonBody = body.toString();
+
+        // build HTTP POST request
+        Request request = new Request.Builder()
+                .url(config.eventLogWebhook())
+                .post(RequestBody.create(MediaType.parse("application/json"), jsonBody))
+                .build();
+
+        String response = SithClanUtil.executeRequest(httpClient, request);
+        if (response == null)
+        {
+            log.error("Failed to post event log to Discord.");
+        }
+        return response;
+    }
 
     /**
      * Helper function to update status label with error message

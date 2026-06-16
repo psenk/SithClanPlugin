@@ -27,8 +27,6 @@ package sithclanplugin.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.concurrent.ScheduledExecutorService;
@@ -107,15 +105,9 @@ public class SithClanSenatePanel extends JPanel
         this.add(senatePanelLabel);
         this.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // status label panel
-        statusPanel = new JPanel();
-        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
-
-        // status message label
+        // status label panel and label
         statusLabel = SithClanUtil.createStatusLabel();
-
-        statusPanel.add(statusLabel);
-        statusPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        statusPanel = SithClanUtil.createStatusPanel(statusLabel);
         this.add(statusPanel);
 
         // post event schedule functionality
@@ -202,14 +194,7 @@ public class SithClanSenatePanel extends JPanel
         textArea.setLineWrap(false);
 
         // highlights all text when box focused
-        textArea.addFocusListener(new FocusAdapter()
-        {
-            @Override
-            public void focusGained(FocusEvent e)
-            {
-                textArea.selectAll();
-            }
-        });
+        SithClanUtil.attachSelectAllOnFocus(textArea);
 
         JScrollPane scrollPane = new JScrollPane(textArea);
 

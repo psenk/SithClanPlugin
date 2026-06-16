@@ -128,15 +128,9 @@ public class SithClanSchedulePanel extends JPanel
         JLabel schedulePanelLabel = new JLabel(EVENT_SCHEDULE);
         schedulePanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // status label panel
-        statusPanel = new JPanel();
-        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
-
-        // status message label
+        // status label panel and label
         statusLabel = SithClanUtil.createStatusLabel();
-
-        statusPanel.add(statusLabel);
-        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        statusPanel = SithClanUtil.createStatusPanel(statusLabel);
         this.add(statusPanel);
 
         // warning if schedule is expired

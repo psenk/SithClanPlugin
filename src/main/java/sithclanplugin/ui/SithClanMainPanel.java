@@ -125,8 +125,8 @@ public class SithClanMainPanel extends PluginPanel
         navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
 
         // main plugin title
-        JLabel pluginLabel = new JLabel(PLUGIN_LABEL);
-        pluginLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel mainPanelLabel = new JLabel(PLUGIN_LABEL);
+        mainPanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // card buttons
         JButton scheduleButton = new JButton(SCHEDULE_BUTTON);
@@ -157,7 +157,7 @@ public class SithClanMainPanel extends PluginPanel
         navLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // top panel
-        navPanel.add(pluginLabel);
+        navPanel.add(mainPanelLabel);
         navPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         navPanel.add(announcementsPanel);
         navPanel.add(Box.createRigidArea(new Dimension(0, 10)));

@@ -27,8 +27,6 @@ package sithclanplugin.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -45,7 +43,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -58,6 +55,8 @@ import sithclanplugin.announcements.SithClanAnnouncement;
 import sithclanplugin.announcements.SithClanAnnouncements;
 import sithclanplugin.util.SithClanConstants;
 import sithclanplugin.util.SithClanUtil;
+
+// refactored on june 16
 
 @Slf4j
 @Singleton
@@ -77,18 +76,16 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
 
     private static final String ANNOUNCEMENTS_LABEL = "Update Announcements";
     private static final String ADD_NEW_ANNOUNCEMENT = "Add New";
-    private static final Border ANNOUNCEMENT_BORDER = BorderFactory.createMatteBorder(1, 1, 1, 1,
-            ColorScheme.BORDER_COLOR);
     private static final String NEW_ANNOUNCEMENT_DEFAULT_TEXT = "Type Announcement Here";
     private static final String POST_ANNOUNCEMENT_BUTTON = "Post";
     private static final String CANCEL_ANNOUNCEMENT_BUTTON = "Cancel";
     private static final String EDIT_ANNOUNCEMENT_BUTTON = "Edit";
     private static final String SAVE_ANNOUNCEMENT_BUTTON = "Save";
     private static final String DELETE_ANNOUNCEMENT_BUTTON = "Delete";
-    private static final String ANNOUNCEMENT_POSTED = "Announcement Posted";
-    private static final String ANNOUNCEMENT_UPDATED = "Announcement Updated";
-    private static final String ANNOUNCEMENT_DELETED = "Announcement Deleted";
-    private static final String ANNOUNCEMENT_ERROR = "Announcement Error";
+    private static final String ANNOUNCEMENT_POSTED = "Announcement Posted.";
+    private static final String ANNOUNCEMENT_UPDATED = "Announcement Updated.";
+    private static final String ANNOUNCEMENT_DELETED = "Announcement Deleted.";
+    private static final String ANNOUNCEMENT_ERROR = "Announcement Error.";
 
     SithClanAnnouncementsPanelSenate()
     {
@@ -107,14 +104,8 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         mainPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
         // status label panel
-        statusPanel = new JPanel();
-        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
-
-        // status message label
         statusLabel = SithClanUtil.createStatusLabel();
-
-        statusPanel.add(statusLabel);
-        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        statusPanel = SithClanUtil.createStatusPanel(statusLabel);
 
         // announcements interactive label
         JLabel announcementsPanelLabel = new JLabel(ANNOUNCEMENTS_LABEL);
@@ -141,7 +132,8 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         // scroll pane for announcements
         announcementsScrollPane = new JScrollPane(announcementsListPanel);
         announcementsScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 300));
-        announcementsScrollPane.setBorder(ANNOUNCEMENT_BORDER);
+        announcementsScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
+                ColorScheme.BORDER_COLOR));
         announcementsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
         announcementsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -154,14 +146,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         newAnnouncementTextArea.setWrapStyleWord(true);
 
         // highlights all text when box focused
-        newAnnouncementTextArea.addFocusListener(new FocusAdapter()
-        {
-            @Override
-            public void focusGained(FocusEvent e)
-            {
-                newAnnouncementTextArea.selectAll();
-            }
-        });
+        SithClanUtil.attachSelectAllOnFocus(newAnnouncementTextArea);
 
         // panel for new announcement buttons
         JPanel buttonPanel = new JPanel();
@@ -218,9 +203,9 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
             newAnnouncementPanel.setVisible(true);
             announcementsListPanel.revalidate();
             announcementsListPanel.repaint();
-
         });
 
+        // post announcement action listener
         postAnnouncementButton.addActionListener(e ->
         {
             executor.submit(() ->
@@ -235,6 +220,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
             });
         });
 
+        // cancel announcement action listener
         cancelAnnouncementButton.addActionListener(e ->
         {
             newAnnouncementTextArea.setText(NEW_ANNOUNCEMENT_DEFAULT_TEXT);
@@ -262,11 +248,11 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
      */
     private JPanel createSingleAnnouncement(SithClanAnnouncement announcement)
     {
-
         // create announcement panel
         JPanel singleAnnouncementPanel = new JPanel();
         singleAnnouncementPanel.setLayout(new BoxLayout(singleAnnouncementPanel, BoxLayout.Y_AXIS));
-        singleAnnouncementPanel.setBorder(ANNOUNCEMENT_BORDER);
+        singleAnnouncementPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
+                ColorScheme.BORDER_COLOR));
 
         // create text area to type announcement
         JTextArea announcementTextArea = new JTextArea(announcement.getAnnouncementText());
@@ -401,16 +387,12 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                 SithClanUtil.statusTimer(statusLabel);
                 break;
             case SithClanConstants.STATUS_BAD_INPUT:
-                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
-                statusLabel.setText(ANNOUNCEMENT_ERROR);
-                SithClanUtil.statusTimer(statusLabel);
-                break;
             case SithClanConstants.STATUS_NOT_FOUND:
+            default:
+                log.error("Announcement action failed.");
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(ANNOUNCEMENT_ERROR);
                 SithClanUtil.statusTimer(statusLabel);
-                break;
-            default:
                 break;
         }
     }

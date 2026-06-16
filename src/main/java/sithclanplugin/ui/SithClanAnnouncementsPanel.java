@@ -31,6 +31,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -49,6 +51,7 @@ import com.google.common.html.HtmlEscapers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
@@ -58,6 +61,9 @@ import sithclanplugin.announcements.SithClanAnnouncements;
 import sithclanplugin.util.SithClanConstants;
 import sithclanplugin.util.SithClanUtil;
 
+// refactored on june 16
+
+@Slf4j
 @Singleton
 public class SithClanAnnouncementsPanel extends JPanel
 {
@@ -74,7 +80,7 @@ public class SithClanAnnouncementsPanel extends JPanel
 
     private static final String ANNOUNCEMENTS_LABEL = "Clan Announcements";
     private static final String REFRESH_ANNOUNCEMENTS = "Refresh Announcements";
-    private static final String NO_ANNOUNCEMENTS_LABEL = "No Announcements Currently";
+    private static final String NO_ANNOUNCEMENTS_LABEL = "No Announcements Currently.";
     private static final String RATE_LIMITED_WARNING = "Announcements have been retrieved too recently. Try again in a few minutes.";
     private static final String ANNOUNCEMENTS_ERROR = "Error obtaining announcements.";
 
@@ -100,15 +106,9 @@ public class SithClanAnnouncementsPanel extends JPanel
         JPanel collapsiblePanel = new JPanel();
         collapsiblePanel.setLayout(new BoxLayout(collapsiblePanel, BoxLayout.Y_AXIS));
 
-        // status label panel
-        statusPanel = new JPanel();
-        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
-
-        // status message label
+        // status label panel and label
         statusLabel = SithClanUtil.createStatusLabel();
-
-        statusPanel.add(statusLabel);
-        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        statusPanel = SithClanUtil.createStatusPanel(statusLabel);
 
         // announcements list panel
         announcementsListPanel = new JPanel();
@@ -146,6 +146,7 @@ public class SithClanAnnouncementsPanel extends JPanel
             public void mouseClicked(MouseEvent e)
             {
                 boolean isVisible = !collapsiblePanel.isVisible();
+                collapsiblePanel.setVisible(isVisible);
                 announcementsPanelLabel.setIcon(isVisible ? downArrowIcon : rightArrowIcon);
                 revalidate();
                 repaint();
@@ -234,19 +235,21 @@ public class SithClanAnnouncementsPanel extends JPanel
     /**
      * Handle response status of event
      * 
-     * @param statusCode
-     *                       int returned status code
+     * @param status
+     *                   int returned status code
      */
-    private void handleAnnouncementStatus(int statusCode)
+    private void handleAnnouncementStatus(int status)
     {
-        switch (statusCode)
+        switch (status)
         {
             case SithClanConstants.STATUS_RATE_LIMITED:
+                log.warn("Announcements fetch rate limited");
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(RATE_LIMITED_WARNING);
                 SithClanUtil.statusTimer(statusLabel);
                 break;
             case SithClanConstants.STATUS_NOT_FOUND:
+                log.error("Announcements fetch failed with status: {}", status);
                 statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                 statusLabel.setText(ANNOUNCEMENTS_ERROR);
                 SithClanUtil.statusTimer(statusLabel);
@@ -265,15 +268,23 @@ public class SithClanAnnouncementsPanel extends JPanel
      */
     private String convertLinks(String text)
     {
-        // detect urls
         String urlPattern = "(https?://\\S+)";
+        String[] parts = text.split(urlPattern, -1);
+        Matcher matcher = Pattern.compile(urlPattern).matcher(text);
 
-        // replace characters
-        String escaped = HtmlEscapers.htmlEscaper().escape(text);
-        String withBreaks = escaped.replace("\n", "<br>");
-
-        // add HTML tags
-        String withLinks = withBreaks.replaceAll(urlPattern, "<a href='$1'>$1</a>");
-        return "<html>" + withLinks + "</html>";
+        StringBuilder result = new StringBuilder("<html>");
+        for (String part : parts)
+        {
+            // escape and add the non-URL text segment
+            result.append(HtmlEscapers.htmlEscaper().escape(part).replace("\n", "<br>"));
+            // if there's a matching URL for this gap, append it as a link
+            if (matcher.find())
+            {
+                String url = matcher.group();
+                result.append("<a href='").append(url).append("'>").append(url).append("</a>");
+            }
+        }
+        result.append("</html>");
+        return result.toString();
     }
 }

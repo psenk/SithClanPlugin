@@ -154,6 +154,6 @@ public class SithClanConstants
         // misc
         public static final Dimension STATUS_LABEL_DIMENSION = new Dimension(PluginPanel.PANEL_WIDTH, 20);
         public static final String ARROW_RIGHT_PATH = "/arrow_right.png";
-        public static final String ARROW_DOWN_PATH = "/arrow_left.png";
+        public static final String ARROW_DOWN_PATH = "/arrow_down.png";
 
 }

@@ -26,15 +26,21 @@
 package sithclanplugin.util;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
-
-import com.google.gson.JsonObject;
+import javax.swing.text.JTextComponent;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
@@ -160,7 +166,7 @@ public class SithClanUtil
      *                    Request HTTP request object
      * @return String response body
      */
-    private static String executeRequest(OkHttpClient client, Request request)
+    public static String executeRequest(OkHttpClient client, Request request)
     {
         log.debug("Sending {} request to {}", request.method(), request.url());
 
@@ -180,33 +186,6 @@ public class SithClanUtil
             log.error("Exception during request to {}: {}", request.url(), e.getMessage(), e);
             return null;
         }
-    }
-
-    /**
-     * Create and send HTTP POST request to Discord webhook
-     * 
-     * @param client
-     *                       OkHttpClient client to send request
-     * @param webhookUrl
-     *                       String Discord webhook URL
-     * @param message
-     *                       String content to post
-     * @return String HTTP Response body
-     */
-    public static String sendEventLogToDiscord(OkHttpClient client, String webhookUrl, String message)
-    {
-        // create JSON string
-        JsonObject body = new JsonObject();
-        body.addProperty("content", message);
-        String jsonBody = body.toString();
-
-        // build HTTP POST request
-        Request request = new Request.Builder()
-                .url(webhookUrl)
-                .post(RequestBody.create(MediaType.parse("application/json"), jsonBody))
-                .build();
-
-        return executeRequest(client, request);
     }
 
     /**
@@ -330,9 +309,48 @@ public class SithClanUtil
         JLabel statusLabel = new JLabel();
         statusLabel.setVisible(true);
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
         statusLabel.setPreferredSize(SithClanConstants.STATUS_LABEL_DIMENSION);
         statusLabel.setMinimumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
         statusLabel.setMaximumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
         return statusLabel;
+    }
+
+    /**
+     * Helper function to create status message panel
+     * 
+     * @param statusLabel
+     *                        JLabel label containing status messages
+     * @return JPanel created status panel
+     */
+    public static JPanel createStatusPanel(JLabel statusLabel)
+    {
+        // status label panel
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+
+        statusPanel.add(statusLabel);
+        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+        return statusPanel;
+    }
+
+    /**
+     * Helper function to highlight all text when box focused
+     * 
+     * @param component
+     *                      JTextComponent component to attach focus adapter to
+     */
+    public static void attachSelectAllOnFocus(JTextComponent component)
+    {
+
+        component.addFocusListener(new FocusAdapter()
+        {
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                component.selectAll();
+            }
+        });
     }
 }

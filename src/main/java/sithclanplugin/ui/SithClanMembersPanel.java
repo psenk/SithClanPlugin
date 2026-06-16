@@ -30,8 +30,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -75,7 +73,7 @@ import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.util.SithClanConstants;
 import sithclanplugin.util.SithClanUtil;
 
-// reformatted june 15
+// refactored june 16
 
 @Singleton
 public class SithClanMembersPanel extends JPanel
@@ -157,46 +155,23 @@ public class SithClanMembersPanel extends JPanel
         JLabel membersPanelLabel = new JLabel(MEMBERS_PANEL_TITLE);
         membersPanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // panel containing all status labels
-        statusPanel = new JPanel();
-        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+        // status label panel and label
+        statusLabel = SithClanUtil.createStatusLabel();
+        statusPanel = SithClanUtil.createStatusPanel(statusLabel);
 
         // current roster date
-        rosterDateLabel = createStatusLabel(false);
-
-        // status message label
-        statusLabel = createStatusLabel(true);
-
+        rosterDateLabel = SithClanUtil.createStatusLabel();
         statusPanel.add(rosterDateLabel);
-        statusPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        statusPanel.add(statusLabel);
-
-        // panel containing search area and button
-        JPanel membersSearchArea = new JPanel();
-        membersSearchArea.setLayout(new BoxLayout(membersSearchArea, BoxLayout.Y_AXIS));
-        membersSearchArea.setVisible(true);
-        membersSearchArea.setOpaque(true);
-        membersSearchArea.setAlignmentX(Component.CENTER_ALIGNMENT);
+        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
         // search field
         membersSearchTextField = new JTextField();
 
-        // highlights all text when box is focused
-        membersSearchTextField.addFocusListener(new FocusAdapter()
-        {
-            @Override
-            public void focusGained(FocusEvent e)
-            {
-                membersSearchTextField.selectAll();
-            }
-        });
+        // highlights all text when box focused
+        SithClanUtil.attachSelectAllOnFocus(membersSearchTextField);
 
         // search member button
         membersSearchButton = createButton(MEMBERS_SEARCH_BUTTON);
-
-        membersSearchArea.add(membersSearchTextField);
-        membersSearchArea.add(Box.createRigidArea(new Dimension(0, 10)));
-        membersSearchArea.add(membersSearchButton);
 
         // show all members button
         membersShowAllButton = createButton(MEMBERS_SHOW_ALL_BUTTON);
@@ -217,8 +192,9 @@ public class SithClanMembersPanel extends JPanel
         topPanel.add(membersPanelLabel);
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         topPanel.add(statusPanel);
+        topPanel.add(membersSearchTextField);
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        topPanel.add(membersSearchArea);
+        topPanel.add(membersSearchButton);
         topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         topPanel.add(membersShowAllButton);
         topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -239,9 +215,9 @@ public class SithClanMembersPanel extends JPanel
         membersAreaPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         membersAreaScrollPane = new JScrollPane(membersAreaPanel);
-        membersAreaScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
-        membersAreaScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
         membersAreaScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 600));
+        membersAreaScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
+        membersAreaScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // members label and scroll pane
         JPanel bottomPanel = new JPanel();
@@ -270,6 +246,7 @@ public class SithClanMembersPanel extends JPanel
                 {
                     SwingUtilities.invokeLater(() ->
                     {
+                        statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                         statusLabel.setText(BLANK_SEARCH_VALUE);
                         SithClanUtil.statusTimer(statusLabel);
                     });
@@ -288,8 +265,8 @@ public class SithClanMembersPanel extends JPanel
                     // if member does not exist
                     if (members.isEmpty())
                     {
-                        statusLabel.setText(MEMBER_DOES_NOT_EXIST);
                         statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                        statusLabel.setText(MEMBER_DOES_NOT_EXIST);
                         SithClanUtil.statusTimer(statusLabel);
                     } else if (members.size() == 1)
                     {
@@ -558,6 +535,7 @@ public class SithClanMembersPanel extends JPanel
 
                     } else
                     {
+                        statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                         statusLabel.setText(ABOUT_ME_FAILED);
                         SithClanUtil.statusTimer(statusLabel);
                     }
@@ -762,32 +740,6 @@ public class SithClanMembersPanel extends JPanel
      */
 
     /**
-     * Helper function to create status labels
-     * 
-     * @param isErrorLabel
-     *                         boolean if label will contain error statuses
-     * @return JLabel created status label
-     */
-    private JLabel createStatusLabel(boolean isErrorLabel)
-    {
-        JLabel label = new JLabel();
-        label.setVisible(true);
-        label.setHorizontalAlignment(JLabel.CENTER);
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        label.setPreferredSize(SithClanConstants.STATUS_LABEL_DIMENSION);
-        label.setMinimumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
-        label.setMaximumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
-
-        // label will contain error statuses
-        if (isErrorLabel)
-        {
-            label.setForeground(ColorScheme.BRAND_ORANGE);
-        }
-
-        return label;
-    }
-
-    /**
      * Helper method to create buttons
      * 
      * @param buttonText
@@ -848,8 +800,8 @@ public class SithClanMembersPanel extends JPanel
                 // if member does not exist
                 if (member == null)
                 {
-                    statusLabel.setText(MEMBER_DOES_NOT_EXIST);
                     statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                    statusLabel.setText(MEMBER_DOES_NOT_EXIST);
                     SithClanUtil.statusTimer(statusLabel);
                 } else
                 {
@@ -874,6 +826,7 @@ public class SithClanMembersPanel extends JPanel
             {
                 SwingUtilities.invokeLater(() ->
                 {
+                    statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
                     statusLabel.setText(ROSTER_UNOBTAINABLE_WARNING);
                     SithClanUtil.statusTimer(statusLabel);
                 });
