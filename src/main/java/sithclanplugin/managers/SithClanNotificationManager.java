@@ -136,7 +136,7 @@ public class SithClanNotificationManager
 
                     // checks if event has already passed
                     long delay = ChronoUnit.MINUTES.between(ZonedDateTime.now(), localDateTime)
-                            - config.notificationTimeBuffer();
+                            - config.eventAlertTimeBuffer();
 
                     // schedule event
                     if (delay >= 0)

@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import sithclanplugin.SithClanConfig;
 import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanState;
 import sithclanplugin.util.SithClanUtil;
 
 @Slf4j
@@ -58,11 +59,11 @@ public class SithClanAnnouncements
     @Inject
     private Gson gson;
 
-    @Setter
-    private ZonedDateTime announcementsUpdated;
+    @Inject
+    private SithClanState state;
 
     @Setter
-    private boolean isSenateMember = false;
+    private ZonedDateTime announcementsUpdated;
 
     private ArrayList<SithClanAnnouncement> announcementsList;
     private ZonedDateTime lastTimeAnnouncementsFetched;
@@ -98,7 +99,7 @@ public class SithClanAnnouncements
      */
     private String postAnnouncement(String jsonData)
     {
-        return SithClanUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
+        return SithClanUtil.sendPostRequest(httpClient, config.senateApiKey(), jsonData,
                 SithClanConstants.ANNOUNCEMENTS_URI);
     }
 
@@ -114,7 +115,7 @@ public class SithClanAnnouncements
     private String putAnnouncement(String jsonData, int announcementId)
     {
         String uri = SithClanConstants.ANNOUNCEMENTS_URI + "/" + announcementId;
-        return SithClanUtil.sendPutRequest(httpClient, config.apiKey(), jsonData,
+        return SithClanUtil.sendPutRequest(httpClient, config.senateApiKey(), jsonData,
                 uri);
     }
 
@@ -128,7 +129,7 @@ public class SithClanAnnouncements
     private String deleteAnnouncement(int announcementId)
     {
         String uri = SithClanConstants.ANNOUNCEMENTS_URI + "/" + announcementId;
-        return SithClanUtil.sendDeleteRequest(httpClient, config.apiKey(), uri);
+        return SithClanUtil.sendDeleteRequest(httpClient, config.senateApiKey(), uri);
     }
 
     /**
@@ -145,7 +146,7 @@ public class SithClanAnnouncements
     {
         // rate limiting
         if (SithClanUtil.isRateLimited(lastTimeAnnouncementsFetched, ANNOUNCEMENTS_FETCH_COOLDOWN_MINUTES,
-                isSenateMember))
+                state.isSenateMember()))
         {
             log.debug("Announcements fetch skipped: rate limited");
             return SithClanConstants.STATUS_RATE_LIMITED;

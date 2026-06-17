@@ -37,7 +37,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import sithclanplugin.SithClanConfig;
@@ -62,9 +61,6 @@ public class SithClanMemberRoster
 
     @Inject
     private SithClanConfig config;
-
-    @Setter
-    private boolean isSenateMember;
 
     private HashMap<String, SithClanMember> roster;
     private ZonedDateTime dateRosterPosted;
@@ -98,7 +94,7 @@ public class SithClanMemberRoster
      */
     private String postMemberRoster(String jsonData)
     {
-        return SithClanUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
+        return SithClanUtil.sendPostRequest(httpClient, config.senateApiKey(), jsonData,
                 SithClanConstants.MEMBER_ROSTER_URI);
     }
 

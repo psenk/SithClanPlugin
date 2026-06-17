@@ -44,24 +44,25 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.runelite.client.ui.PluginPanel;
 
+// refactored on june 17
+
 @Singleton
 public class SithClanMainPanel extends PluginPanel
 {
-
     @Getter
-    private final SithClanSchedulePanel schedulePanel;
-
-    @Getter
-    private final SithClanSenatePanel senatePanel;
+    private final SithClanAnnouncementsPanel announcementsPanel;
 
     @Getter
     private final SithClanMembersPanel membersPanel;
 
     @Getter
-    private final SithClanAnnouncementsPanel announcementsPanel;
+    private final SithClanSchedulePanel schedulePanel;
 
     @Getter
     private final SithClanEventLogPanel eventLogPanel;
+
+    @Getter
+    private final SithClanSenatePanel senatePanel;
 
     @Getter
     private final JButton senateButton;
@@ -92,15 +93,14 @@ public class SithClanMainPanel extends PluginPanel
     private static final String MAIN_CARD = "main";
 
     @Inject
-    SithClanMainPanel(SithClanSchedulePanel schedulePanel,
-            SithClanSenatePanel senatePanel, SithClanMembersPanel membersPanel,
-            SithClanAnnouncementsPanel announcementsPanel, SithClanEventLogPanel eventLogPanel)
+    SithClanMainPanel(SithClanAnnouncementsPanel announcementsPanel, SithClanSchedulePanel schedulePanel,
+            SithClanMembersPanel membersPanel, SithClanEventLogPanel eventLogPanel, SithClanSenatePanel senatePanel)
     {
+        this.announcementsPanel = announcementsPanel;
         this.schedulePanel = schedulePanel;
         this.membersPanel = membersPanel;
-        this.senatePanel = senatePanel;
-        this.announcementsPanel = announcementsPanel;
         this.eventLogPanel = eventLogPanel;
+        this.senatePanel = senatePanel;
 
         // main panel
         cardLayout = new CardLayout();
@@ -192,7 +192,6 @@ public class SithClanMainPanel extends PluginPanel
         notLoggedInPanel = new JPanel();
         notLoggedInPanel.setLayout(new BoxLayout(notLoggedInPanel, BoxLayout.Y_AXIS));
         JLabel notLoggedInLabel = new JLabel(NOT_LOGGED_IN_MESSAGE);
-        notLoggedInLabel.setSize(PluginPanel.PANEL_WIDTH - 10, Short.MAX_VALUE);
         notLoggedInLabel.setMaximumSize(
                 new Dimension(PluginPanel.PANEL_WIDTH - 10, notLoggedInLabel.getPreferredSize().height));
         notLoggedInPanel.add(notLoggedInLabel);
@@ -201,7 +200,6 @@ public class SithClanMainPanel extends PluginPanel
         notClanMemberPanel = new JPanel();
         notClanMemberPanel.setLayout(new BoxLayout(notClanMemberPanel, BoxLayout.Y_AXIS));
         JLabel notClanMemberLabel = new JLabel(NON_MEMBER_MESSAGE);
-        notClanMemberLabel.setSize(PluginPanel.PANEL_WIDTH - 10, Short.MAX_VALUE);
         notClanMemberLabel.setMaximumSize(
                 new Dimension(PluginPanel.PANEL_WIDTH - 10, notClanMemberLabel.getPreferredSize().height));
         notClanMemberPanel.add(notClanMemberLabel);

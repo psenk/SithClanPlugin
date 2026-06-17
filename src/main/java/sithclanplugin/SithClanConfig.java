@@ -33,7 +33,7 @@ import net.runelite.client.config.Range;
 @ConfigGroup("sithclanplugin")
 public interface SithClanConfig extends Config
 {
-	@ConfigItem(keyName = "eventAlerts", name = "Event Alerts", description = "Enables or disables notifications for upcoming clan events.", position = 1)
+	@ConfigItem(keyName = "eventNotifications", name = "Event Alerts", description = "Enables or disables notifications for upcoming clan events.", position = 1)
 	default boolean eventNotifications()
 	{
 		return false;
@@ -41,13 +41,13 @@ public interface SithClanConfig extends Config
 
 	@Range(min = 1, max = 60)
 	@ConfigItem(keyName = "eventAlertTimeBuffer", name = "Alert Time Buffer", description = "Sets amount of time in minutes before event notification occurs.", position = 2)
-	default int notificationTimeBuffer()
+	default int eventAlertTimeBuffer()
 	{
 		return 15;
 	}
 
 	@ConfigItem(keyName = "memberLookupMenu", name = "Clan Member Lookup", description = "Enables option to lookup clan members in right-click menus.", position = 3)
-	default boolean memberLookup()
+	default boolean memberLookupMenu()
 	{
 		return false;
 	}
@@ -59,7 +59,7 @@ public interface SithClanConfig extends Config
 	}
 
 	@ConfigItem(keyName = "senateApiKey", name = "Senate API Key", description = "API Key for access to Senate member plugin options", position = 5)
-	default String apiKey()
+	default String senateApiKey()
 	{
 		return "".trim();
 	}

@@ -71,6 +71,7 @@ import okhttp3.OkHttpClient;
 import sithclanplugin.members.SithClanMember;
 import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanState;
 import sithclanplugin.util.SithClanUtil;
 
 // refactored june 16
@@ -86,6 +87,9 @@ public class SithClanMembersPanel extends JPanel
 
     @Inject
     private ScheduledExecutorService executor;
+
+    @Inject
+    private SithClanState state;
 
     @Inject
     private SithClanMemberRoster memberRoster;
@@ -105,7 +109,6 @@ public class SithClanMembersPanel extends JPanel
     private final JScrollPane membersAreaScrollPane;
     private final JLabel membersAreaLabel;
 
-    private String playerName = null;
     private ArrayList<SithClanMember> rosterList;
     private int pageIndex;
     private boolean isLoading;
@@ -318,7 +321,7 @@ public class SithClanMembersPanel extends JPanel
             // fetch existing about me
             executor.submit(() ->
             {
-                String existingAboutMe = fetchAboutMe(playerName);
+                String existingAboutMe = fetchAboutMe(state.getPlayerName());
                 SwingUtilities.invokeLater(() ->
                 {
                     String aboutMe = existingAboutMe == null ? "" : existingAboutMe;
@@ -517,7 +520,7 @@ public class SithClanMembersPanel extends JPanel
             String text = membersAboutMeTextArea.getText().trim();
             executor.submit(() ->
             {
-                boolean success = submitAboutMe(playerName, text);
+                boolean success = submitAboutMe(state.getPlayerName(), text);
                 SwingUtilities.invokeLater(() ->
                 {
                     if (success)
@@ -836,17 +839,12 @@ public class SithClanMembersPanel extends JPanel
     }
 
     /**
-     * Set currently logged in players name
-     * TODO: FIX BEFORE LAUNCHING
+     * Set visibility of about me button
      * 
-     * @param name
-     *                 String player username
      */
-    public void setCurrentPlayerName(String name)
+    public void refreshAboutMeButton()
     {
-        // this.playerName = name;
-        this.playerName = "Kyanize";
-        SwingUtilities.invokeLater(() -> membersEditAboutMeButton.setVisible(name != null));
+        SwingUtilities.invokeLater(() -> membersEditAboutMeButton.setVisible(state.getPlayerName() != null));
     }
 
     /**

@@ -74,9 +74,9 @@ import sithclanplugin.dto.StartupResponse;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
 import sithclanplugin.managers.SithClanFileManager;
 import sithclanplugin.managers.SithClanNotificationManager;
-import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.ui.SithClanMainPanel;
 import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanState;
 import sithclanplugin.util.SithClanUtil;
 
 @Slf4j
@@ -114,13 +114,13 @@ public class SithClanPlugin extends Plugin
 	private SithClanConfig config;
 
 	@Inject
+	private SithClanState state;
+
+	@Inject
 	private SithClanAnnouncements announcements;
 
 	@Inject
 	private SithClanEventSchedule eventSchedule;
-
-	@Inject
-	private SithClanMemberRoster memberRoster;
 
 	@Inject
 	private SithClanFileManager fileManager;
@@ -132,9 +132,7 @@ public class SithClanPlugin extends Plugin
 	private Provider<SithClanMainPanel> uiPanel;
 
 	private NavigationButton uiNavigationButton;
-	private boolean isSenateMember = false;
 	private boolean pendingClanCheck = false;
-	private String playerName = null;
 	private net.runelite.api.World quickHopTargetWorld;
 	private int displaySwitcherAttempts = 0;
 
@@ -166,7 +164,7 @@ public class SithClanPlugin extends Plugin
 		clientToolbar.addNavigation(uiNavigationButton);
 
 		// add member lookup option to menu
-		if (config.memberLookup())
+		if (config.memberLookupMenu())
 		{
 			menuManager.addPlayerMenuItem(SITH_LOOKUP);
 		}
@@ -178,7 +176,6 @@ public class SithClanPlugin extends Plugin
 		if (SithClanConstants.BYPASS_CLAN_CHECK)
 		{
 			SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
-			log.error("WE HAVE SHOWN THE MAIN PANEL");
 		}
 
 		// startup loading
@@ -186,18 +183,16 @@ public class SithClanPlugin extends Plugin
 		{
 			// get startup info and parse
 			int status = parseStartupInfo();
+
 			// if fails, load from local file
 			if (status != SithClanConstants.STATUS_OK)
 			{
 				eventSchedule.parseScheduleFromFile();
 			}
 			// validate API key of Senate members
-			if (!config.apiKey().isBlank())
+			if (!config.senateApiKey().isBlank())
 			{
-				isSenateMember = SithClanUtil.validateApiKey(httpClient, config);
-				eventSchedule.setSenateMember(isSenateMember);
-				announcements.setSenateMember(isSenateMember);
-				memberRoster.setSenateMember(isSenateMember);
+				state.setSenateMember(SithClanUtil.validateSenateApiKey(httpClient, config));
 			}
 			SwingUtilities.invokeLater(() ->
 			{
@@ -206,7 +201,7 @@ public class SithClanPlugin extends Plugin
 				// display clan announcements
 				uiPanel.get().getAnnouncementsPanel().displayAnnouncements();
 				// display senate options button if senate
-				uiPanel.get().getSenateButton().setVisible(isSenateMember);
+				uiPanel.get().getSenateButton().setVisible(state.isSenateMember());
 			});
 
 			// allow plugin to work immediately on install
@@ -267,7 +262,7 @@ public class SithClanPlugin extends Plugin
 
 		if (event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
 		{
-			SwingUtilities.invokeLater(() -> uiPanel.get().getMembersPanel().setCurrentPlayerName(null));
+			state.setPlayerName(null);
 		}
 	}
 
@@ -302,12 +297,12 @@ public class SithClanPlugin extends Plugin
 		}
 
 		// get player name logic
-		if (playerName == null)
+		if (state.getPlayerName() == null)
 		{
 			clientThread.invokeLater(() ->
 			{
-				playerName = client.getLocalPlayer().getName();
-				SwingUtilities.invokeLater(() -> uiPanel.get().getMembersPanel().setCurrentPlayerName(playerName));
+				state.setPlayerName(client.getLocalPlayer().getName());
+				SwingUtilities.invokeLater(() -> uiPanel.get().getMembersPanel().refreshAboutMeButton());
 			});
 		}
 
@@ -364,7 +359,7 @@ public class SithClanPlugin extends Plugin
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{
-		if (!config.memberLookup())
+		if (!config.memberLookupMenu())
 		{
 			return;
 		}
@@ -442,13 +437,13 @@ public class SithClanPlugin extends Plugin
 		{
 			executor.submit(() ->
 			{
-				boolean isSenateMember = SithClanUtil.validateApiKey(httpClient, config);
-				SwingUtilities.invokeLater(() -> uiPanel.get().getSenateButton().setVisible(isSenateMember));
+				state.setSenateMember(SithClanUtil.validateSenateApiKey(httpClient, config));
+				SwingUtilities.invokeLater(() -> uiPanel.get().getSenateButton().setVisible(state.isSenateMember()));
 			});
 		}
 
 		// enable/disable event notification checkboxes
-		if (event.getKey().equals("eventAlerts"))
+		if (event.getKey().equals("eventNotifications"))
 		{
 			SwingUtilities.invokeLater(
 					() -> uiPanel.get().getSchedulePanel().setCheckboxesEnabled(config.eventNotifications()));
@@ -457,7 +452,7 @@ public class SithClanPlugin extends Plugin
 		// enable/disable sith lookup menu option
 		if (event.getKey().equals("memberLookupMenu"))
 		{
-			if (config.memberLookup())
+			if (config.memberLookupMenu())
 			{
 				menuManager.addPlayerMenuItem(SITH_LOOKUP);
 			} else

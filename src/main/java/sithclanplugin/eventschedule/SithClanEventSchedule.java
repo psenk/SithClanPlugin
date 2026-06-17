@@ -36,13 +36,13 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Singleton;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import sithclanplugin.SithClanConfig;
 import sithclanplugin.managers.SithClanFileManager;
 import sithclanplugin.managers.SithClanNotificationManager;
 import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanState;
 import sithclanplugin.util.SithClanUtil;
 
 /**
@@ -64,13 +64,13 @@ public class SithClanEventSchedule
     private SithClanConfig config;
 
     @Inject
+    private SithClanState state;
+
+    @Inject
     private SithClanFileManager fileManager;
 
     @Inject
     private SithClanNotificationManager notificationManager;
-
-    @Setter
-    private boolean isSenateMember = false;
 
     private ArrayList<SithClanDaySchedule> schedule;
     private ZonedDateTime lastTimeScheduleFetched;
@@ -106,7 +106,7 @@ public class SithClanEventSchedule
      */
     private String postEventSchedule(String jsonData)
     {
-        return SithClanUtil.sendPostRequest(httpClient, config.apiKey(), jsonData,
+        return SithClanUtil.sendPostRequest(httpClient, config.senateApiKey(), jsonData,
                 SithClanConstants.EVENT_SCHEDULE_URI);
     }
 
@@ -126,7 +126,7 @@ public class SithClanEventSchedule
     {
         // rate limiting
         if (SithClanUtil.isRateLimited(lastTimeScheduleFetched, SCHEDULE_FETCH_COOLDOWN_MINUTES,
-                isSenateMember))
+                state.isSenateMember()))
         {
             log.debug("Schedule fetch skipped: rate limited");
             return SithClanConstants.STATUS_RATE_LIMITED;
