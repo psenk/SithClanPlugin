@@ -64,6 +64,7 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
@@ -76,6 +77,7 @@ import sithclanplugin.util.SithClanUtil;
 
 // refactored june 16
 
+@Slf4j
 @Singleton
 public class SithClanMembersPanel extends JPanel
 {
@@ -101,6 +103,7 @@ public class SithClanMembersPanel extends JPanel
     private final JTextField membersSearchTextField;
     private final JButton membersSearchButton;
     private final JButton membersShowAllButton;
+    private final JButton membersRefreshRosterButton;
     private final JButton membersEditAboutMeButton;
     private final JTextArea membersAboutMeTextArea;
     private final JLabel membersAboutMeCharCount;
@@ -120,8 +123,10 @@ public class SithClanMembersPanel extends JPanel
     private static final String MEMBERS_PANEL_TITLE = "Sith Member Info";
     private static final String MEMBERS_SEARCH_BUTTON = "Search Members";
     private static final String MEMBERS_SHOW_ALL_BUTTON = "Show All Members";
+    private static final String MEMBERS_REFRESH_ROSTER_BUTTON = "Refresh Roster";
     private static final String ABOUT_ME_BUTTON = "Edit My About Me";
     private static final String MEMBERS_AREA_LABEL = "Member(s)";
+    private static final String RATE_LIMITED_WARNING = "The roster has been retrieved too recently. Try again in a few minutes.";
     private static final String ROSTER_UNOBTAINABLE_WARNING = "Unable to obtain roster.";
     private static final String BLANK_SEARCH_VALUE = "Please input a value to search.";
     private static final String MEMBER_DOES_NOT_EXIST = "Member does not exist!";
@@ -179,6 +184,9 @@ public class SithClanMembersPanel extends JPanel
         // show all members button
         membersShowAllButton = createButton(MEMBERS_SHOW_ALL_BUTTON);
 
+        // refresh roster button
+        membersRefreshRosterButton = createButton(MEMBERS_REFRESH_ROSTER_BUTTON);
+
         // edit members about me button
         membersEditAboutMeButton = createButton(ABOUT_ME_BUTTON);
         membersEditAboutMeButton.setVisible(false);
@@ -200,6 +208,8 @@ public class SithClanMembersPanel extends JPanel
         topPanel.add(membersSearchButton);
         topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         topPanel.add(membersShowAllButton);
+        topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        topPanel.add(membersRefreshRosterButton);
         topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         topPanel.add(membersEditAboutMeButton);
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -289,9 +299,6 @@ public class SithClanMembersPanel extends JPanel
         {
             executor.submit(() ->
             {
-                // fetch new roster and about me cache
-                memberRoster.clearRoster();
-                aboutMeCache = null;
                 fetchRosterIfNeeded();
                 fetchAboutMeCacheIfNeeded();
 
@@ -299,6 +306,33 @@ public class SithClanMembersPanel extends JPanel
                 SwingUtilities.invokeLater(() ->
                 {
                     // dismiss about me area if open
+                    membersAboutMePanel.setVisible(false);
+                    membersAreaLabel.setVisible(true);
+                    membersAreaScrollPane.setVisible(true);
+
+                    updateRosterDateLabel(memberRoster.getDateRosterPosted());
+                    displayAllMembers(memberRoster.getRoster().values());
+                });
+            });
+        });
+
+        membersRefreshRosterButton.addActionListener(e ->
+        {
+            executor.submit(() ->
+            {
+                int status = memberRoster.parseRosterFromGet();
+
+                if (status != SithClanConstants.STATUS_OK)
+                {
+                    SwingUtilities.invokeLater(() -> handleRosterStatus(status));
+                    return;
+                }
+
+                aboutMeCache = null;
+                fetchAboutMeCacheIfNeeded();
+
+                SwingUtilities.invokeLater(() ->
+                {
                     membersAboutMePanel.setVisible(false);
                     membersAreaLabel.setVisible(true);
                     membersAreaScrollPane.setVisible(true);
@@ -818,6 +852,7 @@ public class SithClanMembersPanel extends JPanel
 
     /**
      * Fetches roster if not currently saved to memory
+     * Rate limiting 5 minutes
      */
     private void fetchRosterIfNeeded()
     {
@@ -825,14 +860,9 @@ public class SithClanMembersPanel extends JPanel
         {
             int status = memberRoster.parseRosterFromGet();
 
-            if (status == SithClanConstants.STATUS_NOT_FOUND)
+            if (status != SithClanConstants.STATUS_OK)
             {
-                SwingUtilities.invokeLater(() ->
-                {
-                    statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
-                    statusLabel.setText(ROSTER_UNOBTAINABLE_WARNING);
-                    SithClanUtil.statusTimer(statusLabel);
-                });
+                SwingUtilities.invokeLater(() -> handleRosterStatus(status));
                 return;
             }
         }
@@ -896,6 +926,33 @@ public class SithClanMembersPanel extends JPanel
 
         String response = SithClanUtil.sendPutRequest(httpClient, "", jsonBody, uri);
         return response != null;
+    }
+
+    /**
+     * Handle the returned status of the roster
+     * 
+     * @param status
+     *                   int status code
+     */
+    private void handleRosterStatus(int status)
+    {
+        switch (status)
+        {
+            case SithClanConstants.STATUS_RATE_LIMITED:
+                log.warn("Roster fetch rate limited");
+                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                statusLabel.setText(RATE_LIMITED_WARNING);
+                SithClanUtil.statusTimer(statusLabel);
+                break;
+            case SithClanConstants.STATUS_NOT_FOUND:
+                log.error("Roster fetch failed with status: {}", status);
+                statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
+                statusLabel.setText(ROSTER_UNOBTAINABLE_WARNING);
+                SithClanUtil.statusTimer(statusLabel);
+                break;
+            default:
+                break;
+        }
     }
 
     /**

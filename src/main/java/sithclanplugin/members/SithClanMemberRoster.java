@@ -42,6 +42,7 @@ import okhttp3.OkHttpClient;
 import sithclanplugin.SithClanConfig;
 import sithclanplugin.dto.RosterResponse;
 import sithclanplugin.util.SithClanConstants;
+import sithclanplugin.util.SithClanState;
 import sithclanplugin.util.SithClanUtil;
 
 /**
@@ -62,13 +63,20 @@ public class SithClanMemberRoster
     @Inject
     private SithClanConfig config;
 
+    @Inject
+    private SithClanState state;
+
     private HashMap<String, SithClanMember> roster;
     private ZonedDateTime dateRosterPosted;
+    private ZonedDateTime lastTimeRosterFetched;
+
+    private static final int ROSTER_FETCH_COOLDOWN_MINUTES = 5;
 
     public SithClanMemberRoster()
     {
         roster = new HashMap<>();
         dateRosterPosted = null;
+        lastTimeRosterFetched = null;
     }
 
     /**
@@ -104,12 +112,19 @@ public class SithClanMemberRoster
 
     /**
      * Get member roster
-     * Includes rate limiting of 30 mins
+     * Includes rate limiting of 5 mins
      * 
      * @return int SithClanPluginConstants status code value
      */
     public int parseRosterFromGet()
     {
+        // rate limiting
+        if (SithClanUtil.isRateLimited(lastTimeRosterFetched, ROSTER_FETCH_COOLDOWN_MINUTES, state.isSenateMember()))
+        {
+            log.debug("Roster fetch skipped: rate limited");
+            return SithClanConstants.STATUS_RATE_LIMITED;
+        }
+
         log.info("Fetching roster from server..");
         // get fresh member roster
         String jsonRoster = getMemberRoster();
@@ -119,6 +134,7 @@ public class SithClanMemberRoster
         }
         // convert roster to JSON
         this.roster = deserializeRoster(jsonRoster);
+        this.lastTimeRosterFetched = ZonedDateTime.now();
         log.info("Roster loaded successfully");
         return SithClanConstants.STATUS_OK;
     }
@@ -282,14 +298,5 @@ public class SithClanMemberRoster
             }
         }
         return new ArrayList<>(seen);
-    }
-
-    /**
-     * Clears roster
-     */
-    public void clearRoster()
-    {
-        roster = new HashMap<>();
-        dateRosterPosted = null;
     }
 }
