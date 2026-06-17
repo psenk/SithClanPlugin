@@ -43,6 +43,6 @@ import sithclanplugin.members.SithClanMember;
 @AllArgsConstructor
 public class RosterResponse
 {
-    private ArrayList<SithClanMember> roster;
-    private String date;
+    private ArrayList<SithClanMember> responseRoster;
+    private String responseDate;
 }

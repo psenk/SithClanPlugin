@@ -589,9 +589,9 @@ public class SithClanPlugin extends Plugin
 		}
 		log.info("Startup info retrieved successfully, deserializing..");
 		StartupResponse startupResponse = gson.fromJson(jsonStartupInfo, StartupResponse.class);
-		String scheduleJson = gson.toJson(startupResponse.getStartupSchedule());
-		eventSchedule.loadStartupSchedule(startupResponse.getStartupSchedule(), scheduleJson);
-		announcements.loadStartupAnnouncements(startupResponse.getStartupAnnouncements());
+		String scheduleJson = gson.toJson(startupResponse.getResponseSchedule());
+		eventSchedule.loadStartupSchedule(startupResponse.getResponseSchedule(), scheduleJson);
+		announcements.loadStartupAnnouncements(startupResponse.getResponseAnnouncements());
 		log.info("Startup info loaded successfully.");
 		return SithClanConstants.STATUS_OK;
 	}

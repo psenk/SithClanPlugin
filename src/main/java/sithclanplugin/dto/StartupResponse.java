@@ -44,6 +44,6 @@ import sithclanplugin.eventschedule.SithClanDaySchedule;
 @AllArgsConstructor
 public class StartupResponse
 {
-    private ArrayList<SithClanDaySchedule> startupSchedule;
-    private ArrayList<SithClanAnnouncement> startupAnnouncements;
+    private ArrayList<SithClanDaySchedule> responseSchedule;
+    private ArrayList<SithClanAnnouncement> responseAnnouncements;
 }

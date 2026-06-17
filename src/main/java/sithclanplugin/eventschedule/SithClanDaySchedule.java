@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Object for each days schedule
+ * Daily Events Object
  */
 
 @Getter
