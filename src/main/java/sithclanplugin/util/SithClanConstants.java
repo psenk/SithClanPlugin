@@ -34,7 +34,7 @@ import net.runelite.client.ui.PluginPanel;
 public class SithClanConstants
 {
         // testing
-        public static final boolean BYPASS_CLAN_CHECK = true;
+        public static final boolean BYPASS_CLAN_CHECK = false;
 
         // clan info
         public static final String CLAN_NAME = "Sith";

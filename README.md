@@ -1,4 +1,4 @@
-# Sith Clan Plugin v1.1
+# Sith Clan Plugin v1.2.1
 
 A [RuneLite](https://runelite.net/) plugin for members of the Sith clan in Old School Runescape.
 
