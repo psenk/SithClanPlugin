@@ -43,6 +43,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -260,12 +262,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         announcementTextArea.setLineWrap(true);
         announcementTextArea.setWrapStyleWord(true);
         announcementTextArea.setColumns(1);
-        int textAreaWidth = PluginPanel.PANEL_WIDTH - 10;
-        announcementTextArea.setSize(textAreaWidth, Short.MAX_VALUE);
-        int textAreaHeight = announcementTextArea.getPreferredSize().height;
-        announcementTextArea.setPreferredSize(new Dimension(textAreaWidth, textAreaHeight));
-        announcementTextArea.setMaximumSize(new Dimension(textAreaWidth, textAreaHeight));
-        announcementTextArea.setMinimumSize(new Dimension(textAreaWidth, textAreaHeight));
+        lockTextAreaHeight(announcementTextArea);
 
         // row of buttons, edit and delete announcements
         JPanel buttonPanel = new JPanel();
@@ -318,6 +315,38 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
             });
         });
 
+        // allows dynamic resizing of text area
+        announcementTextArea.getDocument().addDocumentListener(new DocumentListener()
+        {
+            @Override
+            public void insertUpdate(DocumentEvent e)
+            {
+                resize();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e)
+            {
+                resize();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e)
+            {
+                resize();
+            }
+
+            private void resize()
+            {
+                SwingUtilities.invokeLater(() ->
+                {
+                    lockTextAreaHeight(announcementTextArea);
+                    singleAnnouncementPanel.revalidate();
+                    singleAnnouncementPanel.repaint();
+                });
+            }
+        });
+
         buttonPanel.add(editAnnouncementButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         buttonPanel.add(deleteAnnouncementButton);
@@ -363,6 +392,23 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     /**
      * MISC FUNCTIONS
      */
+
+    /**
+     * Locks size of text area
+     * 
+     * @param textArea
+     *                     JTextArea to have size locked
+     */
+    private void lockTextAreaHeight(JTextArea textArea)
+    {
+        int textAreaWidth = PluginPanel.PANEL_WIDTH - 10;
+        textArea.setPreferredSize(null);
+        textArea.setSize(textAreaWidth, Short.MAX_VALUE);
+        int textAreaHeight = textArea.getPreferredSize().height;
+        textArea.setPreferredSize(new Dimension(textAreaWidth, textAreaHeight));
+        textArea.setMaximumSize(new Dimension(textAreaWidth, textAreaHeight));
+        textArea.setMinimumSize(new Dimension(textAreaWidth, textAreaHeight));
+    }
 
     /**
      * Handle response status of announcement event
