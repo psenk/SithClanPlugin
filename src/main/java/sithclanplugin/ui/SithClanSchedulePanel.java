@@ -115,6 +115,7 @@ public class SithClanSchedulePanel extends JPanel
     private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
     private static final String NO_UPCOMING_EVENTS = "No upcoming events.";
+    private static final int LABEL_WRAP_WIDTH = PluginPanel.PANEL_WIDTH - 45;
 
     SithClanSchedulePanel()
     {
@@ -497,7 +498,7 @@ public class SithClanSchedulePanel extends JPanel
         });
 
         // event title
-        JLabel eventTitle = new JLabel(wrapLabelText(eventTitleString));
+        JLabel eventTitle = new JLabel(wrapHtml(HtmlEscapers.htmlEscaper().escape(eventTitleString)));
         eventTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventTitle);
 
@@ -520,8 +521,8 @@ public class SithClanSchedulePanel extends JPanel
         // event host (optional info)
         if (event.getEventHost() != null && !event.getEventHost().isBlank())
         {
-            JLabel eventHost = new JLabel(
-                    wrapLabelText("Hosted by: " + SithClanUtil.removeEmojis(event.getEventHost())));
+            JLabel eventHost = new JLabel(wrapHtml(HtmlEscapers.htmlEscaper()
+                    .escape("Hosted by: " + SithClanUtil.removeEmojis(event.getEventHost()))));
             eventHost.setAlignmentX(Component.LEFT_ALIGNMENT);
             singleEvent.add(eventHost);
         }
@@ -582,7 +583,7 @@ public class SithClanSchedulePanel extends JPanel
             // creating link
             String escaped = HtmlEscapers.htmlEscaper().escape(text);
             String withLink = escaped.replaceAll("&lt;#\\d+&gt;", "<a href=''>Discord Channel</a>");
-            JLabel channelLink = new JLabel("<html>" + withLink + "</html>");
+            JLabel channelLink = new JLabel(wrapHtml(withLink));
             channelLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             channelLink.addMouseListener(new MouseAdapter()
             {
@@ -599,7 +600,7 @@ public class SithClanSchedulePanel extends JPanel
             });
             return channelLink;
         }
-        return new JLabel("<html>" + HtmlEscapers.htmlEscaper().escape(text) + "</html>");
+        return new JLabel(wrapHtml(HtmlEscapers.htmlEscaper().escape(text)));
     }
 
     /**
@@ -621,7 +622,7 @@ public class SithClanSchedulePanel extends JPanel
         // create clickable link
         String escaped = HtmlEscapers.htmlEscaper().escape(location);
         String withLink = escaped.replaceAll("W\\d{3}$", "<a href=''>W" + worldId + "</a>");
-        JLabel worldLink = new JLabel("<html>" + withLink + "</html>");
+        JLabel worldLink = new JLabel(wrapHtml(withLink));
         worldLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         worldLink.addMouseListener(new MouseAdapter()
         {
@@ -717,14 +718,14 @@ public class SithClanSchedulePanel extends JPanel
     }
 
     /**
-     * Wraps escaped String in HTML tags
-     * 
-     * @param text
-     *                 String text to wrap
-     * @return String text wrapped in HTML tags
+     * Wraps pre-built HTML in a fixed-width body
+     *
+     * @param html
+     *                 String HTML fragment to wrap
+     * @return String fragment wrapped in width-constrained HTML
      */
-    private String wrapLabelText(String text)
+    private String wrapHtml(String html)
     {
-        return "<html>" + HtmlEscapers.htmlEscaper().escape(text) + "</html>";
+        return "<html><body style='width:" + LABEL_WRAP_WIDTH + "px'>" + html + "</body></html>";
     }
 }
