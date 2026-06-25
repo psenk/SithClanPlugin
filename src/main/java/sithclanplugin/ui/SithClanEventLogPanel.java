@@ -27,30 +27,35 @@ package sithclanplugin.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.RuneLite;
 import net.runelite.client.ui.ColorScheme;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import sithclanplugin.SithClanConfig;
+import sithclanplugin.managers.SithClanFileManager;
 import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.util.SithClanConstants;
 import sithclanplugin.util.SithClanUtil;
@@ -61,6 +66,7 @@ import sithclanplugin.util.SithClanUtil;
 @Singleton
 public class SithClanEventLogPanel extends JPanel
 {
+
     @Inject
     private OkHttpClient httpClient;
 
@@ -72,6 +78,9 @@ public class SithClanEventLogPanel extends JPanel
 
     @Inject
     private SithClanMemberRoster memberRoster;
+
+    @Inject
+    private SithClanFileManager fileManager;
 
     private final JPanel statusPanel;
     private final JLabel statusLabel;
@@ -92,6 +101,14 @@ public class SithClanEventLogPanel extends JPanel
     private static final String ROSTER_ERROR_WARNING = "Unable to load member roster.";
     private static final String TABLE_HEADER = "Name         | Time   | Late"; // spaces intentional
     private static final String NON_MEMBER_WARNING = "The following names were not found in the clan roster:\n";
+    private static final String IMPORT_BUTTON = "Import Latest Event";
+    private static final String IMPORT_OTHER_BUTTON = "Import Other Event";
+    private static final String IMPORT_NO_FILE_WARNING = "No Clan Event Attendance file found.";
+    private static final String IMPORT_READ_ERROR_WARNING = "Failed to read attendance file.";
+    private static final String IMPORT_NO_MEMBERS_WARNING = "No present members found in attendance file.";
+    private static final String SELECT_EVENT_LOG_FILE = "Select Event Log File";
+    private static final String FILE_FILTER_DESCRIPTION = "Text files (*.txt)";
+    private static final String EVENT_LOG_FILE_EXTENSION = "txt";
     private static final int DISCORD_MAX_LENGTH = 2000;
 
     SithClanEventLogPanel()
@@ -121,18 +138,33 @@ public class SithClanEventLogPanel extends JPanel
         // highlights all text when box focused
         SithClanUtil.attachSelectAllOnFocus(eventLogTextArea);
 
+        // import button
+        JButton importButton = new JButton(IMPORT_BUTTON);
+        importButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // import other button
+        JButton importOtherButton = new JButton(IMPORT_OTHER_BUTTON);
+        importOtherButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         // submit button
         JButton submitButton = new JButton(SUBMIT_BUTTON);
         submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        this.add(Box.createRigidArea(new Dimension(0, 10)));
-        this.add(submitButton);
+        // import button action
+        importButton.addActionListener(e -> importLatestEventFile());
+
+        // import other button action
+        importOtherButton.addActionListener(e -> importOtherEventFile());
 
         // submit button action
-        submitButton.addActionListener(e ->
-        {
-            executor.submit(() -> validateEventLog(eventLogTextArea.getText()));
-        });
+        submitButton.addActionListener(e -> executor.submit(() -> validateEventLog(eventLogTextArea.getText())));
+
+        this.add(Box.createRigidArea(new Dimension(0, 10)));
+        this.add(importButton);
+        this.add(Box.createRigidArea(new Dimension(0, 10)));
+        this.add(importOtherButton);
+        this.add(Box.createRigidArea(new Dimension(0, 10)));
+        this.add(submitButton);
     }
 
     /**
@@ -193,6 +225,7 @@ public class SithClanEventLogPanel extends JPanel
         log.info("Event log posted to Discord successfully ({} message(s)).", messages.size());
         SwingUtilities.invokeLater(() ->
         {
+            eventLogTextArea.setText(TEXT_AREA_DEFAULT);
             statusLabel.setText(POST_SUCCESS);
             SithClanUtil.statusTimer(statusLabel);
         });
@@ -469,5 +502,57 @@ public class SithClanEventLogPanel extends JPanel
         statusLabel.setForeground(ColorScheme.BRAND_ORANGE);
         statusLabel.setText(message);
         SithClanUtil.statusTimer(statusLabel);
+    }
+
+    /**
+     * Import the data from the latest Clan Event Attendance file
+     */
+    private void importLatestEventFile()
+    {
+        // read file and save to string
+        String result = fileManager.readLatestAttendanceFile();
+        handleImportResult(result);
+    }
+
+    /**
+     * Import the data from a specific Clan Event Attendance file
+     */
+    private void importOtherEventFile()
+    {
+        // get clan event attendance plugin directory
+        File eventLogDirectory = new File(RuneLite.RUNELITE_DIR, SithClanConstants.CLAN_EVENT_ATTENDANCE_DIR);
+
+        // open file chooser for user, only txt files
+        JFileChooser chooser = new JFileChooser(eventLogDirectory.exists() ? eventLogDirectory : null);
+        chooser.setDialogTitle(SELECT_EVENT_LOG_FILE);
+        chooser.setFileFilter(new FileNameExtensionFilter(FILE_FILTER_DESCRIPTION, EVENT_LOG_FILE_EXTENSION));
+
+        // handle X or cancel
+        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION)
+        {
+            return;
+        }
+
+        // read file and save to string
+        String result = fileManager.readAttendanceFile(chooser.getSelectedFile());
+        handleImportResult(result);
+    }
+
+    /**
+     * Handle result of event log file import
+     * 
+     * @param result
+     *                   String event log to handle
+     */
+    private void handleImportResult(String result)
+    {
+        if (result == null)
+        {
+            showError(IMPORT_NO_FILE_WARNING);
+            return;
+        }
+
+        // add log to text area
+        SwingUtilities.invokeLater(() -> eventLogTextArea.setText(result));
     }
 }
