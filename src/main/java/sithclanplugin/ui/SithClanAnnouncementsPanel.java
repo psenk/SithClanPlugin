@@ -202,14 +202,9 @@ public class SithClanAnnouncementsPanel extends JPanel
                     editorPane.setEditable(false);
                     editorPane.setOpaque(false);
                     editorPane.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                            BorderFactory.createMatteBorder(0, 0, 1, 0,
-                                    ColorScheme.BORDER_COLOR)));
-                    int editorPaneWidth = PluginPanel.PANEL_WIDTH - 10;
-                    editorPane.setSize(editorPaneWidth, Short.MAX_VALUE);
-                    int editorPaneHeight = editorPane.getPreferredSize().height;
-                    editorPane.setPreferredSize(new Dimension(editorPaneWidth, editorPaneHeight));
-                    editorPane.setMaximumSize(new Dimension(editorPaneWidth, editorPaneHeight));
-                    editorPane.setMinimumSize(new Dimension(editorPaneWidth, editorPaneHeight));
+                            BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.BORDER_COLOR)));
+                    editorPane.setSize(PluginPanel.PANEL_WIDTH - 35, Short.MAX_VALUE);
+                    editorPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, editorPane.getPreferredSize().height));
 
                     // open links
                     editorPane.addHyperlinkListener(e ->
@@ -283,10 +278,25 @@ public class SithClanAnnouncementsPanel extends JPanel
             if (matcher.find())
             {
                 String url = matcher.group();
-                result.append("<a href='").append(url).append("'>").append(url).append("</a>");
+                result.append("<a href='").append(url).append("'>").append(breakableUrl(url)).append("</a>");
             }
         }
         result.append("</html>");
         return result.toString();
+    }
+
+    /**
+     * Breaks URLs apart to fit in announcement panel
+     *
+     * @param url
+     *                String raw URL
+     * @return String URL with spaces added to break
+     */
+    private String breakableUrl(String url)
+    {
+        return url.replace("/", "/&#8203;")
+                .replace("?", "?&#8203;")
+                .replace("=", "=&#8203;")
+                .replace("-", "-&#8203;");
     }
 }
