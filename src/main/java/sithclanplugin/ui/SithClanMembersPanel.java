@@ -178,6 +178,11 @@ public class SithClanMembersPanel extends JPanel
         // highlights all text when box focused
         SithClanUtil.attachSelectAllOnFocus(membersSearchTextField);
 
+        // panel for all buttons
+        JPanel buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+
         // search member button
         membersSearchButton = createButton(MEMBERS_SEARCH_BUTTON);
 
@@ -197,6 +202,15 @@ public class SithClanMembersPanel extends JPanel
         membersAboutMePanel = buildEditAboutMePanel();
         membersAboutMePanel.setVisible(false);
 
+        buttonPanel.add(membersSearchButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        buttonPanel.add(membersShowAllButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        buttonPanel.add(membersRefreshRosterButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        buttonPanel.add(membersEditAboutMeButton);
+        buttonContainer.add(buttonPanel);
+
         // contains search area and buttons
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
@@ -205,13 +219,7 @@ public class SithClanMembersPanel extends JPanel
         topPanel.add(statusPanel);
         topPanel.add(membersSearchTextField);
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        topPanel.add(membersSearchButton);
-        topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        topPanel.add(membersShowAllButton);
-        topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        topPanel.add(membersRefreshRosterButton);
-        topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        topPanel.add(membersEditAboutMeButton);
+        topPanel.add(buttonContainer);
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         this.add(topPanel, BorderLayout.NORTH);
@@ -788,7 +796,7 @@ public class SithClanMembersPanel extends JPanel
         JButton button = new JButton(buttonText);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button
-                .setPreferredSize(new Dimension(Short.MAX_VALUE, button.getPreferredSize().height));
+                .setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
         return button;
     }
 
