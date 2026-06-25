@@ -756,6 +756,7 @@ public class SithClanMembersPanel extends JPanel
         aboutMeText.setFont(getFont().deriveFont(Font.ITALIC));
         aboutMeText.setAlignmentX(Component.LEFT_ALIGNMENT);
         aboutMeText.setBorder(BorderFactory.createEmptyBorder(0, 4, 2, 4));
+        aboutMeText.setSize(PluginPanel.PANEL_WIDTH, Short.MAX_VALUE);
 
         aboutMePanel.add(aboutMeText, BorderLayout.CENTER);
 
