@@ -115,7 +115,7 @@ public class SithClanSchedulePanel extends JPanel
     private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
     private static final String NO_UPCOMING_EVENTS = "No upcoming events.";
-    private static final int LABEL_WRAP_WIDTH = PluginPanel.PANEL_WIDTH - 45;
+    private static final int LABEL_WRAP_WIDTH = PluginPanel.PANEL_WIDTH - 95;
 
     SithClanSchedulePanel()
     {
