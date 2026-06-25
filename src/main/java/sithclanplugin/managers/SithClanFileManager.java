@@ -32,6 +32,8 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -46,6 +48,7 @@ import sithclanplugin.util.SithClanConstants;
 @Singleton
 public class SithClanFileManager
 {
+
     @Inject
     private Gson gson;
 
@@ -53,6 +56,8 @@ public class SithClanFileManager
     private final File storedScheduleFile;
     private final File storedSubscriptionsFile;
     private ArrayList<String> cachedSubscriptions = null;
+
+    private static final String EVENT_LOG_FILE_EXTENTION = ".txt";
 
     public SithClanFileManager()
     {
@@ -208,6 +213,71 @@ public class SithClanFileManager
     {
         ArrayList<String> subscriptions = loadSubscriptions();
         return subscriptions.contains(eventTitle);
+    }
+
+    /**
+     * ATTENDANCE FUNCTIONS
+     */
+
+    /**
+     * Read Clan Event Attendance file
+     * 
+     * @param file
+     *                 File event log file to read
+     * @return String assembled event log text
+     */
+    public String readAttendanceFile(File file)
+    {
+        try
+        {
+            // read file as string
+            return Files.readString(file.toPath(), StandardCharsets.UTF_8);
+        } catch (IOException e)
+        {
+            log.error("Failed to read attendance file '{}'", file.getName(), e);
+            return null;
+        }
+    }
+
+    /**
+     * Read most recent Clan Event Attendance file
+     *
+     * @return String file contents, or null on failure
+     */
+    public String readLatestAttendanceFile()
+    {
+        // TODO: CUSTOM ERROR MESSAGES FOR STATUS LABEL
+        // get clan event attendance directory
+        File dir = new File(RuneLite.RUNELITE_DIR, SithClanConstants.CLAN_EVENT_ATTENDANCE_DIR);
+
+        // if directory doesn't exist
+        if (!dir.exists() || !dir.isDirectory())
+        {
+            log.warn("Attendance directory not found: {}", dir.getAbsolutePath());
+            return null;
+        }
+
+        // list all .txt files
+        File[] files = dir.listFiles((d, name) -> name.endsWith(EVENT_LOG_FILE_EXTENTION));
+
+        if (files == null || files.length == 0)
+        {
+            log.warn("No attendance files found in {}", dir.getAbsolutePath());
+            return null;
+        }
+
+        // sort files by latest first
+        File latest = Arrays.stream(files)
+                .max(Comparator.comparingLong(File::lastModified))
+                .orElse(null);
+
+        if (latest == null)
+        {
+            return null;
+        }
+
+        log.info("Reading latest attendance file: {}", latest.getName());
+        return readAttendanceFile(latest);
     }
 
     /**
