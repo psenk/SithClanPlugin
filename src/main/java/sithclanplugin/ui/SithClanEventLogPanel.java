@@ -578,7 +578,7 @@ public class SithClanEventLogPanel extends JPanel
      * @param enabled
      *                    boolean hide or show buttons
      */
-    private void setImportEnabled(boolean enabled)
+    public void setImportEnabled(boolean enabled)
     {
         importButton.setVisible(enabled);
         importOtherButton.setVisible(enabled);
