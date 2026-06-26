@@ -86,6 +86,8 @@ public class SithClanEventLogPanel extends JPanel
     private final JPanel statusPanel;
     private final JLabel statusLabel;
     private final JTextArea eventLogTextArea;
+    private final JButton importButton;
+    private final JButton importOtherButton;
 
     private static final String PANEL_LABEL = "Post Event Log";
     private static final String TEXT_AREA_DEFAULT = "Post Event Log Here";
@@ -145,12 +147,12 @@ public class SithClanEventLogPanel extends JPanel
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
         // import button
-        JButton importButton = new JButton(IMPORT_BUTTON);
+        importButton = new JButton(IMPORT_BUTTON);
         importButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         importButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
         // import other button
-        JButton importOtherButton = new JButton(IMPORT_OTHER_BUTTON);
+        importOtherButton = new JButton(IMPORT_OTHER_BUTTON);
         importOtherButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         importOtherButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
@@ -176,6 +178,9 @@ public class SithClanEventLogPanel extends JPanel
         buttonPanel.add(submitButton);
         buttonContainer.add(buttonPanel);
         this.add(buttonContainer);
+
+        // show/hide import buttons
+        setImportEnabled(config.attendanceImport());
     }
 
     /**
@@ -565,5 +570,17 @@ public class SithClanEventLogPanel extends JPanel
 
         // add log to text area
         SwingUtilities.invokeLater(() -> eventLogTextArea.setText(result));
+    }
+
+    /**
+     * Hide or show import event log buttons based on config
+     * 
+     * @param enabled
+     *                    boolean hide or show buttons
+     */
+    private void setImportEnabled(boolean enabled)
+    {
+        importButton.setVisible(enabled);
+        importOtherButton.setVisible(enabled);
     }
 }
