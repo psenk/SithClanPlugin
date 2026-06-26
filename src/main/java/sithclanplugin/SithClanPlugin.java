@@ -202,6 +202,8 @@ public class SithClanPlugin extends Plugin
 				uiPanel.get().getAnnouncementsPanel().displayAnnouncements();
 				// display senate options button if senate
 				uiPanel.get().getSenateButton().setVisible(state.isSenateMember());
+				// display import buttons if config enabled
+				uiPanel.get().getEventLogPanel().setImportEnabled(config.attendanceImport());
 			});
 
 			// allow plugin to work immediately on install

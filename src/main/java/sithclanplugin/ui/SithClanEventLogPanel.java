@@ -150,11 +150,13 @@ public class SithClanEventLogPanel extends JPanel
         importButton = new JButton(IMPORT_BUTTON);
         importButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         importButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        importButton.setVisible(false);
 
         // import other button
         importOtherButton = new JButton(IMPORT_OTHER_BUTTON);
         importOtherButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         importOtherButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        importOtherButton.setVisible(false);
 
         // submit button
         JButton submitButton = new JButton(SUBMIT_BUTTON);
@@ -178,9 +180,6 @@ public class SithClanEventLogPanel extends JPanel
         buttonPanel.add(submitButton);
         buttonContainer.add(buttonPanel);
         this.add(buttonContainer);
-
-        // show/hide import buttons
-        setImportEnabled(config.attendanceImport());
     }
 
     /**
