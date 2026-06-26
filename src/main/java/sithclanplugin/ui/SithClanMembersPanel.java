@@ -136,14 +136,14 @@ public class SithClanMembersPanel extends JPanel
     private static final String ABOUT_ME_CANCEL = "Cancel";
     private static final String ABOUT_ME_FAILED = "Save failed.  Please try again.";
     private static final String ABOUT_ME_SUCCESSFUL = "About me saved successfully.";
-    private static final String MEMBER_RANK = "Rank: "; // trailing space intentional
+    private static final String MEMBER_RANK = "<u>Rank</u>: "; // trailing space intentional
     private static final String MEMBER_CREDITS = " Imperial Credits"; // leading space intentional
-    private static final String MEMBER_PROMOTED = "Promoted On: "; // trailing space intentional
+    private static final String MEMBER_PROMOTED = "<u>Promoted On</u>: "; // trailing space intentional
     private static final String MEMBER_CREDITS_NEEDED = "Credits until promotion: "; // trailing space intentional
-    private static final String MEMBER_DAYS_NEEDED = "Days until promotion: "; // trailing space intentional
+    private static final String MEMBER_DAYS_NEEDED = "<u>Days until promotion</u>: "; // trailing space intentional
     private static final String MEMBER_NONE_NEEDED = "None! Coming soon..";
-    private static final String MEMBER_JOINED = "Joined: "; // trailing space intentional
-    private static final String MEMBER_ALT = "Alt: "; // trailing space intentional
+    private static final String MEMBER_JOINED = "<u>Joined</u>: "; // trailing space intentional
+    private static final String MEMBER_ALT = "<u>Alt</u>: "; // trailing space intentional
     private static final String MEMBER_UNKNOWN = "Unknown";
     private static final String SENATE_MEMBER = "Senate Member";
 
@@ -681,14 +681,15 @@ public class SithClanMembersPanel extends JPanel
         }
 
         // member rank
-        rightPanel.add(new JLabel(MEMBER_RANK + SithClanConstants.CLAN_RANKS[memberRankInt - 1]));
+        rightPanel
+                .add(new JLabel("<html>" + MEMBER_RANK + SithClanConstants.CLAN_RANKS[memberRankInt - 1] + "</html>"));
 
         // member credits
-        rightPanel.add(new JLabel(memberCreditsInt + MEMBER_CREDITS));
+        rightPanel.add(new JLabel("<html>" + memberCreditsInt + MEMBER_CREDITS + "</html>"));
 
         // member promoted date
-        JLabel memberPromoted = new JLabel(MEMBER_PROMOTED
-                + (memberLastPromotionDate == null ? MEMBER_UNKNOWN : memberLastPromotionDate));
+        JLabel memberPromoted = new JLabel("<html>" + MEMBER_PROMOTED
+                + (memberLastPromotionDate == null ? MEMBER_UNKNOWN : memberLastPromotionDate) + "</html>");
         rightPanel.add(memberPromoted);
 
         // until next promotion
@@ -699,7 +700,7 @@ public class SithClanMembersPanel extends JPanel
             int creditsNeeded = SithClanConstants.CREDITS_TO_PROMOTE[memberRankInt] - memberCreditsInt;
             if (creditsNeeded > 0)
             {
-                rightPanel.add(new JLabel(MEMBER_CREDITS_NEEDED + creditsNeeded));
+                rightPanel.add(new JLabel("<html>" + MEMBER_CREDITS_NEEDED + creditsNeeded + "</html>"));
             } else
             {
                 // between death trooper and sith marauder
@@ -708,7 +709,7 @@ public class SithClanMembersPanel extends JPanel
                     JLabel daysUntilPromotion = null;
                     if (memberLastPromotionDate == null)
                     {
-                        daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + MEMBER_UNKNOWN);
+                        daysUntilPromotion = new JLabel("<html>" + MEMBER_DAYS_NEEDED + MEMBER_UNKNOWN + "</html>");
                     } else
                     {
                         long daysInRank = ChronoUnit.DAYS.between(
@@ -717,28 +718,29 @@ public class SithClanMembersPanel extends JPanel
                         long daysNeeded = SithClanConstants.DAYS_TO_PROMOTE[memberRankInt - 1] - daysInRank;
                         if (daysNeeded <= 0)
                         {
-                            daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + MEMBER_NONE_NEEDED);
+                            daysUntilPromotion = new JLabel(
+                                    "<html>" + MEMBER_DAYS_NEEDED + MEMBER_NONE_NEEDED + "</html>");
                         } else
                         {
-                            daysUntilPromotion = new JLabel(MEMBER_DAYS_NEEDED + daysNeeded);
+                            daysUntilPromotion = new JLabel("<html>" + MEMBER_DAYS_NEEDED + daysNeeded + "</html>");
                         }
                     }
                     rightPanel.add(daysUntilPromotion);
                 } else
                 {
-                    rightPanel.add(new JLabel(MEMBER_CREDITS_NEEDED + MEMBER_NONE_NEEDED));
+                    rightPanel.add(new JLabel("<html>" + MEMBER_CREDITS_NEEDED + MEMBER_NONE_NEEDED + "</html>"));
                 }
             }
         }
 
         // member date joined
-        rightPanel.add(new JLabel(MEMBER_JOINED + member.getMemberDateJoined()));
+        rightPanel.add(new JLabel("<html>" + MEMBER_JOINED + member.getMemberDateJoined() + "</html>"));
 
         // member alt accounts
         String altName = member.getMemberAltName();
         if (altName != null && !altName.isBlank())
         {
-            rightPanel.add(new JLabel(MEMBER_ALT + altName));
+            rightPanel.add(new JLabel("<html>" + MEMBER_ALT + altName + "</html>"));
         }
 
         // member about me section
