@@ -623,6 +623,8 @@ public class SithClanSchedulePanel extends JPanel
         String escaped = HtmlEscapers.htmlEscaper().escape(location);
         String withLink = escaped.replaceAll("W\\d{3}$", "<a href=''>W" + worldId + "</a>");
         JLabel worldLink = new JLabel(wrapHtml(withLink));
+        worldLink
+                .setMaximumSize(new Dimension(worldLink.getPreferredSize().width - 100, worldLink.getPreferredSize().height));
         worldLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         worldLink.addMouseListener(new MouseAdapter()
         {
