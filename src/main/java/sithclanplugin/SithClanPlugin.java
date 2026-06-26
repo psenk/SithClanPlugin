@@ -432,21 +432,18 @@ public class SithClanPlugin extends Plugin
 			return;
 		}
 
-		// enable senate button
-		if (event.getKey().equals("senateApiKey"))
-		{
-			executor.submit(() ->
-			{
-				state.setSenateMember(SithClanUtil.validateSenateApiKey(httpClient, config));
-				SwingUtilities.invokeLater(() -> uiPanel.get().getSenateButton().setVisible(state.isSenateMember()));
-			});
-		}
-
 		// enable/disable event notification checkboxes
 		if (event.getKey().equals("eventNotifications"))
 		{
 			SwingUtilities.invokeLater(
 					() -> uiPanel.get().getSchedulePanel().setCheckboxesEnabled(config.eventNotifications()));
+		}
+
+		// enable/disable clan attendance import option
+		if (event.getKey().equals("attendanceImport"))
+		{
+			SwingUtilities
+					.invokeLater(() -> uiPanel.get().getEventLogPanel().setImportEnabled(config.attendanceImport()));
 		}
 
 		// enable/disable sith lookup menu option
@@ -459,6 +456,16 @@ public class SithClanPlugin extends Plugin
 			{
 				menuManager.removePlayerMenuItem(SITH_LOOKUP);
 			}
+		}
+
+		// enable senate button
+		if (event.getKey().equals("senateApiKey"))
+		{
+			executor.submit(() ->
+			{
+				state.setSenateMember(SithClanUtil.validateSenateApiKey(httpClient, config));
+				SwingUtilities.invokeLater(() -> uiPanel.get().getSenateButton().setVisible(state.isSenateMember()));
+			});
 		}
 	}
 
