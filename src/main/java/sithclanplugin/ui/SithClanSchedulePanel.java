@@ -251,8 +251,6 @@ public class SithClanSchedulePanel extends JPanel
                 noEventsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
                 noEventsLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
                 noEventsLabel.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
-                noEventsLabel.setMinimumSize(
-                        new Dimension(PluginPanel.PANEL_WIDTH - 10, noEventsLabel.getPreferredSize().height));
                 noEventsLabel.setMaximumSize(new Dimension(Short.MAX_VALUE, noEventsLabel.getPreferredSize().height));
                 dailyEvents.add(noEventsLabel);
                 dailyEvents.setMaximumSize(new Dimension(Short.MAX_VALUE, dailyEvents.getPreferredSize().height));
@@ -624,7 +622,8 @@ public class SithClanSchedulePanel extends JPanel
         String withLink = escaped.replaceAll("W\\d{3}$", "<a href=''>W" + worldId + "</a>");
         JLabel worldLink = new JLabel(wrapHtml(withLink));
         worldLink
-                .setMaximumSize(new Dimension(worldLink.getPreferredSize().width - 100, worldLink.getPreferredSize().height));
+                .setMaximumSize(
+                        new Dimension(worldLink.getPreferredSize().width - 100, worldLink.getPreferredSize().height));
         worldLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         worldLink.addMouseListener(new MouseAdapter()
         {

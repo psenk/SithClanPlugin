@@ -130,13 +130,13 @@ public class SithClanMainPanel extends PluginPanel
 
         // card buttons
         JButton scheduleButton = new JButton(SCHEDULE_BUTTON);
-        scheduleButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        scheduleButton.setMaximumSize(new Dimension(Short.MAX_VALUE, scheduleButton.getPreferredSize().height));
         JButton membersButton = new JButton(MEMBERS_BUTTON);
-        membersButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        membersButton.setMaximumSize(new Dimension(Short.MAX_VALUE, membersButton.getPreferredSize().height));
         JButton eventLogButton = new JButton(EVENT_LOG_BUTTON);
-        eventLogButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        eventLogButton.setMaximumSize(new Dimension(Short.MAX_VALUE, eventLogButton.getPreferredSize().height));
         senateButton = new JButton(SENATE_BUTTON);
-        senateButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        senateButton.setMaximumSize(new Dimension(Short.MAX_VALUE, senateButton.getPreferredSize().height));
         senateButton.setVisible(false);
 
         buttonPanel.add(scheduleButton);
@@ -192,16 +192,12 @@ public class SithClanMainPanel extends PluginPanel
         notLoggedInPanel = new JPanel();
         notLoggedInPanel.setLayout(new BoxLayout(notLoggedInPanel, BoxLayout.Y_AXIS));
         JLabel notLoggedInLabel = new JLabel(NOT_LOGGED_IN_MESSAGE);
-        notLoggedInLabel.setMaximumSize(
-                new Dimension(PluginPanel.PANEL_WIDTH - 10, notLoggedInLabel.getPreferredSize().height));
         notLoggedInPanel.add(notLoggedInLabel);
 
         // panel for users not in the clan
         notClanMemberPanel = new JPanel();
         notClanMemberPanel.setLayout(new BoxLayout(notClanMemberPanel, BoxLayout.Y_AXIS));
         JLabel notClanMemberLabel = new JLabel(NON_MEMBER_MESSAGE);
-        notClanMemberLabel.setMaximumSize(
-                new Dimension(PluginPanel.PANEL_WIDTH - 10, notClanMemberLabel.getPreferredSize().height));
         notClanMemberPanel.add(notClanMemberLabel);
 
         // add center state cards into outer panel

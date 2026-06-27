@@ -81,6 +81,7 @@ import sithclanplugin.util.SithClanUtil;
 @Singleton
 public class SithClanMembersPanel extends JPanel
 {
+
     @Inject
     private OkHttpClient httpClient;
 
@@ -117,9 +118,6 @@ public class SithClanMembersPanel extends JPanel
     private boolean isLoading;
     private Map<String, String> aboutMeCache = null;
 
-    private static final int AVATAR_SIZE = 64;
-    private static final int PAGE_SIZE = 6;
-    private static final int ABOUT_ME_LENGTH = 200;
     private static final String MEMBERS_PANEL_TITLE = "Sith Member Info";
     private static final String MEMBERS_SEARCH_BUTTON = "Search Members";
     private static final String MEMBERS_SHOW_ALL_BUTTON = "Show All Members";
@@ -139,13 +137,17 @@ public class SithClanMembersPanel extends JPanel
     private static final String MEMBER_RANK = "<u>Rank</u>: "; // trailing space intentional
     private static final String MEMBER_CREDITS = " Imperial Credits"; // leading space intentional
     private static final String MEMBER_PROMOTED = "<u>Promoted On</u>: "; // trailing space intentional
-    private static final String MEMBER_CREDITS_NEEDED = "Credits until promotion: "; // trailing space intentional
-    private static final String MEMBER_DAYS_NEEDED = "<u>Days until promotion</u>: "; // trailing space intentional
+    private static final String MEMBER_TO_PROMOTE = "<u>To Promote</u>: "; // trailing space intentional
     private static final String MEMBER_NONE_NEEDED = "None! Coming soon..";
     private static final String MEMBER_JOINED = "<u>Joined</u>: "; // trailing space intentional
     private static final String MEMBER_ALT = "<u>Alt</u>: "; // trailing space intentional
     private static final String MEMBER_UNKNOWN = "Unknown";
     private static final String SENATE_MEMBER = "Senate Member";
+    private static final int AVATAR_SIZE = 64;
+    private static final int PAGE_SIZE = 6;
+    private static final int ABOUT_ME_LENGTH = 200;
+    private static final int SCROLL_PANE_HEIGHT = 150;
+    private static final int MEMBERS_AREA_SCROLL_PANE_HEIGHT = 600;
 
     SithClanMembersPanel()
     {
@@ -236,9 +238,10 @@ public class SithClanMembersPanel extends JPanel
         membersAreaPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         membersAreaScrollPane = new JScrollPane(membersAreaPanel);
-        membersAreaScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 600));
+        membersAreaScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, MEMBERS_AREA_SCROLL_PANE_HEIGHT));
         membersAreaScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
         membersAreaScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        membersAreaScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         // members label and scroll pane
         JPanel bottomPanel = new JPanel();
@@ -492,7 +495,7 @@ public class SithClanMembersPanel extends JPanel
         JScrollPane aboutMeScrollPane = new JScrollPane(membersAboutMeTextArea);
         aboutMeScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         aboutMeScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        aboutMeScrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, 150));
+        aboutMeScrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, SCROLL_PANE_HEIGHT));
         aboutMeScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // character count label
@@ -604,7 +607,7 @@ public class SithClanMembersPanel extends JPanel
         editPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         editPanel.add(buttonRow);
 
-        editPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, editPanel.getPreferredSize().height));
+        editPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, editPanel.getPreferredSize().height));
 
         return editPanel;
     }
@@ -623,7 +626,7 @@ public class SithClanMembersPanel extends JPanel
         singleMemberPanel.setLayout(new BoxLayout(singleMemberPanel, BoxLayout.Y_AXIS));
         singleMemberPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR),
-                BorderFactory.createEmptyBorder(4, 1, 4, 1)));
+                BorderFactory.createEmptyBorder(15, 1, 4, 1)));
         singleMemberPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         singleMemberPanel.setOpaque(true);
         singleMemberPanel.setVisible(true);
@@ -645,9 +648,8 @@ public class SithClanMembersPanel extends JPanel
 
         memberAvatar.setLayout(new BorderLayout());
         memberAvatar.setAlignmentY(Component.CENTER_ALIGNMENT);
-        memberAvatar.setPreferredSize(new Dimension(AVATAR_SIZE - 5, 130));
-        memberAvatar.setMaximumSize(new Dimension(AVATAR_SIZE - 5, 130));
-        memberAvatar.setMinimumSize(new Dimension(AVATAR_SIZE - 5, 130));
+        memberAvatar.setPreferredSize(new Dimension(AVATAR_SIZE, AVATAR_SIZE));
+        memberAvatar.setMaximumSize(new Dimension(AVATAR_SIZE, AVATAR_SIZE));
         memberAvatar.setOpaque(false);
 
         JLabel avatar;
@@ -659,7 +661,6 @@ public class SithClanMembersPanel extends JPanel
         {
             avatar = new JLabel(rankIcons[memberRankInt - 1]);
         }
-        avatar.setPreferredSize(new Dimension(AVATAR_SIZE, AVATAR_SIZE));
         memberAvatar.add(avatar, BorderLayout.CENTER);
         memberInfoPanel.add(memberAvatar);
 
@@ -700,7 +701,7 @@ public class SithClanMembersPanel extends JPanel
             int creditsNeeded = SithClanConstants.CREDITS_TO_PROMOTE[memberRankInt] - memberCreditsInt;
             if (creditsNeeded > 0)
             {
-                rightPanel.add(new JLabel("<html>" + MEMBER_CREDITS_NEEDED + creditsNeeded + "</html>"));
+                rightPanel.add(new JLabel("<html>" + MEMBER_TO_PROMOTE + creditsNeeded + " credits</html>"));
             } else
             {
                 // between death trooper and sith marauder
@@ -709,7 +710,7 @@ public class SithClanMembersPanel extends JPanel
                     JLabel daysUntilPromotion = null;
                     if (memberLastPromotionDate == null)
                     {
-                        daysUntilPromotion = new JLabel("<html>" + MEMBER_DAYS_NEEDED + MEMBER_UNKNOWN + "</html>");
+                        daysUntilPromotion = new JLabel("<html>" + MEMBER_TO_PROMOTE + MEMBER_UNKNOWN + "</html>");
                     } else
                     {
                         long daysInRank = ChronoUnit.DAYS.between(
@@ -719,16 +720,16 @@ public class SithClanMembersPanel extends JPanel
                         if (daysNeeded <= 0)
                         {
                             daysUntilPromotion = new JLabel(
-                                    "<html>" + MEMBER_DAYS_NEEDED + MEMBER_NONE_NEEDED + "</html>");
+                                    "<html>" + MEMBER_TO_PROMOTE + MEMBER_NONE_NEEDED + "</html>");
                         } else
                         {
-                            daysUntilPromotion = new JLabel("<html>" + MEMBER_DAYS_NEEDED + daysNeeded + "</html>");
+                            daysUntilPromotion = new JLabel("<html>" + MEMBER_TO_PROMOTE + daysNeeded + " days</html>");
                         }
                     }
                     rightPanel.add(daysUntilPromotion);
                 } else
                 {
-                    rightPanel.add(new JLabel("<html>" + MEMBER_CREDITS_NEEDED + MEMBER_NONE_NEEDED + "</html>"));
+                    rightPanel.add(new JLabel("<html>" + MEMBER_TO_PROMOTE + MEMBER_NONE_NEEDED + "</html>"));
                 }
             }
         }

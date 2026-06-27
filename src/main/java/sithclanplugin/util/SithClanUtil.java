@@ -312,7 +312,6 @@ public class SithClanUtil
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
         statusLabel.setPreferredSize(SithClanConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMinimumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
         statusLabel.setMaximumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
         return statusLabel;
     }

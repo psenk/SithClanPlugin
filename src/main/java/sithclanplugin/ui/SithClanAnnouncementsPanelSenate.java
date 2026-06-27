@@ -64,6 +64,7 @@ import sithclanplugin.util.SithClanUtil;
 @Singleton
 public class SithClanAnnouncementsPanelSenate extends JPanel
 {
+
     @Inject
     private ScheduledExecutorService executor;
 
@@ -88,6 +89,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     private static final String ANNOUNCEMENT_UPDATED = "Announcement Updated.";
     private static final String ANNOUNCEMENT_DELETED = "Announcement Deleted.";
     private static final String ANNOUNCEMENT_ERROR = "Announcement Error.";
+    private static final int SCROLL_PANE_HEIGHT = 300;
 
     SithClanAnnouncementsPanelSenate()
     {
@@ -98,12 +100,10 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
 
         // this panel
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
         // main panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
         // status label panel
         statusLabel = SithClanUtil.createStatusLabel();
@@ -128,12 +128,10 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         // panel displaying all announcements
         announcementsListPanel = new JPanel();
         announcementsListPanel.setLayout(new BoxLayout(announcementsListPanel, BoxLayout.Y_AXIS));
-        announcementsListPanel.setPreferredSize(
-                new Dimension(PluginPanel.PANEL_WIDTH - 10, announcementsListPanel.getPreferredSize().height));
 
         // scroll pane for announcements
         announcementsScrollPane = new JScrollPane(announcementsListPanel);
-        announcementsScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 300));
+        announcementsScrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, SCROLL_PANE_HEIGHT));
         announcementsScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
                 ColorScheme.BORDER_COLOR));
         announcementsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -407,7 +405,6 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         int textAreaHeight = textArea.getPreferredSize().height;
         textArea.setPreferredSize(new Dimension(textAreaWidth, textAreaHeight));
         textArea.setMaximumSize(new Dimension(textAreaWidth, textAreaHeight));
-        textArea.setMinimumSize(new Dimension(textAreaWidth, textAreaHeight));
     }
 
     /**

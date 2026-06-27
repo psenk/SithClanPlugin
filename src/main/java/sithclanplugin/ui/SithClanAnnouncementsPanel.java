@@ -67,6 +67,7 @@ import sithclanplugin.util.SithClanUtil;
 @Singleton
 public class SithClanAnnouncementsPanel extends JPanel
 {
+
     @Inject
     private ScheduledExecutorService executor;
 
@@ -83,6 +84,7 @@ public class SithClanAnnouncementsPanel extends JPanel
     private static final String NO_ANNOUNCEMENTS_LABEL = "No Announcements Currently.";
     private static final String RATE_LIMITED_WARNING = "Announcements have been retrieved too recently. Try again in a few minutes.";
     private static final String ANNOUNCEMENTS_ERROR = "Error obtaining announcements.";
+    private static final int SCROLL_PANE_HEIGHT = 150;
 
     SithClanAnnouncementsPanel()
     {
@@ -116,7 +118,7 @@ public class SithClanAnnouncementsPanel extends JPanel
         announcementsListPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         announcementsScrollPane = new JScrollPane(announcementsListPanel);
-        announcementsScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 10, 150));
+        announcementsScrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, SCROLL_PANE_HEIGHT));
         announcementsScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
                 ColorScheme.BORDER_COLOR));
         announcementsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
