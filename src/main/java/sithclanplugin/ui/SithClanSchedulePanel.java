@@ -52,6 +52,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 
 import com.google.common.html.HtmlEscapers;
 import com.google.inject.Inject;
@@ -78,6 +79,7 @@ import sithclanplugin.util.SithClanUtil;
 @Singleton
 public class SithClanSchedulePanel extends JPanel
 {
+
     @Inject
     private ScheduledExecutorService executor;
 
@@ -115,6 +117,8 @@ public class SithClanSchedulePanel extends JPanel
     private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
     private static final String REPEATED_WEEKLY = "Repeated Weekly";
     private static final String NO_UPCOMING_EVENTS = "No upcoming events.";
+    private static final String EVENT_PASSED = "Event has already started or has passed.";
+    private static final String M_UNTIL_THIS_EVENT = "m until this event.";
     private static final int LABEL_WRAP_WIDTH = PluginPanel.PANEL_WIDTH - 100;
 
     SithClanSchedulePanel()
@@ -468,11 +472,51 @@ public class SithClanSchedulePanel extends JPanel
         JPanel eventContainer = new JPanel();
         eventContainer.setLayout(new BoxLayout(eventContainer, BoxLayout.X_AXIS));
 
+        // for tooltip time until next event
+        final ZonedDateTime[] eventLocalTime =
+        { null };
+
         // container for one event
-        JPanel singleEvent = new JPanel();
+        JPanel singleEvent = new JPanel()
+        {
+            // create tooltip showing time until next event
+            @Override
+            public String getToolTipText(MouseEvent event)
+            {
+                if (eventLocalTime[0] == null)
+                {
+                    return null;
+                }
+
+                ZonedDateTime now = ZonedDateTime.now();
+
+                // event over or ongoing
+                if (!eventLocalTime[0].isAfter(now))
+                {
+                    return EVENT_PASSED;
+                }
+
+                // calc time remaining
+                long minutesUntil = ChronoUnit.MINUTES.between(now, eventLocalTime[0]);
+                long hours = minutesUntil / 60;
+                long minutes = minutesUntil % 60;
+
+                // print time remaining
+                if (hours > 0)
+                {
+                    return hours + "h " + minutes + M_UNTIL_THIS_EVENT;
+                } else
+                {
+                    return minutes + M_UNTIL_THIS_EVENT;
+                }
+            }
+        };
         singleEvent.setLayout(new BoxLayout(singleEvent, BoxLayout.Y_AXIS));
         singleEvent.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+
+        // register tooltip
+        ToolTipManager.sharedInstance().registerComponent(singleEvent);
 
         // checkbox to subscribe to event notifications
         JCheckBox notificationCheckbox = new JCheckBox();
@@ -511,6 +555,7 @@ public class SithClanSchedulePanel extends JPanel
             JLabel eventTime = new JLabel(localTime.format(SithClanConstants.TIME_FORMATTER));
             eventTime.setAlignmentX(Component.LEFT_ALIGNMENT);
             singleEvent.add(eventTime);
+            eventLocalTime[0] = localTime;
         } catch (Exception e)
         {
             log.error("Exception while creating event panel: {}", e.getMessage(), e);
@@ -580,8 +625,10 @@ public class SithClanSchedulePanel extends JPanel
             String channelUrl = SithClanConstants.DISCORD_CHANNEL_URI + channelId;
             // creating link
             String escaped = HtmlEscapers.htmlEscaper().escape(text);
-            String withLink = escaped.replaceAll("&lt;#\\d+&gt;", "<a href=''>Discord Channel</a>");
+            String withLink = escaped.replaceAll("&lt;#\\d+&gt;", "<a href=''>Discord</a>");
             JLabel channelLink = new JLabel(wrapHtml(withLink));
+            channelLink.setPreferredSize(
+                    new Dimension(channelLink.getPreferredSize().width, channelLink.getPreferredSize().height));
             channelLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             channelLink.addMouseListener(new MouseAdapter()
             {
