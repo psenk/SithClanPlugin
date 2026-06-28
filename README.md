@@ -1,46 +1,48 @@
-# Sith Clan Plugin v1.2.1
+# Sith Clan Plugin v1.3
 
 A [RuneLite](https://runelite.net/) plugin for members of the Sith clan in Old School Runescape.
 
-| NOTE: This plugin will only work for members of the Sith clan in-game. |
+| NOTE: This plugin will only work for members of the Sith clan. |
 | --- |
-
 
 ## Features
 
 ### Side Panel Interface
 
-The plugin includes a dedicated side panel that connects users to each of the it's available features using navigation buttons and dropdown interfaces. The panel is accessible via a Sith clan navigation icon on RuneLite's right edge navigation panel.
+The plugin includes a dedicated side panel that connects users to each feature using navigation buttons and dropdown interfaces. The panel is accessible via the Sith clan icon on the RuneLite navigation bar.
 
 ![Sidepanel](./assets/side_panel.png "Side Panel")
 
 ### Clan Announcements
 
-View announcements about ongoing clan events.  Announcements panel is collapsible by clicking on the Clan Announcements label.
+View clan announcements. Panel is collapsible by clicking on the Clan Announcements label.
 
 ![Clan Announcements](./assets/clan_announcements.png "Clan Announcements")
 
 ### Event Schedule
 
-View the clans weekly event schedule and appropriate event information. Event lists can expand or collapse by clicking on the date label.  World links allow quick hopping to the events world. The checkboxes enable or disable an in-game notification for that event, configurable in the plugin settings.
+View the weekly event schedule and event information. The daily event lists can expand or collapse by clicking on the date label.  Click on world links to quick hop. The checkboxes enable or disable an in-game notification before the event starts, configurable in the plugin settings.
 
 ![Event Schedule](./assets/event_schedule.png "Event Schedule")
 
 ### Member Info
 
-View individual clan member information or entire clan roster.  Update users about me section allowing for individual flair.
+View individual clan member information or the entire clan roster.  Update your about me section for individual flair.
 
 ![Member Info](./assets/member_info.png "Member Info")
 
 ### Post Event Log
 
-Post event logs from the plugin that will post directly to the Sith Discord server #event-log channel. The format used should match the Discord Code Block option and default format for the [Clan Event Attendance](https://github.com/JoRouss/runelite-ClanEventAttendance) plugin.
+Post event attendance logs directly to the Sith Discord server. The format used should match the Discord Code Block option and default format for the [Clan Event Attendance](https://github.com/JoRouss/runelite-ClanEventAttendance) plugin.  With the config option enabled, import event logs directly from the Clan Event Attendance plugin.
+
+| NOTE: For the import feature to work, you must have the [Clan Event Attendance](https://github.com/JoRouss/runelite-ClanEventAttendance) plugin installed on RuneLite, with that plugins 'File Save' -> 'Save Locally' setting enabled. |
+| --- |
 
 ![Post Event Log](./assets/event_log.png "Post Event Log")
 
-### Senate (Clan Leadership) Options _(Senate members only)_
+### Senate (Clan Leadership) Options
 
-Features options that allow for managing the Sith clan plugin info. This section is viewable and usable by Senate members only via an assigned API key saved in the plugin settings.
+Only Senate members will have access to these features.  Allows for managing the Sith clan plugin info.
 
 ![Senate Options](./assets/senate_options.png "Senate Options")
 
@@ -49,12 +51,15 @@ Features options that allow for managing the Sith clan plugin info. This section
 Open the RuneLite settings panel by clicking the wrench icon at the top of the right navigation bar and search **Sith Clan Plugin** to access the following options:
 
 | Setting                       | Description                                                        | Default   |
-| ----------------------------- | ------------------------------------------------------------------ | --------- |
+| :---                          | :---                                                               |      ---: |
+| ***Clan Events Section***     | ---                                                                | ---       |
 | Event Alerts                  | Enables or disables notifications for upcoming clan events         | Off       |
 | Alert Time Buffer             | Time to receive notification before an event (in minutes) (1–60)   | 15        |
+| Import Clan Attendance        | Enables or disables importing Clan Event Attendance plugin logs    | Off       |
+| Discord Event Log Webhook URL | The Discord webhook URL used to post event logs                    | *(empty)* |
+| ***Miscellaneous Section***   | ---                                                                | ---       |
 | Clan Member Lookup            | Enables or disables option to lookup clan members via right click  | Off       |
-| Discord Event Log Webhook URL | The Discord webhook URL used to post event logs                    | _(empty)_ |
-| Senate API Key                | API key granting access to Senate member options                   | _(empty)_ |
+| Senate API Key                | API key granting access to Senate member options                   | *(empty)* |
 
 | NOTE: The Discord Webhook URL will need to be obtained from a qualified Sith clan member. |
 | --- |

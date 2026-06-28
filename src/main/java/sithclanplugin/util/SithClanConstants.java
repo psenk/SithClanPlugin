@@ -129,6 +129,7 @@ public class SithClanConstants
         public static final String LOCAL_DIRECTORY_NAME = "sithclanplugin";
         public static final String STORED_SCHEDULE_NAME = "sithclaneventschedule.txt";
         public static final String STORED_SUBSCRIPTIONS_NAME = "sithclannotifiedevents.txt";
+        public static final String CLAN_EVENT_ATTENDANCE_DIR = "clan-event-attendance";
 
         // endpoints
         public static final String URI_PREFIX = "https://sithclanplugin.psenk168.workers.dev";
@@ -155,5 +156,4 @@ public class SithClanConstants
         public static final Dimension STATUS_LABEL_DIMENSION = new Dimension(PluginPanel.PANEL_WIDTH, 20);
         public static final String ARROW_RIGHT_PATH = "/arrow_right.png";
         public static final String ARROW_DOWN_PATH = "/arrow_down.png";
-
 }
