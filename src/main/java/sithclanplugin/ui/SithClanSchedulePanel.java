@@ -279,6 +279,7 @@ public class SithClanSchedulePanel extends JPanel
         // display next event
         updateNextEventDisplay();
 
+        scheduleContainer.setMaximumSize(new Dimension(Short.MAX_VALUE, scheduleContainer.getPreferredSize().height));
         scheduleContainer.revalidate();
         scheduleContainer.repaint();
     }
@@ -441,6 +442,8 @@ public class SithClanSchedulePanel extends JPanel
                 {
                     dateLabel.setIcon(rightArrowIcon);
                 }
+                scheduleContainer
+                        .setMaximumSize(new Dimension(Short.MAX_VALUE, scheduleContainer.getPreferredSize().height));
                 revalidate();
                 repaint();
             }
