@@ -96,13 +96,7 @@ public class SithClanAnnouncementsPanel extends JPanel
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // collapsible panel label
-        JLabel announcementsPanelLabel = new JLabel(ANNOUNCEMENTS_LABEL);
-        announcementsPanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        announcementsPanelLabel.setIcon(downArrowIcon);
-        announcementsPanelLabel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        announcementsPanelLabel.setOpaque(true);
-        announcementsPanelLabel
-                .setMaximumSize(new Dimension(Short.MAX_VALUE, announcementsPanelLabel.getPreferredSize().height));
+        JLabel announcementsPanelLabel = SithClanUtil.createCollapsibleLabel(ANNOUNCEMENTS_LABEL, downArrowIcon);
 
         // collapsible panel
         JPanel collapsiblePanel = new JPanel();

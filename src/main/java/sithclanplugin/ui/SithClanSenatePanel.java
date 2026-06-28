@@ -168,21 +168,21 @@ public class SithClanSenatePanel extends JPanel
      * Create collapsible text area panel
      * 
      * @param labelText
-     *                        String text of collapsible panel label
+     *                           String text of collapsible panel label
      * @param defaultText
-     *                        String default text of text area
+     *                           String default text of text area
      * @param textArea
-     *                        JTextArea text area to put text for posting
+     *                           JTextArea text area to put text for posting
      * @param button
-     *                        JButton button to post text
-     * @param rightIcon
-     *                        Icon right arrow to display collapsed state
-     * @param downIcon
-     *                        Icon down arrow to display expanded state
+     *                           JButton button to post text
+     * @param rightArrowIcon
+     *                           Icon right arrow to display collapsed state
+     * @param downArrowIcon
+     *                           Icon down arrow to display expanded state
      * @return JPanel created collapsible panel
      */
     private JPanel createCollapsiblePanel(String labelText, String defaultText, JTextArea textArea,
-            JButton button, Icon rightIcon, Icon downIcon)
+            JButton button, Icon rightArrowIcon, Icon downArrowIcon)
     {
         // main panel container
         JPanel container = new JPanel();
@@ -199,13 +199,7 @@ public class SithClanSenatePanel extends JPanel
         JScrollPane scrollPane = new JScrollPane(textArea);
 
         // setup label
-        JLabel panelLabel = new JLabel(labelText);
-        panelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panelLabel.setIcon(rightIcon);
-        panelLabel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        panelLabel.setOpaque(true);
-        panelLabel
-                .setMaximumSize(new Dimension(Short.MAX_VALUE, panelLabel.getPreferredSize().height));
+        JLabel panelLabel = SithClanUtil.createCollapsibleLabel(labelText, rightArrowIcon);
 
         // setup main panel
         JPanel collapsiblePanel = new JPanel();
@@ -224,7 +218,7 @@ public class SithClanSenatePanel extends JPanel
                 boolean isVisible = !collapsiblePanel.isVisible();
                 collapsiblePanel.setVisible(isVisible);
                 // change arrow icon
-                panelLabel.setIcon(isVisible ? downIcon : rightIcon);
+                panelLabel.setIcon(isVisible ? downArrowIcon : rightArrowIcon);
                 revalidate();
                 repaint();
             }

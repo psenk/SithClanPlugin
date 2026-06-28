@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -263,6 +264,65 @@ public class SithClanUtil
     }
 
     /**
+     * CREATE FUNCTIONS
+     */
+
+    /**
+     * Helper function to create status message label
+     * 
+     * @return JLabel created status label
+     */
+    public static JLabel createStatusLabel()
+    {
+        JLabel statusLabel = new JLabel();
+        statusLabel.setVisible(true);
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        statusLabel.setPreferredSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        statusLabel.setMaximumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
+        return statusLabel;
+    }
+
+    /**
+     * Helper function to create status message panel
+     * 
+     * @param statusLabel
+     *                        JLabel label containing status messages
+     * @return JPanel created status panel
+     */
+    public static JPanel createStatusPanel(JLabel statusLabel)
+    {
+        // status label panel
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+
+        statusPanel.add(statusLabel);
+        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+        return statusPanel;
+    }
+
+    /**
+     * Creates collapsible label header section
+     * 
+     * @param text
+     *                      String label text
+     * @param startIcon
+     *                      default icon
+     * @return JLabel created label
+     */
+    public static JLabel createCollapsibleLabel(String text, Icon startIcon)
+    {
+        JLabel label = new JLabel(text);
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setIcon(startIcon);
+        label.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        label.setOpaque(true);
+        label.setMaximumSize(new Dimension(Short.MAX_VALUE, label.getPreferredSize().height));
+        return label;
+    }
+
+    /**
      * MISC FUNCTIONS
      */
 
@@ -298,41 +358,6 @@ public class SithClanUtil
 
         timer.setRepeats(false);
         timer.start();
-    }
-
-    /**
-     * Helper function to create status message label
-     * 
-     * @return JLabel created status label
-     */
-    public static JLabel createStatusLabel()
-    {
-        JLabel statusLabel = new JLabel();
-        statusLabel.setVisible(true);
-        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        statusLabel.setPreferredSize(SithClanConstants.STATUS_LABEL_DIMENSION);
-        statusLabel.setMaximumSize(SithClanConstants.STATUS_LABEL_DIMENSION);
-        return statusLabel;
-    }
-
-    /**
-     * Helper function to create status message panel
-     * 
-     * @param statusLabel
-     *                        JLabel label containing status messages
-     * @return JPanel created status panel
-     */
-    public static JPanel createStatusPanel(JLabel statusLabel)
-    {
-        // status label panel
-        JPanel statusPanel = new JPanel();
-        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
-
-        statusPanel.add(statusLabel);
-        statusPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-
-        return statusPanel;
     }
 
     /**

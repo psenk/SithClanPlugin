@@ -110,13 +110,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         statusPanel = SithClanUtil.createStatusPanel(statusLabel);
 
         // announcements interactive label
-        JLabel announcementsPanelLabel = new JLabel(ANNOUNCEMENTS_LABEL);
-        announcementsPanelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        announcementsPanelLabel.setIcon(rightArrowIcon);
-        announcementsPanelLabel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        announcementsPanelLabel.setOpaque(true);
-        announcementsPanelLabel
-                .setMaximumSize(new Dimension(Short.MAX_VALUE, announcementsPanelLabel.getPreferredSize().height));
+        JLabel announcementsPanelLabel = SithClanUtil.createCollapsibleLabel(ANNOUNCEMENTS_LABEL, rightArrowIcon);
 
         // top buttons
         JPanel topButtonPanel = new JPanel();
