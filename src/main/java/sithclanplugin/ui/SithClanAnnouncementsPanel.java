@@ -111,12 +111,8 @@ public class SithClanAnnouncementsPanel extends JPanel
         announcementsListPanel.setLayout(new BoxLayout(announcementsListPanel, BoxLayout.Y_AXIS));
         announcementsListPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        announcementsScrollPane = new JScrollPane(announcementsListPanel);
-        announcementsScrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, SCROLL_PANE_HEIGHT));
-        announcementsScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
-                ColorScheme.BORDER_COLOR));
-        announcementsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        announcementsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        // create scroll pane
+        announcementsScrollPane = SithClanUtil.createScrollPane(announcementsListPanel, SCROLL_PANE_HEIGHT);
 
         // refresh announcements button
         JButton refreshButton = new JButton(REFRESH_ANNOUNCEMENTS);

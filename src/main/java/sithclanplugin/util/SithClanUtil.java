@@ -34,11 +34,13 @@ import java.awt.event.FocusEvent;
 import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.text.JTextComponent;
@@ -308,7 +310,7 @@ public class SithClanUtil
      * @param text
      *                      String label text
      * @param startIcon
-     *                      default icon
+     *                      Icon default icon
      * @return JLabel created label
      */
     public static JLabel createCollapsibleLabel(String text, Icon startIcon)
@@ -320,6 +322,25 @@ public class SithClanUtil
         label.setOpaque(true);
         label.setMaximumSize(new Dimension(Short.MAX_VALUE, label.getPreferredSize().height));
         return label;
+    }
+
+    /**
+     * Creates scroll pane
+     * 
+     * @param content
+     *                    Component swing component contained in the scroll pane
+     * @param height
+     *                    int height of scroll pane
+     * @return JScrollPane created scroll pane
+     */
+    public static JScrollPane createScrollPane(Component content, int height)
+    {
+        JScrollPane scrollPane = new JScrollPane(content);
+        scrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, height));
+        scrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        return scrollPane;
     }
 
     /**

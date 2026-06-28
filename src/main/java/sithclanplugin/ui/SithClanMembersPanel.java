@@ -237,11 +237,8 @@ public class SithClanMembersPanel extends JPanel
         membersAreaPanel.setOpaque(true);
         membersAreaPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        membersAreaScrollPane = new JScrollPane(membersAreaPanel);
-        membersAreaScrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, MEMBERS_AREA_SCROLL_PANE_HEIGHT));
-        membersAreaScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
-        membersAreaScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
-        membersAreaScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        // create scroll pane
+        membersAreaScrollPane = SithClanUtil.createScrollPane(membersAreaPanel, MEMBERS_AREA_SCROLL_PANE_HEIGHT);
 
         // members label and scroll pane
         JPanel bottomPanel = new JPanel();
