@@ -316,23 +316,39 @@ public class SithClanEventLogPanel extends JPanel
 
         for (String line : eventLog)
         {
+            // blank line ends the current table section
+            if (line.isBlank())
+            {
+                inTable = false;
+                continue;
+            }
+
+            // table header line arms inTable
             if (line.trim().startsWith(TABLE_HEADER.trim()))
             {
                 inTable = true;
                 continue;
             }
-            if (!inTable || line.isBlank())
+
+            if (!inTable)
             {
                 continue;
             }
+
+            // closing code fence ends the table
             if (line.trim().equals("```"))
             {
                 break;
             }
 
+            // skip lines that aren't member rows (e.g. "Below Threshold (10:00)", dashes)
+            if (!line.contains("|"))
+            {
+                continue;
+            }
+
             // extract player name
             String memberName = line.substring(0, line.indexOf("|")).trim();
-            // member not in clan
             if (memberRoster.getMemberByName(memberName) == null)
             {
                 nonMembers.add(memberName);
