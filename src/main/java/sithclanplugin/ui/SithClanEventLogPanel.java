@@ -147,21 +147,15 @@ public class SithClanEventLogPanel extends JPanel
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
         // import button
-        importButton = new JButton(IMPORT_BUTTON);
-        importButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        importButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        importButton = createButton(IMPORT_BUTTON);
         importButton.setVisible(false);
 
         // import other button
-        importOtherButton = new JButton(IMPORT_OTHER_BUTTON);
-        importOtherButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        importOtherButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        importOtherButton = createButton(IMPORT_OTHER_BUTTON);
         importOtherButton.setVisible(false);
 
         // submit button
-        JButton submitButton = new JButton(SUBMIT_BUTTON);
-        submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        submitButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        JButton submitButton = createButton(SUBMIT_BUTTON);
 
         // import button action
         importButton.addActionListener(e -> importLatestEventFile());
@@ -581,5 +575,20 @@ public class SithClanEventLogPanel extends JPanel
     {
         importButton.setVisible(enabled);
         importOtherButton.setVisible(enabled);
+    }
+
+    /**
+     * Helper method to create buttons
+     * 
+     * @param buttonText
+     *                       String text to go on button
+     * @return JButton created button
+     */
+    private JButton createButton(String buttonText)
+    {
+        JButton button = new JButton(buttonText);
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setMaximumSize(new Dimension(Short.MAX_VALUE, button.getPreferredSize().height));
+        return button;
     }
 }

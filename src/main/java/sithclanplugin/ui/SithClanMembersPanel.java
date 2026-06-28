@@ -799,8 +799,7 @@ public class SithClanMembersPanel extends JPanel
     {
         JButton button = new JButton(buttonText);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button
-                .setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        button.setMaximumSize(new Dimension(Short.MAX_VALUE, button.getPreferredSize().height));
         return button;
     }
 
