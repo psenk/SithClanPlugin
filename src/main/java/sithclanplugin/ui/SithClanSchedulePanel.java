@@ -423,6 +423,7 @@ public class SithClanSchedulePanel extends JPanel
     private JLabel createDateLabel(String date, JPanel dailyEvents)
     {
         JLabel dateLabel = SithClanUtil.createCollapsibleLabel(date, rightArrowIcon);
+        dateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         dateLabel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, ColorScheme.BORDER_COLOR));
 
         // expand/collapse action
