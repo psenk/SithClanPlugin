@@ -399,4 +399,22 @@ public class SithClanUtil
             }
         });
     }
+
+    /**
+     * Normalize line endings and strip stray carriage returns
+     *
+     * @param text
+     *                 String raw text to normalize
+     * @return String text with clean \n line endings only
+     */
+    public static String normalizeLineEndings(String text)
+    {
+        // collapse CRLF pairs into a single LF
+        String normalized = text.replace("\r\n", "\n");
+
+        // remove remaining CR
+        normalized = normalized.replace("\r", "");
+
+        return normalized;
+    }
 }

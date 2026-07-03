@@ -138,9 +138,6 @@ public class SithClanEventLogPanel extends JPanel
         scrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, scrollPane.getPreferredSize().height));
         this.add(scrollPane);
 
-        // highlights all text when box focused
-        SithClanUtil.attachSelectAllOnFocus(eventLogTextArea);
-
         // panel for all buttons
         JPanel buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JPanel buttonPanel = new JPanel();
@@ -188,6 +185,9 @@ public class SithClanEventLogPanel extends JPanel
      */
     private void validateEventLog(String eventLog)
     {
+        // normalize line breaks to fix spacing
+        eventLog = SithClanUtil.normalizeLineEndings(eventLog);
+
         // check webhook URL configured
         String webhookUrl = config.eventLogWebhook();
         if (webhookUrl == null || webhookUrl.isBlank())
@@ -260,12 +260,12 @@ public class SithClanEventLogPanel extends JPanel
             }
             if (line.startsWith(EVENT_NAME_PREFIX))
             {
-                eventName = line.substring(EVENT_NAME_PREFIX.length()).trim();
+                eventName = line.substring(EVENT_NAME_PREFIX.length()).replace("\r", "").trim();
                 continue;
             }
             if (line.startsWith(EVENT_HOST_PREFIX))
             {
-                eventHost = line.substring(EVENT_HOST_PREFIX.length()).trim();
+                eventHost = line.substring(EVENT_HOST_PREFIX.length()).replace("\r", "").trim();
                 continue;
             }
         }
@@ -385,7 +385,7 @@ public class SithClanEventLogPanel extends JPanel
         if (eventLog.length() <= DISCORD_MAX_LENGTH)
         {
             ArrayList<String> singleMessage = new ArrayList<>();
-            singleMessage.add(eventLog + "\n\n*Sent from Sith Clan RuneLite Plugin, message 1 of 1*");
+            singleMessage.add(eventLog + "\n*Sent from Sith Clan RuneLite Plugin, message 1 of 1*");
             return singleMessage;
         }
 
