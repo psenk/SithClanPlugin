@@ -623,7 +623,8 @@ public class SithClanPlugin extends Plugin
 	 */
 	private void performSithLookup(String target)
 	{
-		String username = Text.removeTags(target).replace("\u00A0", " ");
+		// stripping everything but name
+		String username = Text.removeTags(target).replace("\u00A0", " ").replaceAll("\\s*\\(.*\\)$", "");
 		SwingUtilities.invokeLater(() ->
 		{
 			clientToolbar.openPanel(uiNavigationButton);
