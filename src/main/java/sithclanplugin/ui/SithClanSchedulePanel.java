@@ -35,8 +35,10 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Locale;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -748,6 +750,20 @@ public class SithClanSchedulePanel extends JPanel
         {
             return;
         }
+        try
+        {
+            LocalDate finalDate = LocalDate.parse(inputDay, SithClanConstants.DATE_FORMATTER);
+            if (finalDate.isBefore(LocalDate.now()))
+            {
+                log.warn("Event schedule is expired, last date was: {}", inputDay);
+                scheduleExpiredLabel.setVisible(true);
+            } else
+            {
+                scheduleExpiredLabel.setVisible(false);
+            }
+        } catch (Exception e)
+        {
+            log.error("Exception while checking schedule expiration: {}", e.getMessage(), e);
         try
         {
             LocalDate finalDate = LocalDate.parse(inputDay, SithClanConstants.DATE_FORMATTER);
