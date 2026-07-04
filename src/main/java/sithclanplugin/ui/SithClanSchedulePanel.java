@@ -35,10 +35,8 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
-import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Locale;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -118,7 +116,7 @@ public class SithClanSchedulePanel extends JPanel
     private static final String REFRESH_SCHEDULE_BUTTON = "Refresh Schedule";
     private static final String EXPAND_ALL_BUTTON = "Expand All";
     private static final String COLLAPSE_ALL_BUTTON = "Collapse All";
-    private static final String RATE_LIMITED_WARNING = "<html><center>Please wait and try again in a few minutes.</center></html>";
+    private static final String RATE_LIMITED_WARNING = "<html><center>Try again in a few minutes.</center></html>";
     private static final String SCHEDULE_ERROR = "Unable to obtain schedule.";
     private static final String NO_EVENTS_SCHEDULED_TODAY = "No events scheduled today.";
     private static final String CHECKBOX_TOOLTIP = "Check box to receive notification before event start.";
@@ -750,20 +748,6 @@ public class SithClanSchedulePanel extends JPanel
         {
             return;
         }
-        try
-        {
-            LocalDate finalDate = LocalDate.parse(inputDay, SithClanConstants.DATE_FORMATTER);
-            if (finalDate.isBefore(LocalDate.now()))
-            {
-                log.warn("Event schedule is expired, last date was: {}", inputDay);
-                scheduleExpiredLabel.setVisible(true);
-            } else
-            {
-                scheduleExpiredLabel.setVisible(false);
-            }
-        } catch (Exception e)
-        {
-            log.error("Exception while checking schedule expiration: {}", e.getMessage(), e);
         try
         {
             LocalDate finalDate = LocalDate.parse(inputDay, SithClanConstants.DATE_FORMATTER);
