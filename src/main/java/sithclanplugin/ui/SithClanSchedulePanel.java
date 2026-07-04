@@ -34,8 +34,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -236,7 +238,10 @@ public class SithClanSchedulePanel extends JPanel
             // create panel for each days events
             JPanel dailyEvents = createDailyEventsPanel();
             // create interactable date label to collapse/expand days events
-            JLabel dateLabel = createDateLabel(currentDay, dailyEvents);
+            LocalDate parsedDate = LocalDate.parse(currentDay, SithClanConstants.DATE_FORMATTER);
+            String dayOfWeekName = parsedDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.US);
+            String labelText = currentDay + " - " + dayOfWeekName;
+            JLabel dateLabel = createDateLabel(labelText, dailyEvents);
 
             scheduleContainer.add(dateLabel);
             scheduleContainer.add(dailyEvents);
@@ -700,14 +705,20 @@ public class SithClanSchedulePanel extends JPanel
         {
             return;
         }
-        LocalDate finalDate = LocalDate.parse(inputDay, SithClanConstants.DATE_FORMATTER);
-        if (finalDate.isBefore(LocalDate.now()))
+        try
         {
-            log.warn("Event schedule is expired, last date was: {}", inputDay);
-            scheduleExpiredLabel.setVisible(true);
-        } else
+            LocalDate finalDate = LocalDate.parse(inputDay, SithClanConstants.DATE_FORMATTER);
+            if (finalDate.isBefore(LocalDate.now()))
+            {
+                log.warn("Event schedule is expired, last date was: {}", inputDay);
+                scheduleExpiredLabel.setVisible(true);
+            } else
+            {
+                scheduleExpiredLabel.setVisible(false);
+            }
+        } catch (Exception e)
         {
-            scheduleExpiredLabel.setVisible(false);
+            log.error("Exception while checking schedule expiration: {}", e.getMessage(), e);
         }
     }
 
