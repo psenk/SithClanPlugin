@@ -58,7 +58,7 @@ import sithclanplugin.announcements.SithClanAnnouncements;
 import sithclanplugin.util.SithClanConstants;
 import sithclanplugin.util.SithClanUtil;
 
-// refactored on june 16
+// refactored on july 3
 
 @Slf4j
 @Singleton
@@ -75,11 +75,12 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     private final JLabel statusLabel;
     private final JPanel announcementsListPanel;
     private final JScrollPane announcementsScrollPane;
-    private final JTextArea newAnnouncementTextArea;
+    private final JTextArea createAnnouncementTextArea;
 
     private static final String ANNOUNCEMENTS_LABEL = "Update Announcements";
-    private static final String ADD_NEW_ANNOUNCEMENT = "Add New";
-    private static final String NEW_ANNOUNCEMENT_DEFAULT_TEXT = "Type Announcement Here";
+    private static final String NEW_ANNOUNCEMENT = "Add New";
+    private static final String REFRESH_ANNOUNCEMENTS = "Refresh";
+    private static final String NEW_ANNOUNCEMENT_DEFAULT_TEXT = "Type announcement here";
     private static final String POST_ANNOUNCEMENT_BUTTON = "Post";
     private static final String CANCEL_ANNOUNCEMENT_BUTTON = "Cancel";
     private static final String EDIT_ANNOUNCEMENT_BUTTON = "Edit";
@@ -93,53 +94,57 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
 
     SithClanAnnouncementsPanelSenate()
     {
+        // for dropdown label ui
         final Icon rightArrowIcon = new ImageIcon(
                 ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_RIGHT_PATH));
         final Icon downArrowIcon = new ImageIcon(
                 ImageUtil.loadImageResource(getClass(), SithClanConstants.ARROW_DOWN_PATH));
 
-        // this panel
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // main panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-        // status label panel
+        // shows status and error messages
         statusLabel = SithClanUtil.createStatusLabel();
         statusPanel = SithClanUtil.createStatusPanel(statusLabel);
 
-        // announcements interactive label
+        // announcements dropdown label
         JLabel announcementsPanelLabel = SithClanUtil.createCollapsibleLabel(ANNOUNCEMENTS_LABEL, rightArrowIcon);
 
-        // top buttons
+        // button container
         JPanel topButtonPanel = new JPanel();
-        topButtonPanel.setLayout(new BoxLayout(topButtonPanel, BoxLayout.X_AXIS));
-        JButton addNewButton = new JButton(ADD_NEW_ANNOUNCEMENT);
+        topButtonPanel.setLayout(new BoxLayout(topButtonPanel, BoxLayout.Y_AXIS));
 
-        topButtonPanel.add(addNewButton);
+        JButton newAnnouncementButton = new JButton(NEW_ANNOUNCEMENT);
+        newAnnouncementButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // panel displaying all announcements
+        JButton refreshAnnouncementsButton = new JButton(REFRESH_ANNOUNCEMENTS);
+        refreshAnnouncementsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        topButtonPanel.add(newAnnouncementButton);
+        topButtonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        topButtonPanel.add(refreshAnnouncementsButton);
+
+        // panel and scroll pane to display all announcements
         announcementsListPanel = new JPanel();
         announcementsListPanel.setLayout(new BoxLayout(announcementsListPanel, BoxLayout.Y_AXIS));
-
-        // scroll pane for announcements
         announcementsScrollPane = SithClanUtil.createScrollPane(announcementsListPanel, SCROLL_PANE_HEIGHT);
 
-        // panel for new announcements
-        JPanel newAnnouncementPanel = new JPanel();
-        newAnnouncementPanel.setLayout(new BoxLayout(newAnnouncementPanel, BoxLayout.Y_AXIS));
-        newAnnouncementTextArea = new JTextArea(NEW_ANNOUNCEMENT_DEFAULT_TEXT);
-        newAnnouncementTextArea.setRows(1);
-        newAnnouncementTextArea.setLineWrap(true);
-        newAnnouncementTextArea.setWrapStyleWord(true);
+        // create new announcement panel
+        JPanel createAnnouncementPanel = new JPanel();
+        createAnnouncementPanel.setLayout(new BoxLayout(createAnnouncementPanel, BoxLayout.Y_AXIS));
+        createAnnouncementTextArea = new JTextArea(NEW_ANNOUNCEMENT_DEFAULT_TEXT);
+        createAnnouncementTextArea.setRows(1);
+        createAnnouncementTextArea.setLineWrap(true);
+        createAnnouncementTextArea.setWrapStyleWord(true);
 
         // highlights all text when box focused
-        SithClanUtil.attachSelectAllOnFocus(newAnnouncementTextArea);
+        SithClanUtil.attachSelectAllOnFocus(createAnnouncementTextArea);
 
-        // panel for new announcement buttons
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        // create announcement button panel (post and cancel)
+        JPanel createAnnouncementButtonPanel = new JPanel();
+        createAnnouncementButtonPanel.setLayout(new BoxLayout(createAnnouncementButtonPanel, BoxLayout.X_AXIS));
 
         JButton postAnnouncementButton = new JButton(POST_ANNOUNCEMENT_BUTTON);
         postAnnouncementButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -147,35 +152,34 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         JButton cancelAnnouncementButton = new JButton(CANCEL_ANNOUNCEMENT_BUTTON);
         cancelAnnouncementButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        buttonPanel.add(postAnnouncementButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-        buttonPanel.add(cancelAnnouncementButton);
+        createAnnouncementButtonPanel.add(postAnnouncementButton);
+        createAnnouncementButtonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        createAnnouncementButtonPanel.add(cancelAnnouncementButton);
 
-        newAnnouncementPanel.add(newAnnouncementTextArea);
-        newAnnouncementPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        newAnnouncementPanel.add(buttonPanel);
-        newAnnouncementPanel.setVisible(false);
+        createAnnouncementPanel.add(createAnnouncementTextArea);
+        createAnnouncementPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        createAnnouncementPanel.add(createAnnouncementButtonPanel);
+        createAnnouncementPanel.setVisible(false);
 
-        // setup collapsible panel
+        // setup collapsible panel under dropdown
         JPanel announcementsCollapsiblePanel = new JPanel();
         announcementsCollapsiblePanel.setLayout((new BoxLayout(announcementsCollapsiblePanel, BoxLayout.Y_AXIS)));
         announcementsCollapsiblePanel.add(Box.createRigidArea(new Dimension(0, 10)));
         announcementsCollapsiblePanel.add(statusPanel);
         announcementsCollapsiblePanel.add(topButtonPanel);
         announcementsCollapsiblePanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        announcementsCollapsiblePanel.add(newAnnouncementPanel);
+        announcementsCollapsiblePanel.add(createAnnouncementPanel);
         announcementsCollapsiblePanel.add(Box.createRigidArea(new Dimension(0, 5)));
         announcementsCollapsiblePanel.add(announcementsScrollPane);
         announcementsCollapsiblePanel.setVisible(false);
 
-        // expand/collapse panel
+        // expand/collapse panel action
         announcementsPanelLabel.addMouseListener(new MouseAdapter()
         {
             public void mouseClicked(MouseEvent e)
             {
                 boolean isVisible = !announcementsCollapsiblePanel.isVisible();
                 announcementsCollapsiblePanel.setVisible(isVisible);
-                // change arrow icon
                 announcementsPanelLabel.setIcon(isVisible ? downArrowIcon : rightArrowIcon);
                 if (isVisible)
                 {
@@ -186,34 +190,44 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
             }
         });
 
-        // add new announcement
-        addNewButton.addActionListener(e ->
+        newAnnouncementButton.addActionListener(e ->
         {
-            newAnnouncementPanel.setVisible(true);
+            createAnnouncementPanel.setVisible(true);
             announcementsListPanel.revalidate();
             announcementsListPanel.repaint();
         });
 
-        // post announcement action listener
-        postAnnouncementButton.addActionListener(e ->
+        refreshAnnouncementsButton.addActionListener(e ->
         {
             executor.submit(() ->
             {
-                int status = announcements.parseAnnouncementForPost(newAnnouncementTextArea.getText());
+                int status = announcements.parseAnnouncementsFromGet();
                 SwingUtilities.invokeLater(() ->
                 {
                     handleAnnouncementStatus(status);
                     displayAnnouncements(announcements.getAnnouncementsList());
-                    newAnnouncementPanel.setVisible(false);
                 });
             });
         });
 
-        // cancel announcement action listener
+        postAnnouncementButton.addActionListener(e ->
+        {
+            executor.submit(() ->
+            {
+                int status = announcements.parseAnnouncementForPost(createAnnouncementTextArea.getText());
+                SwingUtilities.invokeLater(() ->
+                {
+                    handleAnnouncementStatus(status);
+                    displayAnnouncements(announcements.getAnnouncementsList());
+                    createAnnouncementPanel.setVisible(false);
+                });
+            });
+        });
+
         cancelAnnouncementButton.addActionListener(e ->
         {
-            newAnnouncementTextArea.setText(NEW_ANNOUNCEMENT_DEFAULT_TEXT);
-            newAnnouncementPanel.setVisible(false);
+            createAnnouncementTextArea.setText(NEW_ANNOUNCEMENT_DEFAULT_TEXT);
+            createAnnouncementPanel.setVisible(false);
             announcementsListPanel.revalidate();
             announcementsListPanel.repaint();
         });
@@ -229,11 +243,11 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
 
     /**
      * Create single announcement panel for display
-     * Allow edit and delete of announcements
+     * Allow edit and deletion of announcements
      * 
      * @param announcement
      *                         SithClanAnnouncement announcement to display
-     * @return JPanel single announcement panel
+     * @return JPanel panel containing single announcement
      */
     private JPanel createSingleAnnouncement(SithClanAnnouncement announcement)
     {
@@ -243,29 +257,33 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
         singleAnnouncementPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
                 ColorScheme.BORDER_COLOR));
 
+        // save announcement text for cancel
+        String originalAnnouncementText = announcement.getAnnouncementText();
+
         // create text area to type announcement
-        JTextArea announcementTextArea = new JTextArea(announcement.getAnnouncementText());
+        JTextArea announcementTextArea = new JTextArea(originalAnnouncementText);
         announcementTextArea.setEditable(false);
         announcementTextArea.setLineWrap(true);
         announcementTextArea.setWrapStyleWord(true);
         announcementTextArea.setColumns(1);
         lockTextAreaHeight(announcementTextArea);
 
-        // row of buttons, edit and delete announcements
+        // button container (edit and delete)
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         JButton editAnnouncementButton = new JButton(EDIT_ANNOUNCEMENT_BUTTON);
         JButton deleteAnnouncementButton = new JButton(DELETE_ANNOUNCEMENT_BUTTON);
 
-        // edit button action
         editAnnouncementButton.addActionListener(e ->
         {
+
             // edit announcement
             if (!announcementTextArea.isEditable())
             {
                 announcementTextArea.setEditable(true);
                 announcementTextArea.requestFocus();
                 editAnnouncementButton.setText(SAVE_ANNOUNCEMENT_BUTTON);
+                deleteAnnouncementButton.setText(CANCEL_ANNOUNCEMENT_BUTTON);
             } else
             {
                 // save announcement
@@ -280,6 +298,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
                             // reset button state, lock text area
                             announcementTextArea.setEditable(false);
                             editAnnouncementButton.setText(EDIT_ANNOUNCEMENT_BUTTON);
+                            deleteAnnouncementButton.setText(DELETE_ANNOUNCEMENT_BUTTON);
                             displayAnnouncements(announcements.getAnnouncementsList());
                         }
                         handleAnnouncementStatus(status);
@@ -288,18 +307,31 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
             }
         });
 
-        // delete button action
         deleteAnnouncementButton.addActionListener(e ->
         {
-            executor.submit(() ->
+            // cancel edit action
+            if (announcementTextArea.isEditable())
             {
-                int status = announcements.parseAnnouncementForDelete(announcement.getAnnouncementId());
-                SwingUtilities.invokeLater(() ->
+                announcementTextArea.setText(originalAnnouncementText);
+                announcementTextArea.setEditable(false);
+                editAnnouncementButton.setText(EDIT_ANNOUNCEMENT_BUTTON);
+                deleteAnnouncementButton.setText(DELETE_ANNOUNCEMENT_BUTTON);
+                lockTextAreaHeight(announcementTextArea);
+                singleAnnouncementPanel.revalidate();
+                singleAnnouncementPanel.repaint();
+            } else
+            {
+                // delete announcement
+                executor.submit(() ->
                 {
-                    handleAnnouncementStatus(status);
-                    displayAnnouncements(announcements.getAnnouncementsList());
+                    int status = announcements.parseAnnouncementForDelete(announcement.getAnnouncementId());
+                    SwingUtilities.invokeLater(() ->
+                    {
+                        handleAnnouncementStatus(status);
+                        displayAnnouncements(announcements.getAnnouncementsList());
+                    });
                 });
-            });
+            }
         });
 
         // allows dynamic resizing of text area
@@ -354,8 +386,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
      * 
      * @param announcements
      *                          ArrayList<SithClanAnnouncement> list of
-     *                          announcements to
-     *                          display
+     *                          announcements to display
      */
     private void displayAnnouncements(ArrayList<SithClanAnnouncement> announcements)
     {
@@ -397,10 +428,10 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     }
 
     /**
-     * Handle response status of announcement event
+     * Handle response of announcement event
      * 
      * @param statusCode
-     *                       int returned status code
+     *                       int response status code
      */
     private void handleAnnouncementStatus(int statusCode)
     {
