@@ -31,6 +31,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -140,6 +141,7 @@ public class SithClanMembersPanel extends JPanel
     private static final String MEMBER_TO_PROMOTE = "<u>To Promote</u>: "; // trailing space intentional
     private static final String MEMBER_NONE_NEEDED = "None! Coming soon..";
     private static final String MEMBER_JOINED = "<u>Joined</u>: "; // trailing space intentional
+    private static final String MEMBER_TIME_IN_CLAN = "<u>Time in clan</u>: "; // trailing space intentional
     private static final String MEMBER_ALT = "<u>Alt</u>: "; // trailing space intentional
     private static final String MEMBER_UNKNOWN = "Unknown";
     private static final String SENATE_MEMBER = "Senate Member";
@@ -148,6 +150,7 @@ public class SithClanMembersPanel extends JPanel
     private static final int ABOUT_ME_LENGTH = 200;
     private static final int SCROLL_PANE_HEIGHT = 150;
     private static final int MEMBERS_AREA_SCROLL_PANE_HEIGHT = 600;
+    private static final int LABEL_WRAP_WIDTH = PluginPanel.PANEL_WIDTH - AVATAR_SIZE - 50;
 
     SithClanMembersPanel()
     {
@@ -680,7 +683,8 @@ public class SithClanMembersPanel extends JPanel
 
         // member rank
         rightPanel
-                .add(new JLabel("<html>" + MEMBER_RANK + SithClanConstants.CLAN_RANKS[memberRankInt - 1] + "</html>"));
+                .add(new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH,
+                        MEMBER_RANK + SithClanConstants.CLAN_RANKS[memberRankInt - 1])));
 
         // member credits
         rightPanel.add(new JLabel("<html>" + memberCreditsInt + MEMBER_CREDITS + "</html>"));
@@ -733,6 +737,9 @@ public class SithClanMembersPanel extends JPanel
 
         // member date joined
         rightPanel.add(new JLabel("<html>" + MEMBER_JOINED + member.getMemberDateJoined() + "</html>"));
+
+        rightPanel.add(new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH,
+                MEMBER_TIME_IN_CLAN + calculateTimeInClan(member.getMemberDateJoined()))));
 
         // member alt accounts
         String altName = member.getMemberAltName();
@@ -989,6 +996,60 @@ public class SithClanMembersPanel extends JPanel
         for (Map.Entry<String, JsonElement> entry : json.entrySet())
         {
             aboutMeCache.put(entry.getKey(), entry.getValue().getAsString());
+        }
+    }
+
+    /**
+     * Calculates how long member has been in clan
+     * 
+     * @param dateJoined
+     *                       String date member joined clan
+     * @return String formatted date string
+     */
+    private String calculateTimeInClan(String dateJoined)
+    {
+        if (dateJoined == null || dateJoined.isBlank())
+        {
+            return MEMBER_UNKNOWN;
+        }
+
+        try
+        {
+            // calc time in clan
+            LocalDate joinedDate = LocalDate.parse(dateJoined, SithClanConstants.SHORT_DATE_FORMATTER);
+            Period timeInClan = Period.between(joinedDate, LocalDate.now());
+
+            int years = timeInClan.getYears();
+            int months = timeInClan.getMonths();
+            int days = timeInClan.getDays();
+
+            // less than month in clan
+            if (years == 0 && months == 0)
+            {
+                return days + (days == 1 ? " day" : " days");
+            }
+
+            StringBuilder timeInClanText = new StringBuilder();
+
+            if (years > 0)
+            {
+                timeInClanText.append(years).append(years == 1 ? " year" : " years");
+            }
+
+            if (months > 0)
+            {
+                if (timeInClanText.length() > 0)
+                {
+                    timeInClanText.append(", ");
+                }
+                timeInClanText.append(months).append(months == 1 ? " month" : " months");
+            }
+
+            return timeInClanText.toString();
+        } catch (Exception e)
+        {
+            log.error("Failed to parse member join date: {}", dateJoined, e);
+            return MEMBER_UNKNOWN;
         }
     }
 }
