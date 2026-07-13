@@ -417,4 +417,16 @@ public class SithClanUtil
 
         return normalized;
     }
+
+    /**
+     * Wraps pre-built HTML in a fixed-width body
+     *
+     * @param html
+     *                 String HTML fragment to wrap
+     * @return String fragment wrapped in width-constrained HTML
+     */
+    public static String wrapLabelWidth(int wrapWidth, String html)
+    {
+        return "<html><body style='width:" + wrapWidth + "px'>" + html + "</body></html>";
+    }
 }

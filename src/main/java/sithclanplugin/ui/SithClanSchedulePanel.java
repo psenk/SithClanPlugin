@@ -585,7 +585,8 @@ public class SithClanSchedulePanel extends JPanel
             notificationManager.scheduleNotifications(eventSchedule.getSchedule());
         });
 
-        JLabel mainEventTitle = new JLabel(wrapHtml(HtmlEscapers.htmlEscaper().escape(eventTitle)));
+        JLabel mainEventTitle = new JLabel(
+                SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, HtmlEscapers.htmlEscaper().escape(eventTitle)));
         mainEventTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(mainEventTitle);
 
@@ -609,7 +610,7 @@ public class SithClanSchedulePanel extends JPanel
         // event host (optional info)
         if (event.getEventHost() != null && !event.getEventHost().isBlank())
         {
-            JLabel eventHost = new JLabel(wrapHtml(HtmlEscapers.htmlEscaper()
+            JLabel eventHost = new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, HtmlEscapers.htmlEscaper()
                     .escape("Hosted by: " + SithClanUtil.removeEmojis(event.getEventHost()))));
             eventHost.setAlignmentX(Component.LEFT_ALIGNMENT);
             singleEvent.add(eventHost);
@@ -670,7 +671,7 @@ public class SithClanSchedulePanel extends JPanel
             // create link
             String escaped = HtmlEscapers.htmlEscaper().escape(text);
             String withLink = escaped.replaceAll("&lt;#\\d+&gt;", "<a href=''>Discord</a>");
-            JLabel channelLink = new JLabel(wrapHtml(withLink));
+            JLabel channelLink = new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, withLink));
             channelLink.setPreferredSize(
                     new Dimension(channelLink.getPreferredSize().width - 80, channelLink.getPreferredSize().height));
             channelLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -689,7 +690,7 @@ public class SithClanSchedulePanel extends JPanel
             });
             return channelLink;
         }
-        return new JLabel(wrapHtml(HtmlEscapers.htmlEscaper().escape(text)));
+        return new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, HtmlEscapers.htmlEscaper().escape(text)));
     }
 
     /**
@@ -711,7 +712,7 @@ public class SithClanSchedulePanel extends JPanel
         // create link
         String escaped = HtmlEscapers.htmlEscaper().escape(location);
         String withLink = escaped.replaceAll("W\\d{3}$", "<a href=''>W" + worldId + "</a>");
-        JLabel worldLink = new JLabel(wrapHtml(withLink));
+        JLabel worldLink = new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, withLink));
         worldLink
                 .setMaximumSize(
                         new Dimension(worldLink.getPreferredSize().width - 100, worldLink.getPreferredSize().height));
@@ -813,17 +814,5 @@ public class SithClanSchedulePanel extends JPanel
             // log.debug("Stopping next event refresh task");
             nextEventRefreshTask.cancel(false);
         }
-    }
-
-    /**
-     * Wraps pre-built HTML in a fixed-width body
-     *
-     * @param html
-     *                 String HTML fragment to wrap
-     * @return String fragment wrapped in width-constrained HTML
-     */
-    private String wrapHtml(String html)
-    {
-        return "<html><body style='width:" + LABEL_WRAP_WIDTH + "px'>" + html + "</body></html>";
     }
 }
