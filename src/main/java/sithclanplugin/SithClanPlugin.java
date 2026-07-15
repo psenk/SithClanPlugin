@@ -26,6 +26,8 @@
 package sithclanplugin;
 
 import java.awt.image.BufferedImage;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
@@ -74,6 +76,8 @@ import sithclanplugin.dto.StartupResponse;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
 import sithclanplugin.managers.SithClanFileManager;
 import sithclanplugin.managers.SithClanNotificationManager;
+import sithclanplugin.members.SithClanMember;
+import sithclanplugin.members.SithClanMemberRoster;
 import sithclanplugin.ui.SithClanMainPanel;
 import sithclanplugin.util.SithClanConstants;
 import sithclanplugin.util.SithClanState;
@@ -123,6 +127,9 @@ public class SithClanPlugin extends Plugin
 
 	@Inject
 	private SithClanEventSchedule eventSchedule;
+
+	@Inject
+	private SithClanMemberRoster memberRoster;
 
 	@Inject
 	private SithClanFileManager fileManager;
@@ -286,17 +293,17 @@ public class SithClanPlugin extends Plugin
 			{
 				pendingClanCheck = false;
 				boolean isInClan = isInClan();
-				// if not in clan hide panels
-				SwingUtilities.invokeLater(() ->
+
+				if (isInClan)
 				{
-					if (isInClan)
-					{
-						uiPanel.get().showMainPanel();
-					} else
-					{
-						uiPanel.get().userNotInClan();
-					}
-				});
+					SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
+					executor.submit(this::checkAnniversaries);
+				}
+				// if not in clan hide panels
+				else
+				{
+					SwingUtilities.invokeLater(() -> uiPanel.get().userNotInClan());
+				}
 			}
 		}
 
@@ -555,6 +562,48 @@ public class SithClanPlugin extends Plugin
 		}
 
 		return clanSettings.getName().equalsIgnoreCase(SithClanConstants.CLAN_NAME);
+	}
+
+	/**
+	 * Checks roster for members with anniversary and posts messages
+	 */
+	private void checkAnniversaries()
+	{
+		memberRoster.parseRosterFromGet();
+
+		LinkedHashMap<SithClanMember, Integer> anniversaryMembers = memberRoster.getMembersWithAnniversary();
+
+		for (Map.Entry<SithClanMember, Integer> entry : anniversaryMembers.entrySet())
+		{
+			postAnniversaryMessage(entry.getKey().getMemberName(), entry.getValue());
+		}
+	}
+
+	/**
+	 * Posts anniversary message to in-game chat
+	 * 
+	 * @param memberName
+	 *                       String members name
+	 * @param years
+	 *                       int year anniversary to celebrate
+	 */
+	private void postAnniversaryMessage(String memberName, int years)
+	{
+		String yearLabel = years == 1 ? " year" : " years";
+		String chatMessage = new ChatMessageBuilder()
+				.append(ChatColorType.HIGHLIGHT)
+				.append(memberName)
+				.append(ChatColorType.NORMAL)
+				.append(" is celebrating their ")
+				.append(ChatColorType.HIGHLIGHT)
+				.append(years + yearLabel)
+				.append(ChatColorType.NORMAL)
+				.append(" anniversary in Sith!").build();
+
+		chatMessageManager.queue(QueuedMessage.builder()
+				.type(ChatMessageType.CONSOLE)
+				.runeLiteFormattedMessage(chatMessage)
+				.build());
 	}
 
 	/**

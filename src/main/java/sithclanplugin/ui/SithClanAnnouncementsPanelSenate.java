@@ -64,7 +64,6 @@ import sithclanplugin.util.SithClanUtil;
 @Singleton
 public class SithClanAnnouncementsPanelSenate extends JPanel
 {
-
     @Inject
     private ScheduledExecutorService executor;
 

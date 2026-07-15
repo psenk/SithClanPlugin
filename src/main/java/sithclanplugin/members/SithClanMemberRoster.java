@@ -25,11 +25,14 @@
 
 package sithclanplugin.members;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
 import com.google.gson.Gson;
@@ -44,6 +47,8 @@ import sithclanplugin.dto.RosterResponse;
 import sithclanplugin.util.SithClanConstants;
 import sithclanplugin.util.SithClanState;
 import sithclanplugin.util.SithClanUtil;
+
+// refactored july 14
 
 /**
  * Member Roster Object
@@ -68,7 +73,7 @@ public class SithClanMemberRoster
 
     private HashMap<String, SithClanMember> roster;
     private ZonedDateTime dateRosterPosted;
-    private ZonedDateTime lastTimeRosterFetched;
+    private ZonedDateTime lastFetchTime;
 
     private static final int ROSTER_FETCH_COOLDOWN_MINUTES = 5;
 
@@ -76,7 +81,7 @@ public class SithClanMemberRoster
     {
         roster = new HashMap<>();
         dateRosterPosted = null;
-        lastTimeRosterFetched = null;
+        lastFetchTime = null;
     }
 
     /**
@@ -84,9 +89,9 @@ public class SithClanMemberRoster
      */
 
     /**
-     * Create and send an HTTP GET request to obtain the event roster
+     * Create and send HTTP GET request for member roster
      * 
-     * @return String member roster in an HTTP response body
+     * @return String HTTP response with member roster
      */
     private String getMemberRoster()
     {
@@ -94,11 +99,11 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Create and send HTTP POST request to post new member roster
+     * Create and send HTTP POST request to post member roster
      * 
      * @param jsonData
-     *                     String JSON member roster in string format
-     * @return String HTTP Response body with status code
+     *                     String JSON member roster as string
+     * @return String HTTP Response with status code
      */
     private String postMemberRoster(String jsonData)
     {
@@ -114,37 +119,37 @@ public class SithClanMemberRoster
      * Get member roster
      * Includes rate limiting of 5 mins
      * 
-     * @return int SithClanPluginConstants status code value
+     * @return int SithClanPluginConstants status code
      */
     public int parseRosterFromGet()
     {
         // rate limiting
-        if (SithClanUtil.isRateLimited(lastTimeRosterFetched, ROSTER_FETCH_COOLDOWN_MINUTES, state.isSenateMember()))
+        if (SithClanUtil.isRateLimited(lastFetchTime, ROSTER_FETCH_COOLDOWN_MINUTES, state.isSenateMember()))
         {
             log.debug("Roster fetch skipped: rate limited");
             return SithClanConstants.STATUS_RATE_LIMITED;
         }
 
-        log.info("Fetching roster from server..");
-        // get fresh member roster
+        log.info("Fetching roster..");
         String jsonRoster = getMemberRoster();
         if (jsonRoster == null)
         {
+            log.error("Error obtaining member roster");
             return SithClanConstants.STATUS_NOT_FOUND;
         }
         // convert roster to JSON
         this.roster = deserializeRoster(jsonRoster);
-        this.lastTimeRosterFetched = ZonedDateTime.now();
+        this.lastFetchTime = ZonedDateTime.now();
         log.info("Roster loaded successfully");
         return SithClanConstants.STATUS_OK;
     }
 
     /**
-     * Take String input and converts to JSON format for posting
+     * Convert String input to JSON format for posting
      * 
      * @param rosterInput
-     *                        String member roster from plugin text box
-     * @return int SithClanPluginConstants status code value
+     *                        String member roster from Senate panel
+     * @return int status code
      */
     public int parseRosterForPost(String rosterInput)
     {
@@ -153,42 +158,41 @@ public class SithClanMemberRoster
             log.warn("Roster post failed: no input");
             return SithClanConstants.STATUS_BAD_INPUT;
         }
-        log.info("Posting member roster to server..");
-        // split input into list of strings
+        log.info("Posting member roster..");
+
         String[] rosterInputList = rosterInput.split("\\r?\\n");
-        // turn list into member roster
-        HashMap<String, SithClanMember> newRoster = new HashMap<>();
+        // convert into member roster
+        HashMap<String, SithClanMember> memberRoster = new HashMap<>();
         try
         {
-            newRoster = convertRoster(rosterInputList);
+            memberRoster = convertRoster(rosterInputList);
         } catch (Exception e)
         {
-            log.warn("Roster conversion failed.");
+            log.warn("Roster conversion failed");
             return SithClanConstants.STATUS_BAD_INPUT;
         }
 
-        if (newRoster == null || newRoster.isEmpty())
+        if (memberRoster == null || memberRoster.isEmpty())
         {
-            log.warn("Roster conversion failed.");
+            log.warn("Roster conversion failed");
             return SithClanConstants.STATUS_BAD_INPUT;
         }
 
-        // convert roster to array for worker
-        Collection<SithClanMember> rosterOutput = newRoster.values();
-
-        // store roster as JSON object
+        // convert to array for CloudFlare worker
+        Collection<SithClanMember> rosterOutput = memberRoster.values();
+        // store as JSON object
         String data = gson.toJson(rosterOutput);
 
-        // post roster
         String response = postMemberRoster(data);
         if (response == null)
         {
+            log.error("Roster post failed");
             return SithClanConstants.STATUS_NOT_FOUND;
         }
         // save roster
-        this.roster = newRoster;
+        this.roster = memberRoster;
         this.dateRosterPosted = ZonedDateTime.now();
-        log.info("Member roster posted successfully.");
+        log.info("Member roster posted successfully");
         return SithClanConstants.STATUS_OK;
     }
 
@@ -197,18 +201,16 @@ public class SithClanMemberRoster
      */
 
     /**
-     * Convert member roster String list into custom object list
+     * Convert member roster input list to SithClanMember HashMap
      * 
      * @param rosterInput
-     *                        member roster in String[] list
-     * @return HashMap<String, SithClanMember> converted member roster
+     *                        String[] member roster list
+     * @return HashMap<String, SithClanMember> member roster map
      */
     private HashMap<String, SithClanMember> convertRoster(String[] rosterInput)
     {
+        HashMap<String, SithClanMember> memberRoster = new HashMap<>();
 
-        HashMap<String, SithClanMember> newRoster = new HashMap<>();
-
-        // iterate through roster list
         for (String member : rosterInput)
         {
             member = member.trim();
@@ -229,21 +231,20 @@ public class SithClanMemberRoster
                     : memberInfo[6]);
 
             // add member to roster
-            newRoster.put(newMember.getMemberName().toLowerCase(), newMember);
+            memberRoster.put(newMember.getMemberName().toLowerCase(), newMember);
             if (newMember.getMemberAltName() != null && !newMember.getMemberAltName().isBlank())
             {
-                newRoster.put(newMember.getMemberAltName().toLowerCase(), newMember);
+                memberRoster.put(newMember.getMemberAltName().toLowerCase(), newMember);
             }
-
         }
-        return newRoster;
+        return memberRoster;
     }
 
     /**
      * Deserialize JSON string to HashMap roster
      * 
      * @param jsonRoster
-     *                       JSON String of member roster
+     *                       String member roster JSON
      * @return HashMap<String, SithClanMember> deserialized member roster
      */
     private HashMap<String, SithClanMember> deserializeRoster(String jsonRoster)
@@ -266,11 +267,11 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Search for member in roster by name
+     * Search for member by name
      * 
      * @param name
      *                 String name of member to search for
-     * @return SithClanMember member searched for or null
+     * @return SithClanMember member or null
      */
     public SithClanMember getMemberByName(String memberName)
     {
@@ -278,11 +279,11 @@ public class SithClanMemberRoster
     }
 
     /**
-     * Returns list of members based on given substring
+     * Returns list of members based onsubstring
      * 
      * @param substring
      *                      String substring to search for
-     * @return ArrayList<SithClanMember> list of members that contain substring
+     * @return ArrayList<SithClanMember> list of members
      */
     public ArrayList<SithClanMember> getMembersBySubstring(String substring)
     {
@@ -298,5 +299,38 @@ public class SithClanMemberRoster
             }
         }
         return new ArrayList<>(seen);
+    }
+
+    /**
+     * Creates map of all members with anniversaries today
+     * 
+     * @return LinkedHashMap map of members and their # year anniversary
+     */
+    public LinkedHashMap<SithClanMember, Integer> getMembersWithAnniversary()
+    {
+        LinkedHashMap<SithClanMember, Integer> anniversaryMembers = new LinkedHashMap<>();
+        LocalDate today = LocalDate.now();
+
+        // removing alts from member list
+        for (SithClanMember member : new LinkedHashSet<>(roster.values()))
+        {
+            try
+            {
+                // calc date
+                LocalDate joinDate = LocalDate.parse(member.getMemberDateJoined(), SithClanConstants.DATE_FORMATTER);
+                int yearsSinceJoined = Period.between(joinDate, today).getYears();
+
+                // if joined date is today
+                if (joinDate.getMonth() == today.getMonth() && joinDate.getDayOfMonth() == today.getDayOfMonth()
+                        && yearsSinceJoined >= 1)
+                {
+                    anniversaryMembers.put(member, yearsSinceJoined);
+                }
+            } catch (Exception e)
+            {
+                log.warn("Failed to parse join date for member: {}", member.getMemberName());
+            }
+        }
+        return anniversaryMembers;
     }
 }
