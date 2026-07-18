@@ -83,7 +83,7 @@ import sithclanplugin.util.SithClanConstants;
 import sithclanplugin.util.SithClanState;
 import sithclanplugin.util.SithClanUtil;
 
-// refactored on june 28
+// refactored on july 28
 
 @Slf4j
 @PluginDescriptor(name = "Sith Clan Plugin", description = "Enable the Sith Clan Plugin")
@@ -148,8 +148,8 @@ public class SithClanPlugin extends Plugin
 	private static final String PLUGIN_ICON_PATH = "/icon.png";
 	private static final String PLUGIN_TOOLTIP = "Sith Clan Plugin";
 	private static final String SITH_LOOKUP = "Sith Lookup";
-	private static final int DISPLAY_SWITCHER_MAX_ATTEMPTS = 3;
 	private static final String QUICK_HOP_MESSAGE = "Quick hopping to World "; // trailing space intentional
+	private static final int DISPLAY_SWITCHER_MAX_ATTEMPTS = 3;
 
 	/**
 	 * RUNELITE FUNCTIONS
@@ -172,16 +172,16 @@ public class SithClanPlugin extends Plugin
 
 		clientToolbar.addNavigation(uiNavigationButton);
 
-		// add member lookup option to menu
+		// sith lookup
 		if (config.memberLookupMenu())
 		{
 			menuManager.addPlayerMenuItem(SITH_LOOKUP);
 		}
 
-		// create plugin directory and config files
+		// create plugin directory and files
 		fileManager.initializeFiles();
 
-		// bypass check for testing
+		// for testing
 		if (SithClanConstants.BYPASS_CLAN_CHECK)
 		{
 			SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
@@ -190,7 +190,6 @@ public class SithClanPlugin extends Plugin
 		// startup loading
 		executor.submit(() ->
 		{
-			// get startup info and parse
 			int status = parseStartupInfo();
 
 			// if fails, load from local file
@@ -198,24 +197,22 @@ public class SithClanPlugin extends Plugin
 			{
 				eventSchedule.parseScheduleFromFile();
 			}
-			// validate API key of Senate members
+
+			// validate Senate API key
 			if (!config.senateApiKey().isBlank())
 			{
 				state.setSenateMember(SithClanUtil.validateSenateApiKey(httpClient, config));
 			}
+
 			SwingUtilities.invokeLater(() ->
 			{
-				// display event schedule
 				uiPanel.get().getSchedulePanel().displaySchedule();
-				// display clan announcements
 				uiPanel.get().getAnnouncementsPanel().displayAnnouncements();
-				// display senate options button if senate
 				uiPanel.get().getSenateButton().setVisible(state.isSenateMember());
-				// display import buttons if config enabled
 				uiPanel.get().getEventLogPanel().setImportEnabled(config.attendanceImport());
 			});
 
-			// allow plugin to work immediately on install
+			// work immediately on plugin install
 			clientThread.invokeLater(() ->
 			{
 				if (client.getGameState() == GameState.LOGGED_IN)
@@ -241,7 +238,7 @@ public class SithClanPlugin extends Plugin
 			});
 		});
 
-		// schedule next event refresh event
+		// schedule next event refresh task
 		uiPanel.get().getSchedulePanel().startNextEventRefresh();
 	}
 
@@ -258,10 +255,10 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Runs whenever game state has been changed
+	 * Runs when game state changes
 	 * 
 	 * @param event
-	 *                  game state event
+	 *                  GameStateChanged state change event
 	 */
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event)
@@ -281,12 +278,12 @@ public class SithClanPlugin extends Plugin
 	 * Runs every game tick
 	 * 
 	 * @param event
-	 *                  GameTick gametick event object
+	 *                  GameTick gametick event
 	 */
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
-		// clan check logic
+		// clan check
 		if (pendingClanCheck)
 		{
 			if (client.getClanSettings() != null)
@@ -298,9 +295,7 @@ public class SithClanPlugin extends Plugin
 				{
 					SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
 					executor.submit(this::checkAnniversaries);
-				}
-				// if not in clan hide panels
-				else
+				} else
 				{
 					SwingUtilities.invokeLater(() -> uiPanel.get().userNotInClan());
 				}
@@ -317,7 +312,7 @@ public class SithClanPlugin extends Plugin
 			});
 		}
 
-		// world hopping logic
+		// world hopping
 		if (quickHopTargetWorld == null)
 		{
 			return;
@@ -340,10 +335,10 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Run whenever players clan channel changes (joined, leaves, kicked)
+	 * Runs whenever clan channel changes
 	 * 
 	 * @param event
-	 *                  ClanChannelChanged event object
+	 *                  ClanChannelChanged channel changed event
 	 */
 	@Subscribe
 	public void onClanChannelChanged(ClanChannelChanged event)
@@ -362,29 +357,28 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Called whenever a menu entry is added to a menu
+	 * Runs whenever a menu entry is added to a menu
 	 * 
 	 * @param event
-	 *                  MenuEntryAdded event
+	 *                  MenuEntryAdded menu added event
 	 */
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{
-		// config check
 		if (!config.memberLookupMenu())
 		{
 			return;
 		}
 
-		// get event metadata
+		// event metadata
 		final String option = event.getOption();
 		final int componentId = event.getActionParam1();
 		final int groupId = WidgetUtil.componentToInterface(componentId);
 
-		// checks to determine if menu being created in appropriate user areas
+		// determine if menu being created in desired user areas
 		if (isValidMenuTarget(groupId, componentId, option))
 		{
-			// create custom menu entry
+			// create menu entry
 			Menu menu = client.getMenu();
 			MenuEntry menuEntry = menu.createMenuEntry(1);
 			menuEntry.setOption(SITH_LOOKUP);
@@ -394,7 +388,7 @@ public class SithClanPlugin extends Plugin
 			menuEntry.onClick(e -> performSithLookup(e.getTarget()));
 		}
 
-		// checks if menu being created on player in-game
+		// is menu created on player
 		if (event.getOption().equals(SITH_LOOKUP) && event.getType() == MenuAction.RUNELITE_PLAYER.getId())
 		{
 			event.getMenuEntry().onClick(e -> performSithLookup(e.getTarget()));
@@ -402,35 +396,35 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Called whenever a config option is changed
+	 * Runs whenever config changes
 	 * 
 	 * @param event
-	 *                  ConfigChanged event
+	 *                  ConfigChanged config change event
 	 */
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		// return if not relevant to plugin
+		// event not relevant to plugin
 		if (!event.getGroup().equals("sithclanplugin"))
 		{
 			return;
 		}
 
-		// enable/disable event notification checkboxes
+		// event notification checkboxes
 		if (event.getKey().equals("eventNotifications"))
 		{
 			SwingUtilities.invokeLater(
 					() -> uiPanel.get().getSchedulePanel().setCheckboxesEnabled(config.eventNotifications()));
 		}
 
-		// enable/disable clan attendance import option
+		// clan attendance import options
 		if (event.getKey().equals("attendanceImport"))
 		{
 			SwingUtilities
 					.invokeLater(() -> uiPanel.get().getEventLogPanel().setImportEnabled(config.attendanceImport()));
 		}
 
-		// enable/disable sith lookup menu option
+		// sith lookup menu option
 		if (event.getKey().equals("memberLookupMenu"))
 		{
 			if (config.memberLookupMenu())
@@ -442,7 +436,7 @@ public class SithClanPlugin extends Plugin
 			}
 		}
 
-		// enable senate button
+		// senate options
 		if (event.getKey().equals("senateApiKey"))
 		{
 			executor.submit(() ->
@@ -454,11 +448,11 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Allow config to be accessible from RL settings panel
+	 * Access config from RL side panel
 	 * 
 	 * @param configManager
-	 *                          ConfigManager configuration manager object
-	 * @return ConfigManager plugin configuration
+	 *                          ConfigManager config manager object
+	 * @return SithClanConfig plugin config object
 	 */
 	@Provides
 	SithClanConfig provideConfig(ConfigManager configManager)
@@ -471,10 +465,10 @@ public class SithClanPlugin extends Plugin
 	 */
 
 	/**
-	 * Entry point to transfer from EDT to client thread
+	 * Transfer from EDT to client thread
 	 * 
 	 * @param worldId
-	 *                    int id of world to hop to
+	 *                    int id of target hop world
 	 */
 	public void hopTo(int worldId)
 	{
@@ -482,10 +476,10 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Find World from list and passes forward to hop
+	 * Find World pass forward to hop
 	 * 
 	 * @param worldId
-	 *                    int id of world to hop to
+	 *                    int id of target hop world
 	 */
 	private void hop(int worldId)
 	{
@@ -506,13 +500,13 @@ public class SithClanPlugin extends Plugin
 	 * Hop to provided world on next gametick
 	 * 
 	 * @param world
-	 *                  World world to hop to in game
+	 *                  World target hop world
 	 */
 	private void hop(World world)
 	{
 		assert client.isClientThread(); // must be run on client thread
 
-		// creating world object
+		// create world object
 		final net.runelite.api.World rsWorld = client.createWorld();
 		rsWorld.setActivity(world.getActivity());
 		rsWorld.setAddress(world.getAddress());
@@ -521,14 +515,14 @@ public class SithClanPlugin extends Plugin
 		rsWorld.setLocation(world.getLocation());
 		rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
 
-		// if logged out can just swap worlds
+		// if logged out just swap worlds
 		if (client.getGameState() == GameState.LOGIN_SCREEN)
 		{
 			client.changeWorld(rsWorld);
 			return;
 		}
 
-		// crafting quick hop chat message
+		// quick hop chat message
 		String chatMessage = new ChatMessageBuilder()
 				.append(ChatColorType.NORMAL)
 				.append(QUICK_HOP_MESSAGE)
@@ -547,9 +541,9 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Check is player in clan
+	 * Check if player in clan
 	 * 
-	 * @return boolean if member in clan
+	 * @return boolean is member in clan
 	 */
 	private boolean isInClan()
 	{
@@ -580,12 +574,12 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Posts anniversary message to in-game chat
+	 * Posts anniversary message to chat
 	 * 
 	 * @param memberName
 	 *                       String members name
 	 * @param years
-	 *                       int year anniversary to celebrate
+	 *                       int num years to celebrate
 	 */
 	private void postAnniversaryMessage(String memberName, int years)
 	{
@@ -607,7 +601,7 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Parse schedule and announcements on plugin startup
+	 * Parse schedule and announcements on startup
 	 * 
 	 * @return int status code
 	 */
@@ -630,7 +624,7 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * If menu entry was added in a valid player-relayed UI target for Sith Lookup
+	 * If entry added in valid player UI target for Sith Lookup
 	 * 
 	 * @param groupId
 	 *                        int interface group of target component
@@ -665,7 +659,7 @@ public class SithClanPlugin extends Plugin
 	}
 
 	/**
-	 * Search member in member panel
+	 * Search member in plugin member panel
 	 * 
 	 * @param target
 	 *                   String raw target string
