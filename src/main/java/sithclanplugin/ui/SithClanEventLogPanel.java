@@ -107,8 +107,6 @@ public class SithClanEventLogPanel extends JPanel
     private static final String IMPORT_BUTTON = "Import Latest Event";
     private static final String IMPORT_OTHER_BUTTON = "Import Other Event";
     private static final String IMPORT_NO_FILE_WARNING = "No Clan Event Attendance file found.";
-    private static final String IMPORT_READ_ERROR_WARNING = "Failed to read attendance file.";
-    private static final String IMPORT_NO_MEMBERS_WARNING = "No present members found in attendance file.";
     private static final String SELECT_EVENT_LOG_FILE = "Select Event Log File";
     private static final String FILE_FILTER_DESCRIPTION = "Text files (*.txt)";
     private static final String EVENT_LOG_FILE_EXTENSION = "txt";
