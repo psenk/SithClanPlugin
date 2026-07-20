@@ -86,7 +86,7 @@ public class SithClanAnnouncementsPanelSenate extends JPanel
     private static final String SAVE_ANNOUNCEMENT_BUTTON = "Save";
     private static final String DELETE_ANNOUNCEMENT_BUTTON = "Delete";
     private static final String ANNOUNCEMENT_POSTED = "Announcement Posted.";
-    private static final String ANNOUNCEMENT_UPDATED = "Announcement Updated.";
+    private static final String ANNOUNCEMENT_UPDATED = "Announcement(s) Updated.";
     private static final String ANNOUNCEMENT_DELETED = "Announcement Deleted.";
     private static final String ANNOUNCEMENT_ERROR = "Announcement Error.";
     private static final int SCROLL_PANE_HEIGHT = 300;
