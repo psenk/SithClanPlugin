@@ -33,6 +33,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -44,6 +46,8 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.text.JTextComponent;
+
+import com.google.common.html.HtmlEscapers;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
@@ -428,5 +432,34 @@ public class SithClanUtil
     public static String wrapLabelWidth(int wrapWidth, String html)
     {
         return "<html><body style='width:" + wrapWidth + "px'>" + html + "</body></html>";
+    }
+
+    /**
+     * Convert URL to clickable link
+     * 
+     * @param text
+     *                 String input text
+     * @return String output HTML link for display
+     */
+    public static String convertLinks(String text)
+    {
+        String urlPattern = "(https?://\\S+)";
+        String[] parts = text.split(urlPattern, -1);
+        Matcher matcher = Pattern.compile(urlPattern).matcher(text);
+
+        StringBuilder result = new StringBuilder("<html>");
+        for (String part : parts)
+        {
+            // escape and add the non-URL text segment
+            result.append(HtmlEscapers.htmlEscaper().escape(part).replace("\n", "<br>"));
+            // if there's a matching URL for this gap, append it as a link
+            if (matcher.find())
+            {
+                String url = matcher.group();
+                result.append("<a href='").append(url).append("'>Click here").append("</a>");
+            }
+        }
+        result.append("</html>");
+        return result.toString();
     }
 }

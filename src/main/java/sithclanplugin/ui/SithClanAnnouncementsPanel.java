@@ -31,8 +31,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -47,7 +45,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 
-import com.google.common.html.HtmlEscapers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -190,7 +187,7 @@ public class SithClanAnnouncementsPanel extends JPanel
                 {
                     JEditorPane editorPane = new JEditorPane();
                     editorPane.setContentType("text/html");
-                    editorPane.setText(convertLinks(announcementsList.get(i).getAnnouncementText()));
+                    editorPane.setText(SithClanUtil.convertLinks(announcementsList.get(i).getAnnouncementText()));
                     editorPane.setEditable(false);
                     editorPane.setOpaque(false);
                     editorPane.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
@@ -247,34 +244,5 @@ public class SithClanAnnouncementsPanel extends JPanel
             default:
                 break;
         }
-    }
-
-    /**
-     * Convert URL to clickable link
-     * 
-     * @param text
-     *                 String input text
-     * @return String output HTML link for display
-     */
-    private String convertLinks(String text)
-    {
-        String urlPattern = "(https?://\\S+)";
-        String[] parts = text.split(urlPattern, -1);
-        Matcher matcher = Pattern.compile(urlPattern).matcher(text);
-
-        StringBuilder result = new StringBuilder("<html>");
-        for (String part : parts)
-        {
-            // escape and add the non-URL text segment
-            result.append(HtmlEscapers.htmlEscaper().escape(part).replace("\n", "<br>"));
-            // if there's a matching URL for this gap, append it as a link
-            if (matcher.find())
-            {
-                String url = matcher.group();
-                result.append("<a href='").append(url).append("'>Click here").append("</a>");
-            }
-        }
-        result.append("</html>");
-        return result.toString();
     }
 }
