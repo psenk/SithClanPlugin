@@ -715,7 +715,7 @@ public class SithClanMembersPanel extends JPanel
             String aboutMe = aboutMeCache.get(nameForFetch.toLowerCase());
             if (aboutMe != null && !aboutMe.isBlank())
             {
-                aboutMeText.setText(aboutMe);
+                aboutMeText.setText(SithClanUtil.convertLinks(aboutMe));
             }
         }
 
