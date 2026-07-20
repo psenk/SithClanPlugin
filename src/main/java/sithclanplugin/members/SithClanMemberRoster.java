@@ -317,7 +317,8 @@ public class SithClanMemberRoster
             try
             {
                 // calc date
-                LocalDate joinDate = LocalDate.parse(member.getMemberDateJoined(), SithClanConstants.DATE_FORMATTER);
+                LocalDate joinDate = LocalDate.parse(member.getMemberDateJoined(),
+                        SithClanConstants.SHORT_DATE_FORMATTER);
                 int yearsSinceJoined = Period.between(joinDate, today).getYears();
 
                 // if joined date is today
