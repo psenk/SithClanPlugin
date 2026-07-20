@@ -109,6 +109,7 @@ public class SithClanSenatePanel extends JPanel
         statusLabel = SithClanUtil.createStatusLabel();
         statusPanel = SithClanUtil.createStatusPanel(statusLabel);
         this.add(statusPanel);
+        this.add(Box.createRigidArea(new Dimension(0, 10)));
 
         // post event schedule functionality
         senatePostScheduleTextArea = new JTextArea();
