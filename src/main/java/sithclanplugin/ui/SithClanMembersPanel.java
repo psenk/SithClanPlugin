@@ -55,6 +55,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -124,7 +125,7 @@ public class SithClanMembersPanel extends JPanel
     private static final String MEMBERS_REFRESH_ROSTER_BUTTON = "Refresh Roster";
     private static final String ABOUT_ME_BUTTON = "Edit My About Me";
     private static final String MEMBERS_AREA_LABEL = "Member(s)";
-    private static final String RATE_LIMITED_WARNING = "The roster has been retrieved too recently. Try again in a few minutes.";
+    private static final String RATE_LIMITED_WARNING = "Try again in a few minutes.";
     private static final String ROSTER_UNOBTAINABLE_WARNING = "Unable to obtain roster.";
     private static final String BLANK_SEARCH_VALUE = "Please input a value to search.";
     private static final String MEMBER_DOES_NOT_EXIST = "Member does not exist!";
@@ -695,9 +696,8 @@ public class SithClanMembersPanel extends JPanel
         aboutMePanel.setOpaque(false);
         aboutMePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JTextArea aboutMeText = new JTextArea();
-        aboutMeText.setLineWrap(true);
-        aboutMeText.setWrapStyleWord(true);
+        JTextPane aboutMeText = new JTextPane();
+        aboutMeText.setContentType("text/html");
         aboutMeText.setEditable(false);
         aboutMeText.setFocusable(false);
         aboutMeText.setOpaque(false);
