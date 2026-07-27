@@ -66,7 +66,6 @@ import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
 import sithclanplugin.SithClanConfig;
-import sithclanplugin.SithClanPlugin;
 import sithclanplugin.eventschedule.SithClanDaySchedule;
 import sithclanplugin.eventschedule.SithClanEvent;
 import sithclanplugin.eventschedule.SithClanEventSchedule;
@@ -84,9 +83,6 @@ public class SithClanSchedulePanel extends JPanel
 
     @Inject
     private ScheduledExecutorService executor;
-
-    @Inject
-    private SithClanPlugin plugin;
 
     @Inject
     private SithClanConfig config;
@@ -629,8 +625,7 @@ public class SithClanSchedulePanel extends JPanel
         }
 
         // event location
-        // create location world hop link
-        JLabel eventLocation = createWorldLink(event.getEventLocation());
+        JLabel eventLocation = new JLabel(event.getEventLocation());
         eventLocation.setAlignmentX(Component.LEFT_ALIGNMENT);
         singleEvent.add(eventLocation);
 
@@ -691,46 +686,6 @@ public class SithClanSchedulePanel extends JPanel
             return channelLink;
         }
         return new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, HtmlEscapers.htmlEscaper().escape(text)));
-    }
-
-    /**
-     * Turn world location into quick world hop link
-     * 
-     * @param location
-     *                     String event location
-     * @return JLabel world quick hop link
-     */
-    private JLabel createWorldLink(String location)
-    {
-        // search for runescape world in text
-        Matcher matcher = Pattern.compile("W(\\d{3}$)").matcher(location);
-        if (!matcher.find())
-        {
-            return new JLabel(location);
-        }
-        String worldId = matcher.group(1);
-        // create link
-        String escaped = HtmlEscapers.htmlEscaper().escape(location);
-        String withLink = escaped.replaceAll("W\\d{3}$", "<a href=''>W" + worldId + "</a>");
-        JLabel worldLink = new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, withLink));
-        worldLink
-                .setMaximumSize(
-                        new Dimension(worldLink.getPreferredSize().width - 100, worldLink.getPreferredSize().height));
-        worldLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        worldLink.addMouseListener(new MouseAdapter()
-        {
-            public void mouseClicked(MouseEvent e)
-            {
-                try
-                {
-                    plugin.hopTo(Integer.parseInt(worldId));
-                } catch (Exception ex)
-                {
-                    log.error("Exception while creating world link: {}", ex.getMessage(), ex);
-                }
-            }
-        });
-        return worldLink;
     }
 
     /**

@@ -21,7 +21,7 @@ View clan announcements. Panel is collapsible by clicking on the Clan Announceme
 
 ### Event Schedule
 
-View the weekly event schedule and event information. The daily event lists can expand or collapse by clicking on the date label.  Click on world links to quick hop. The checkboxes enable or disable an in-game notification before the event starts, configurable in the plugin settings.
+View the weekly event schedule and event information. The daily event lists can expand or collapse by clicking on the date label. The checkboxes enable or disable an in-game notification before the event starts, configurable in the plugin settings.
 
 ![Event Schedule](./assets/event_schedule.png "Event Schedule")
 
@@ -96,7 +96,6 @@ This project is licensed under the BSD 2-Clause License -- see the LICENSE file 
 Portions of this plugin were inspired by or derived from:
 
 - [Clan Event Attendance](https://github.com/JoRouss/runelite-ClanEventAttendance) - Licensed under BSD 2-Clause License
-- [World Hopper](https://github.com/runelite/runelite/tree/master/runelite-client/src/main/java/net/runelite/client/plugins/worldhopper) - Licensed under BSD 2-Clause License
 - [Hiscore Plugin](https://github.com/runelite/runelite/tree/master/runelite-client/src/main/java/net/runelite/client/plugins/hiscore) - Licensed under BSD 2-Clause License
 
 See the LICENSES directory for third-party details.

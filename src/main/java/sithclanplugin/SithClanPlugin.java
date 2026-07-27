@@ -59,7 +59,6 @@ import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.game.WorldService;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -67,9 +66,6 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.Text;
-import net.runelite.client.util.WorldUtil;
-import net.runelite.http.api.worlds.World;
-import net.runelite.http.api.worlds.WorldResult;
 import okhttp3.OkHttpClient;
 import sithclanplugin.announcements.SithClanAnnouncements;
 import sithclanplugin.dto.StartupResponse;
@@ -100,9 +96,6 @@ public class SithClanPlugin extends Plugin
 
 	@Inject
 	private MenuManager menuManager;
-
-	@Inject
-	private WorldService worldService;
 
 	@Inject
 	private ChatMessageManager chatMessageManager;
@@ -142,14 +135,10 @@ public class SithClanPlugin extends Plugin
 
 	private NavigationButton uiNavigationButton;
 	private boolean pendingClanCheck = false;
-	private net.runelite.api.World quickHopTargetWorld;
-	private int displaySwitcherAttempts = 0;
 
 	private static final String PLUGIN_ICON_PATH = "/icon.png";
 	private static final String PLUGIN_TOOLTIP = "Sith Clan Plugin";
 	private static final String SITH_LOOKUP = "Sith Lookup";
-	private static final String QUICK_HOP_MESSAGE = "Quick hopping to World "; // trailing space intentional
-	private static final int DISPLAY_SWITCHER_MAX_ATTEMPTS = 3;
 
 	/**
 	 * RUNELITE FUNCTIONS
@@ -311,27 +300,6 @@ public class SithClanPlugin extends Plugin
 				SwingUtilities.invokeLater(() -> uiPanel.get().getMembersPanel().refreshAboutMeButton());
 			});
 		}
-
-		// world hopping
-		if (quickHopTargetWorld == null)
-		{
-			return;
-		}
-		// open worlds list
-		if (client.getWidget(InterfaceID.Worldswitcher.BUTTONS) == null)
-		{
-			client.openWorldHopper();
-			if (++displaySwitcherAttempts >= DISPLAY_SWITCHER_MAX_ATTEMPTS)
-			{
-				quickHopTargetWorld = null;
-				displaySwitcherAttempts = 0;
-			}
-		} else
-		{
-			client.hopToWorld(quickHopTargetWorld);
-			quickHopTargetWorld = null;
-			displaySwitcherAttempts = 0;
-		}
 	}
 
 	/**
@@ -463,82 +431,6 @@ public class SithClanPlugin extends Plugin
 	/**
 	 * CUSTOM FUNCTIONS
 	 */
-
-	/**
-	 * Transfer from EDT to client thread
-	 * 
-	 * @param worldId
-	 *                    int id of target hop world
-	 */
-	public void hopTo(int worldId)
-	{
-		clientThread.invoke(() -> hop(worldId));
-	}
-
-	/**
-	 * Find World pass forward to hop
-	 * 
-	 * @param worldId
-	 *                    int id of target hop world
-	 */
-	private void hop(int worldId)
-	{
-		WorldResult worldResult = worldService.getWorlds();
-		if (worldResult == null)
-		{
-			return;
-		}
-		World world = worldResult.findWorld(worldId);
-		if (world == null)
-		{
-			return;
-		}
-		hop(world);
-	}
-
-	/**
-	 * Hop to provided world on next gametick
-	 * 
-	 * @param world
-	 *                  World target hop world
-	 */
-	private void hop(World world)
-	{
-		assert client.isClientThread(); // must be run on client thread
-
-		// create world object
-		final net.runelite.api.World rsWorld = client.createWorld();
-		rsWorld.setActivity(world.getActivity());
-		rsWorld.setAddress(world.getAddress());
-		rsWorld.setId(world.getId());
-		rsWorld.setPlayerCount(world.getPlayers());
-		rsWorld.setLocation(world.getLocation());
-		rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
-
-		// if logged out just swap worlds
-		if (client.getGameState() == GameState.LOGIN_SCREEN)
-		{
-			client.changeWorld(rsWorld);
-			return;
-		}
-
-		// quick hop chat message
-		String chatMessage = new ChatMessageBuilder()
-				.append(ChatColorType.NORMAL)
-				.append(QUICK_HOP_MESSAGE)
-				.append(ChatColorType.HIGHLIGHT)
-				.append(Integer.toString(world.getId()))
-				.append("..")
-				.build();
-
-		// posting
-		chatMessageManager.queue(QueuedMessage.builder()
-				.type(ChatMessageType.CONSOLE)
-				.runeLiteFormattedMessage(chatMessage)
-				.build());
-		quickHopTargetWorld = rsWorld;
-		displaySwitcherAttempts = 0;
-	}
 
 	/**
 	 * Check if player in clan
