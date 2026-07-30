@@ -26,6 +26,7 @@
 package sithclanplugin;
 
 import java.awt.image.BufferedImage;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -135,6 +136,7 @@ public class SithClanPlugin extends Plugin
 
 	private NavigationButton uiNavigationButton;
 	private boolean pendingClanCheck = false;
+	private LocalDate lastAnniversaryCheckDate = null;
 
 	private static final String PLUGIN_ICON_PATH = "/icon.png";
 	private static final String PLUGIN_TOOLTIP = "Sith Clan Plugin";
@@ -283,11 +285,15 @@ public class SithClanPlugin extends Plugin
 				if (isInClan)
 				{
 					SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
-					executor.submit(this::checkAnniversaries);
 				} else
 				{
 					SwingUtilities.invokeLater(() -> uiPanel.get().userNotInClan());
 				}
+			}
+
+			if (isInClan())
+			{
+				executor.submit(this::checkAnniversaries);
 			}
 		}
 
@@ -455,6 +461,13 @@ public class SithClanPlugin extends Plugin
 	 */
 	private void checkAnniversaries()
 	{
+		LocalDate today = LocalDate.now();
+		if (today.equals(lastAnniversaryCheckDate))
+		{
+			return;
+		}
+		lastAnniversaryCheckDate = today;
+
 		memberRoster.parseRosterFromGet();
 
 		LinkedHashMap<SithClanMember, Integer> anniversaryMembers = memberRoster.getMembersWithAnniversary();
