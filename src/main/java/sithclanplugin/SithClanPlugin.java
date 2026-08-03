@@ -136,6 +136,7 @@ public class SithClanPlugin extends Plugin
 
 	private NavigationButton uiNavigationButton;
 	private boolean pendingClanCheck = false;
+	private boolean initialLoginHandled = false;
 	private LocalDate lastAnniversaryCheckDate = null;
 
 	private static final String PLUGIN_ICON_PATH = "/icon.png";
@@ -210,6 +211,7 @@ public class SithClanPlugin extends Plugin
 				{
 					if (client.getClanSettings() != null)
 					{
+						initialLoginHandled = true;
 						boolean isInClan = isInClan();
 						SwingUtilities.invokeLater(() ->
 						{
@@ -221,6 +223,10 @@ public class SithClanPlugin extends Plugin
 								uiPanel.get().userNotInClan();
 							}
 						});
+						if (isInClan)
+						{
+							executor.submit(this::checkAnniversaries);
+						}
 					} else
 					{
 						pendingClanCheck = true;
@@ -254,7 +260,7 @@ public class SithClanPlugin extends Plugin
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event)
 	{
-		if (event.getGameState() == GameState.LOGGED_IN)
+		if (event.getGameState() == GameState.LOGGED_IN && !initialLoginHandled)
 		{
 			pendingClanCheck = true;
 		}
@@ -280,20 +286,17 @@ public class SithClanPlugin extends Plugin
 			if (client.getClanSettings() != null)
 			{
 				pendingClanCheck = false;
+				initialLoginHandled = true;
 				boolean isInClan = isInClan();
 
 				if (isInClan)
 				{
 					SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
+					executor.submit(this::checkAnniversaries);
 				} else
 				{
 					SwingUtilities.invokeLater(() -> uiPanel.get().userNotInClan());
 				}
-			}
-
-			if (isInClan())
-			{
-				executor.submit(this::checkAnniversaries);
 			}
 		}
 
