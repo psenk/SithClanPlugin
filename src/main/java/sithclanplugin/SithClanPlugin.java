@@ -289,10 +289,13 @@ public class SithClanPlugin extends Plugin
 				initialLoginHandled = true;
 				boolean isInClan = isInClan();
 
-				if (isInClan && config.loginAnniversaryMessages())
+				if (isInClan)
 				{
 					SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
-					executor.submit(this::checkAnniversaries);
+					if (config.loginAnniversaryMessages())
+					{
+						executor.submit(this::checkAnniversaries);
+					}
 				} else
 				{
 					SwingUtilities.invokeLater(() -> uiPanel.get().userNotInClan());
