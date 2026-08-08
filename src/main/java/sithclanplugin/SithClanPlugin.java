@@ -223,7 +223,7 @@ public class SithClanPlugin extends Plugin
 								uiPanel.get().userNotInClan();
 							}
 						});
-						if (isInClan)
+						if (isInClan && config.loginAnniversaryMessages())
 						{
 							executor.submit(this::checkAnniversaries);
 						}
@@ -289,7 +289,7 @@ public class SithClanPlugin extends Plugin
 				initialLoginHandled = true;
 				boolean isInClan = isInClan();
 
-				if (isInClan)
+				if (isInClan && config.loginAnniversaryMessages())
 				{
 					SwingUtilities.invokeLater(() -> uiPanel.get().showMainPanel());
 					executor.submit(this::checkAnniversaries);
@@ -413,6 +413,15 @@ public class SithClanPlugin extends Plugin
 			}
 		}
 
+		// clan anniversaries chat notification
+		if (event.getKey().equals("loginAnniversaryMessages"))
+		{
+			if (config.loginAnniversaryMessages())
+			{
+				executor.submit(this::checkAnniversaries);
+			}
+		}
+
 		// senate options
 		if (event.getKey().equals("senateApiKey"))
 		{
@@ -465,7 +474,7 @@ public class SithClanPlugin extends Plugin
 	private void checkAnniversaries()
 	{
 		LocalDate today = LocalDate.now();
-		if (today.equals(lastAnniversaryCheckDate))
+		if (today.equals(lastAnniversaryCheckDate) || !config.loginAnniversaryMessages())
 		{
 			return;
 		}
