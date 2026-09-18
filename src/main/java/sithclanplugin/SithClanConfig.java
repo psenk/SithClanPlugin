@@ -72,6 +72,12 @@ public interface SithClanConfig extends Config
 		return false;
 	}
 
+	@ConfigItem(keyName = "loginAnniversaryMessages", name = "Anniversary Notifications", description = "Shows clan member annual anniversary messages in chat on login.", section = "miscSection", position = 1)
+	default boolean loginAnniversaryMessages()
+	{
+		return true;
+	}
+
 	@ConfigItem(keyName = "senateApiKey", name = "Senate API Key", description = "API Key for access to Senate member plugin options", section = "miscSection", position = 999)
 	default String senateApiKey()
 	{
