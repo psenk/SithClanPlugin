@@ -53,6 +53,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 
@@ -142,6 +143,7 @@ public class SithClanSchedulePanel extends JPanel
         scheduleExpiredLabel = new JLabel(SCHEDULE_EXPIRED_WARNING);
         scheduleExpiredLabel.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
         scheduleExpiredLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        scheduleExpiredLabel.setHorizontalAlignment(SwingConstants.CENTER);
         scheduleExpiredLabel.setVisible(false);
 
         // container for title and expiration warning
@@ -150,7 +152,7 @@ public class SithClanSchedulePanel extends JPanel
         topPanel.add(schedulePanelLabel);
         topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         topPanel.add(scheduleExpiredLabel);
-        topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
         this.add(topPanel);
 
         // next event area

@@ -49,16 +49,18 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.HyperlinkEvent;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -70,6 +72,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
+import net.runelite.client.util.LinkBrowser;
 import okhttp3.OkHttpClient;
 import sithclanplugin.members.SithClanMember;
 import sithclanplugin.members.SithClanMemberRoster;
@@ -143,11 +146,15 @@ public class SithClanMembersPanel extends JPanel
     private static final String MEMBER_JOINED = "<u>Joined</u>: "; // trailing space intentional
     private static final String MEMBER_TIME_IN_CLAN = "<u>Time in clan</u>: "; // trailing space intentional
     private static final String MEMBER_ALT = "<u>Alt</u>: "; // trailing space intentional
+    private static final String LINK_BLOCKED = "Link has been blocked.";
+    private static final String BROWSER_CONFIRMATION = "Open this link in your browser?\n\n";
+    private static final String BROWSER_POPUP_TITLE = "Open Link?";
     private static final String MEMBER_UNKNOWN = "Unknown";
     private static final String SENATE_MEMBER = "Senate Member";
     private static final int AVATAR_SIZE = 64;
     private static final int PAGE_SIZE = 6;
     private static final int ABOUT_ME_LENGTH = 200;
+    private static final int ABOUT_ME_WIDTH = PluginPanel.PANEL_WIDTH - 35;
     private static final int SCROLL_PANE_HEIGHT = 150;
     private static final int MEMBERS_AREA_SCROLL_PANE_HEIGHT = 600;
     private static final int LABEL_WRAP_WIDTH = PluginPanel.PANEL_WIDTH - AVATAR_SIZE - 50;
@@ -696,7 +703,7 @@ public class SithClanMembersPanel extends JPanel
         aboutMePanel.setOpaque(false);
         aboutMePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JTextPane aboutMeText = new JTextPane();
+        JEditorPane aboutMeText = new JEditorPane();
         aboutMeText.setContentType("text/html");
         aboutMeText.setEditable(false);
         aboutMeText.setFocusable(false);
@@ -704,7 +711,7 @@ public class SithClanMembersPanel extends JPanel
         aboutMeText.setFont(getFont().deriveFont(Font.ITALIC));
         aboutMeText.setAlignmentX(Component.LEFT_ALIGNMENT);
         aboutMeText.setBorder(BorderFactory.createEmptyBorder(0, 4, 2, 4));
-        aboutMeText.setSize(PluginPanel.PANEL_WIDTH, Short.MAX_VALUE);
+        aboutMeText.setSize(ABOUT_ME_LENGTH, Short.MAX_VALUE);
 
         aboutMePanel.add(aboutMeText, BorderLayout.CENTER);
 
@@ -718,6 +725,29 @@ public class SithClanMembersPanel extends JPanel
                 aboutMeText.setText(SithClanUtil.convertLinks(aboutMe));
             }
         }
+
+        // open links
+        aboutMeText.addHyperlinkListener(e ->
+        {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+            {
+                String uri = e.getURL().toString();
+
+                if (uri == null)
+                {
+                    showErrorMessage(LINK_BLOCKED);
+                    return;
+                }
+
+                int choice = JOptionPane.showConfirmDialog(SwingUtilities.getWindowAncestor(this),
+                        BROWSER_CONFIRMATION + uri, BROWSER_POPUP_TITLE, JOptionPane.YES_NO_OPTION);
+
+                if (choice == JOptionPane.YES_OPTION)
+                {
+                    LinkBrowser.browse(uri);
+                }
+            }
+        });
 
         memberInfo.add(rightPanel);
         memberCard.add(memberInfo);
