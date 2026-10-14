@@ -456,7 +456,8 @@ public class SithClanUtil
             if (matcher.find())
             {
                 String url = matcher.group();
-                result.append("<a href='").append(url).append("'>Click here").append("</a>");
+                result.append("<a href='").append(HtmlEscapers.htmlEscaper().escape(url)).append("'>Click here")
+                        .append("</a>");
             }
         }
         result.append("</html>");

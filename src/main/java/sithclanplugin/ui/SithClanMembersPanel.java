@@ -30,6 +30,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -642,11 +643,10 @@ public class SithClanMembersPanel extends JPanel
                 .add(new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH,
                         MEMBER_RANK + SithClanConstants.CLAN_RANKS[memberRankInt - 1])));
 
-        rightPanel.add(new JLabel("<html>" + memberCreditsInt + MEMBER_CREDITS + "</html>"));
+        rightPanel.add(new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, memberCreditsInt + MEMBER_CREDITS)));
 
-        JLabel memberPromoted = new JLabel("<html>" + MEMBER_PROMOTED
-                + (memberLastPromotionDate == null ? MEMBER_UNKNOWN : memberLastPromotionDate) + "</html>");
-        rightPanel.add(memberPromoted);
+        rightPanel.add(new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH,
+                MEMBER_PROMOTED + (memberLastPromotionDate == null ? MEMBER_UNKNOWN : memberLastPromotionDate))));
 
         // until next promotion
         // sith marauder and below
@@ -655,16 +655,17 @@ public class SithClanMembersPanel extends JPanel
             int creditsNeeded = SithClanConstants.CREDITS_TO_PROMOTE[memberRankInt] - memberCreditsInt;
             if (creditsNeeded > 0)
             {
-                rightPanel.add(new JLabel("<html>" + MEMBER_TO_PROMOTE + creditsNeeded + " credits</html>"));
+                rightPanel.add(new JLabel(
+                        SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, MEMBER_TO_PROMOTE + creditsNeeded + " credits")));
             } else
             {
-                // between death trooper and sith marauder
                 if (memberRankInt >= 5 && memberRankInt <= 10)
                 {
-                    JLabel daysUntilPromotion = null;
+                    JLabel daysUntilPromotion;
                     if (memberLastPromotionDate == null)
                     {
-                        daysUntilPromotion = new JLabel("<html>" + MEMBER_TO_PROMOTE + MEMBER_UNKNOWN + "</html>");
+                        daysUntilPromotion = new JLabel(
+                                SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, MEMBER_TO_PROMOTE + MEMBER_UNKNOWN));
                     } else
                     {
                         long daysInRank = ChronoUnit.DAYS.between(
@@ -673,22 +674,25 @@ public class SithClanMembersPanel extends JPanel
                         long daysNeeded = SithClanConstants.DAYS_TO_PROMOTE[memberRankInt - 1] - daysInRank;
                         if (daysNeeded <= 0)
                         {
-                            daysUntilPromotion = new JLabel(
-                                    "<html>" + MEMBER_TO_PROMOTE + MEMBER_NONE_NEEDED + "</html>");
+                            daysUntilPromotion = new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH,
+                                    MEMBER_TO_PROMOTE + MEMBER_NONE_NEEDED));
                         } else
                         {
-                            daysUntilPromotion = new JLabel("<html>" + MEMBER_TO_PROMOTE + daysNeeded + " days</html>");
+                            daysUntilPromotion = new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH,
+                                    MEMBER_TO_PROMOTE + daysNeeded + " days"));
                         }
                     }
                     rightPanel.add(daysUntilPromotion);
                 } else
                 {
-                    rightPanel.add(new JLabel("<html>" + MEMBER_TO_PROMOTE + MEMBER_NONE_NEEDED + "</html>"));
+                    rightPanel.add(new JLabel(
+                            SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, MEMBER_TO_PROMOTE + MEMBER_NONE_NEEDED)));
                 }
             }
         }
 
-        rightPanel.add(new JLabel("<html>" + MEMBER_JOINED + member.getMemberDateJoined() + "</html>"));
+        rightPanel.add(new JLabel(
+                SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, MEMBER_JOINED + member.getMemberDateJoined())));
 
         rightPanel.add(new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH,
                 MEMBER_TIME_IN_CLAN + calculateTimeInClan(member.getMemberDateJoined()))));
@@ -696,12 +700,12 @@ public class SithClanMembersPanel extends JPanel
         String altName = member.getMemberAltName();
         if (altName != null && !altName.isBlank())
         {
-            rightPanel.add(new JLabel("<html>" + MEMBER_ALT + altName + "</html>"));
+            rightPanel.add(new JLabel(SithClanUtil.wrapLabelWidth(LABEL_WRAP_WIDTH, MEMBER_ALT + altName)));
         }
 
-        JPanel aboutMePanel = new JPanel(new BorderLayout());
-        aboutMePanel.setOpaque(false);
-        aboutMePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel memberAboutMePanel = new JPanel(new BorderLayout());
+        memberAboutMePanel.setOpaque(false);
+        memberAboutMePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JEditorPane aboutMeText = new JEditorPane();
         aboutMeText.setContentType("text/html");
@@ -711,9 +715,9 @@ public class SithClanMembersPanel extends JPanel
         aboutMeText.setFont(getFont().deriveFont(Font.ITALIC));
         aboutMeText.setAlignmentX(Component.LEFT_ALIGNMENT);
         aboutMeText.setBorder(BorderFactory.createEmptyBorder(0, 4, 2, 4));
-        aboutMeText.setSize(ABOUT_ME_LENGTH, Short.MAX_VALUE);
+        aboutMeText.setSize(ABOUT_ME_WIDTH, Short.MAX_VALUE);
 
-        aboutMePanel.add(aboutMeText, BorderLayout.CENTER);
+        memberAboutMePanel.add(aboutMeText, BorderLayout.CENTER);
 
         // get current about me
         final String nameForFetch = member.getMemberName();
@@ -729,32 +733,33 @@ public class SithClanMembersPanel extends JPanel
         // open links
         aboutMeText.addHyperlinkListener(e ->
         {
-            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+            if (e.getEventType() != HyperlinkEvent.EventType.ACTIVATED)
             {
-                String uri = e.getURL().toString();
+                return;
+            }
 
-                if (uri == null)
-                {
-                    showErrorMessage(LINK_BLOCKED);
-                    return;
-                }
+            URL url = e.getURL();
+            if (url == null || !url.getProtocol().startsWith("http"))
+            {
+                showErrorMessage(LINK_BLOCKED);
+                return;
+            }
 
-                int choice = JOptionPane.showConfirmDialog(SwingUtilities.getWindowAncestor(this),
-                        BROWSER_CONFIRMATION + uri, BROWSER_POPUP_TITLE, JOptionPane.YES_NO_OPTION);
+            String uri = url.toString();
+            int choice = JOptionPane.showConfirmDialog(SwingUtilities.getWindowAncestor(this),
+                    BROWSER_CONFIRMATION + uri, BROWSER_POPUP_TITLE, JOptionPane.YES_NO_OPTION);
 
-                if (choice == JOptionPane.YES_OPTION)
-                {
-                    LinkBrowser.browse(uri);
-                }
+            if (choice == JOptionPane.YES_OPTION)
+            {
+                LinkBrowser.browse(uri);
             }
         });
 
         memberInfo.add(rightPanel);
         memberCard.add(memberInfo);
         memberCard.add(Box.createRigidArea(new Dimension(0, 5)));
-        memberCard.add(aboutMePanel);
-        memberCard
-                .setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, memberCard.getPreferredSize().height));
+        memberCard.add(memberAboutMePanel);
+        memberCard.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, memberCard.getPreferredSize().height));
 
         return memberCard;
     }
